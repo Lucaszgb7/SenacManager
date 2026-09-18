@@ -1,0 +1,55 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+:root {
+  --color-primary: #E30613;
+  --color-primary-dark: #B8050F;
+  --color-secondary: #1A1A1A;
+
+  --color-bg: #F5F6FA;
+  --color-white: #FFFFFF;
+
+  --color-text: #1F2937;
+  --color-text-light: #6B7280;
+  --color-border: #E5E7EB;
+
+  --color-error: #DC2626;
+  --color-error-bg: #FEF2F2;
+
+  --color-success: #16A34A;
+
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.06);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
+  --shadow-lg: 0 10px 30px rgba(0, 0, 0, 0.1);
+
+  --font-family: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+body {
+  font-family: var(--font-family);
+  color: var(--color-text);
+  background-color: var(--color-bg);
+  line-height: 1.5;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+  border: none;
+}
+
+input {
+  font-family: inherit;
+}
