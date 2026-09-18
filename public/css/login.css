@@ -1,0 +1,160 @@
+/* ============================================================
+   login.css
+   Estilos específicos da tela de login.
+   Classes genéricas (.btn, .card, .input-group, etc.)
+   estão em components.css.
+   ============================================================ */
+
+/* ---------- Layout da página ---------- */
+.login-page {
+  min-height: 100vh;
+  background-color: var(--color-bg, #f5f7fa);
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+/* Centraliza o card vertical e horizontalmente */
+.login-container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+/* ---------- Card de login ---------- */
+.login-card {
+  width: 100%;
+  max-width: 420px;
+  padding: 40px 36px 32px;
+}
+
+/* ---------- Identidade / marca ---------- */
+.login-brand {
+  text-align: center;
+  margin-bottom: 28px;
+}
+
+.login-brand__name {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--color-primary);
+  letter-spacing: -0.02em;
+  margin: 0 0 8px;
+}
+
+.login-brand__tagline {
+  font-size: 0.9rem;
+  color: var(--color-text-muted, #6b7280);
+  line-height: 1.4;
+  margin: 0;
+}
+
+/* ---------- Alerta de erro vindo do backend ---------- */
+.login-alert {
+  background-color: rgba(220, 38, 38, 0.08);
+  color: var(--color-error, #dc2626);
+  border: 1px solid rgba(220, 38, 38, 0.25);
+  border-radius: var(--radius-md);
+  padding: 12px 14px;
+  font-size: 0.875rem;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+/* ---------- Formulário ---------- */
+.login-form {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Linha com "lembrar-me" e "esqueci a senha" */
+.login-form__row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+}
+
+/* Botão submit ocupa largura total do card */
+.login-form__submit {
+  width: 100%;
+  padding: 14px 20px;
+  font-size: 1rem;
+}
+
+/* ---------- Campo de senha com botão de toggle ---------- */
+.password-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.password-wrapper input {
+  padding-right: 44px; /* espaço para o botão do olho */
+}
+
+.password-toggle {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  background: transparent;
+  border: none;
+  border-radius: var(--radius-sm, 6px);
+  color: var(--color-text-muted, #6b7280);
+  cursor: pointer;
+  transition: color 0.2s ease, background-color 0.2s ease;
+}
+
+.password-toggle:hover {
+  color: var(--color-primary);
+  background-color: rgba(0, 0, 0, 0.04);
+}
+
+.password-toggle:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+/* ---------- Rodapé do card ---------- */
+.login-footer {
+  margin-top: 28px;
+  padding-top: 20px;
+  border-top: 1px solid var(--color-border, #e5e7eb);
+  text-align: center;
+}
+
+.login-footer p {
+  font-size: 0.875rem;
+  color: var(--color-text-muted, #6b7280);
+  margin: 0;
+}
+
+/* ---------- Responsivo ---------- */
+@media (max-width: 480px) {
+  .login-container {
+    padding: 16px;
+  }
+
+  .login-card {
+    max-width: 90%;
+    padding: 28px 20px 24px;
+  }
+
+  .login-brand__name {
+    font-size: 1.5rem;
+  }
+
+  .login-form__row {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
