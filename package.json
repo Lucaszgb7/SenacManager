@@ -1,4 +1,11 @@
 {
+  "name": "senac-manager",
+  "version": "1.0.0",
+  "scripts": {
+    "dev": "ts-node-dev --respawn src/server.ts",
+    "build": "tsc",
+    "start": "node dist/server.js"
+  },
   "dependencies": {
     "ejs": "^6.0.1",
     "express": "^5.2.1"
@@ -7,7 +14,6 @@
     "@types/express": "^5.0.6",
     "@types/node": "^26.6.1",
     "ts-node-dev": "^2.0.0",
-    "typescript": "^7.0.2"
-    
+    "typescript": "^5.9.3"
   }
 }
