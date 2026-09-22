@@ -3,9 +3,6 @@
    Requer: global.css e components.css carregados antes.
    ========================================================= */
 
-/* ---------------------------------------------------------
-   Variáveis locais de layout (com fallback)
-   --------------------------------------------------------- */
 :root {
   --layout-header-h: 64px;
   --layout-sidebar-w: 240px;
@@ -14,9 +11,6 @@
   --layout-gap: 24px;
 }
 
-/* ---------------------------------------------------------
-   Estrutura geral (body com header + sidebar fixos)
-   --------------------------------------------------------- */
 body {
   background: var(--color-bg, #f5f7fa);
   font-family: var(--font-family, system-ui, sans-serif);
@@ -57,7 +51,6 @@ body {
   font-weight: 500;
 }
 
-/* Hambúrguer (mobile) */
 .hamburger-btn {
   display: none;
   flex-direction: column;
@@ -90,9 +83,6 @@ body {
   transform: translateY(-6px) rotate(-45deg);
 }
 
-/* ---------------------------------------------------------
-   Avatar / dropdown do header
-   --------------------------------------------------------- */
 .avatar-menu {
   position: relative;
 }
@@ -139,6 +129,11 @@ body {
   height: 32px;
   font-size: 0.75rem;
 }
+.avatar--lg {
+  width: 84px;
+  height: 84px;
+  font-size: 1.6rem;
+}
 
 .avatar-menu__dropdown {
   position: absolute;
@@ -179,9 +174,6 @@ body {
   background: rgba(185, 28, 28, 0.08);
 }
 
-/* ---------------------------------------------------------
-   Sidebar
-   --------------------------------------------------------- */
 .app-sidebar {
   position: fixed;
   top: var(--layout-header-h);
@@ -237,7 +229,6 @@ body {
   color: var(--color-primary, #0b5ed7);
 }
 
-/* Backdrop (mobile) */
 .app-sidebar__backdrop {
   position: fixed;
   inset: var(--layout-header-h) 0 0 0;
@@ -250,9 +241,6 @@ body {
   to   { opacity: 1; }
 }
 
-/* ---------------------------------------------------------
-   Conteúdo principal
-   --------------------------------------------------------- */
 .app-main {
   margin-left: var(--layout-sidebar-w);
   padding: calc(var(--layout-header-h) + var(--layout-gap)) var(--layout-gap) var(--layout-gap);
@@ -276,7 +264,6 @@ body {
   margin: 0 0 24px;
 }
 
-/* Grid de cards responsivo */
 .card-grid {
   display: grid;
   grid-template-columns: 1fr;
@@ -289,9 +276,6 @@ body {
   .card-grid--3 { grid-template-columns: repeat(3, 1fr); }
 }
 
-/* ---------------------------------------------------------
-   Rodapé
-   --------------------------------------------------------- */
 .app-footer {
   margin-left: var(--layout-sidebar-w);
   padding: 20px;
@@ -300,9 +284,6 @@ body {
   color: var(--color-muted, #9ca3af);
 }
 
-/* ---------------------------------------------------------
-   Responsivo — mobile (< 900px)
-   --------------------------------------------------------- */
 @media (max-width: 900px) {
   .hamburger-btn { display: flex; }
   .avatar-menu__name { display: none; }

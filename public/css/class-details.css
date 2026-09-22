@@ -1,0 +1,209 @@
+/* =========================================================
+   Detalhes da Aula
+   ========================================================= */
+
+/* Link "Voltar" ------------------------------------------ */
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  text-decoration: none;
+  margin-bottom: 16px;
+  transition: color 0.15s ease;
+}
+
+.back-link:hover {
+  color: var(--color-primary);
+}
+
+.back-link-icon {
+  font-size: 1rem;
+  line-height: 1;
+}
+
+/* Card principal (hero) ---------------------------------- */
+.class-hero {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 24px;
+  margin-bottom: 20px;
+}
+
+.class-hero-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.class-hero-title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.class-title {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--color-text);
+  margin: 0;
+  line-height: 1.2;
+}
+
+/* Grid de informações ------------------------------------ */
+.class-hero-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px 24px;
+  padding-top: 20px;
+  border-top: 1px solid var(--color-border);
+}
+
+.class-info-item {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.class-info-label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--color-text-muted);
+}
+
+.class-info-value {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: 0.9375rem;
+  color: var(--color-text);
+}
+
+.class-info-value strong {
+  font-weight: 700;
+}
+
+.class-info-sub {
+  font-size: 0.8125rem;
+  color: var(--color-text-muted);
+}
+
+/* Professor com avatar de iniciais ----------------------- */
+.class-professor {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.avatar-initials {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--color-primary);
+  color: #fff;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  flex-shrink: 0;
+}
+
+.class-professor-name {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+/* Ações do hero ------------------------------------------ */
+.class-hero-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  padding-top: 20px;
+  border-top: 1px solid var(--color-border);
+}
+
+/* Seção "Sobre a aula" ----------------------------------- */
+.class-about {
+  padding: 24px;
+}
+
+.class-section-title {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: var(--color-text);
+  margin: 0 0 12px;
+}
+
+.class-about-text {
+  font-size: 0.9375rem;
+  line-height: 1.6;
+  color: var(--color-text);
+  margin: 0;
+  white-space: pre-line;
+}
+
+/* Badge NOA ---------------------------------------------- */
+.badge-noa {
+  background: #fff4e5;
+  color: #a15c00;
+  display: inline-block;
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 999px;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+}
+
+/* Botão "perigo" (outline) ------------------------------- */
+.btn-danger-outline {
+  background: transparent;
+  border: 1px solid #b3261e;
+  color: #b3261e;
+  padding: 8px 14px;
+  font-size: 0.875rem;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  font-family: var(--font-family);
+  font-weight: 600;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.btn-danger-outline:hover {
+  background: #b3261e;
+  color: #fff;
+}
+
+/* Responsivo --------------------------------------------- */
+@media (max-width: 640px) {
+  .class-hero-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .class-title {
+    font-size: 1.375rem;
+  }
+
+  .class-hero-actions {
+    flex-direction: column;
+  }
+
+  .class-hero-actions .btn,
+  .class-hero-actions .btn-danger-outline {
+    width: 100%;
+    text-align: center;
+    justify-content: center;
+  }
+}

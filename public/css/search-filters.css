@@ -1,0 +1,199 @@
+.search-page {
+    padding: 32px;
+    background-color: var(--color-bg);
+    min-height: 100vh;
+  }
+  
+  .search-header {
+    margin-bottom: 24px;
+  }
+  
+  .search-header h1 {
+    margin: 0 0 6px;
+  }
+  
+  .search-header p {
+    margin: 0;
+    opacity: 0.7;
+  }
+  
+  
+  /* Barra de pesquisa */
+  
+  .search-box {
+    margin-bottom: 24px;
+  }
+  
+  .search-box input {
+    width: 100%;
+    font-size: 16px;
+  }
+  
+  
+  /* Painel de filtros */
+  
+  .filters-panel {
+    margin-bottom: 32px;
+  }
+  
+  .filters-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 20px;
+  }
+  
+  .filters-header h2 {
+    margin: 0;
+  }
+  
+  .filters-grid {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(150px, 1fr));
+    gap: 16px;
+  }
+  
+  .filters-grid select {
+    width: 100%;
+  }
+  
+  
+  /* Resultados */
+  
+  .results-section {
+    width: 100%;
+  }
+  
+  .results-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 18px;
+  }
+  
+  .results-header h2 {
+    margin: 0;
+  }
+  
+  .results-count {
+    font-size: 14px;
+    opacity: 0.7;
+  }
+  
+  
+  /* Lista de aulas */
+  
+  .search-results {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+  }
+  
+  
+  /* Card específico da aula */
+  
+  .class-card {
+    display: block;
+    text-decoration: none;
+    color: inherit;
+    cursor: pointer;
+    transition:
+      transform 0.2s ease,
+      box-shadow 0.2s ease;
+  }
+  
+  .class-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-sm);
+  }
+  
+  .class-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+  
+  .class-card-title {
+    margin: 0;
+    font-size: 18px;
+  }
+  
+  .class-card-info {
+    display: grid;
+    gap: 10px;
+  }
+  
+  .class-card-info p {
+    margin: 0;
+  }
+  
+  .class-card-info strong {
+    font-weight: 600;
+  }
+  
+  
+  /* Turno */
+  
+  .class-turno {
+    display: inline-flex;
+    align-items: center;
+    padding: 5px 10px;
+    border-radius: var(--radius-md);
+    background-color: var(--color-primary);
+    color: white;
+    font-size: 12px;
+    font-weight: 600;
+  }
+  
+  
+  /* Nenhum resultado */
+  
+  .empty-state {
+    text-align: center;
+    padding: 40px 24px;
+  }
+  
+  .empty-state h3 {
+    margin-top: 0;
+    margin-bottom: 8px;
+  }
+  
+  .empty-state p {
+    margin: 0;
+    opacity: 0.7;
+  }
+  
+  
+  /* Responsividade */
+  
+  @media (max-width: 1100px) {
+    .filters-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+  
+  @media (max-width: 800px) {
+    .search-results {
+      grid-template-columns: 1fr;
+    }
+  
+    .search-page {
+      padding: 20px;
+    }
+  }
+  
+  @media (max-width: 600px) {
+    .filters-grid {
+      grid-template-columns: 1fr;
+    }
+  
+    .filters-header,
+    .results-header {
+      align-items: flex-start;
+      flex-direction: column;
+    }
+  }

@@ -1,6 +1,8 @@
 import express from "express";
 import path from "path";
 
+import { showProfile } from "./controllers/profile-controller";
+
 const app = express();
 
 app.set("view engine", "ejs");
@@ -14,5 +16,7 @@ app.get("/", (req, res) => {
 app.get("/login", (req, res) => {
   res.render("auth/login");
 });
+
+app.get("/perfil", showProfile);
 
 export default app;

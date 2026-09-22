@@ -2,7 +2,6 @@
    SenacManager — Tela "Meu Perfil"
    ========================================================= */
 
-/* --- Card superior de cabeçalho do perfil --- */
 .profile-header {
   display: flex;
   align-items: center;
@@ -38,7 +37,6 @@
   color: var(--color-muted, #6b7280);
 }
 
-/* --- Badge do perfil --- */
 .badge--perfil {
   align-self: flex-start;
   margin-top: 6px;
@@ -47,12 +45,10 @@
   border: 1px solid rgba(11, 94, 215, 0.25);
 }
 
-/* --- Espaçamento entre os cards de formulário --- */
 .card + .card {
   margin-top: 24px;
 }
 
-/* --- Wrapper de senha (input + botão toggle) --- */
 .password-wrap {
   position: relative;
   display: flex;
@@ -80,7 +76,6 @@
   color: var(--color-text, #111827);
 }
 
-/* --- Tags (disciplinas do professor) --- */
 .tag-list {
   display: flex;
   flex-wrap: wrap;
@@ -99,7 +94,6 @@
   font-weight: 500;
 }
 
-/* --- Responsivo --- */
 @media (max-width: 560px) {
   .profile-header {
     flex-direction: column;

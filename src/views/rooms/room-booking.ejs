@@ -1,0 +1,134 @@
+<%- include('../partials/head', { title: 'Reservar Sala' }) %>
+
+<link rel="stylesheet" href="/css/room-booking.css" />
+
+<body>
+  <%- include('../partials/header', { usuario: usuario }) %>
+
+  <div class="dashboard-layout">
+    <%- include('../partials/sidebar', { perfil: 'professor' }) %>
+
+    <main class="dashboard-main">
+      <section class="page-header">
+        <div>
+          <h1 class="page-title">Reservar Sala</h1>
+          <p class="page-subtitle">
+            Escolha uma data, um horário e a sala desejada para a sua aula.
+          </p>
+        </div>
+      </section>
+
+      <form class="card booking-form" id="bookingForm" novalidate>
+        <!-- Bloco 1: data + horário -->
+        <div class="booking-form-row">
+          <div class="input-group">
+            <label for="data">Data da aula</label>
+            <input
+              type="date"
+              id="data"
+              name="data"
+              required
+              value="<%= dataSelecionada %>"
+            />
+          </div>
+
+          <div class="input-group">
+            <label for="horario">Horário / Turno</label>
+            <select id="horario" name="horario" required>
+              <option value="" disabled <%= !horarioSelecionado ? 'selected' : '' %>>
+                Selecione um horário
+              </option>
+              <% horariosDisponiveis.forEach(function (h) { %>
+                <option value="<%= h %>" <%= horarioSelecionado === h ? 'selected' : '' %>>
+                  <%= h %>
+                </option>
+              <% }); %>
+            </select>
+          </div>
+
+          <div class="input-group">
+            <label for="turma">Disciplina / Turma</label>
+            <select id="turma" name="turma" required>
+              <option value="" disabled selected>Selecione a turma</option>
+              <% turmasMock.forEach(function (t) { %>
+                <option value="<%= t.id %>">
+                  <%= t.disciplina %> — <%= t.turma %>
+                </option>
+              <% }); %>
+            </select>
+          </div>
+        </div>
+      </form>
+
+      <!-- Bloco 2: salas disponíveis -->
+      <section class="rooms-section">
+        <header class="rooms-section-header">
+          <h2>Salas disponíveis</h2>
+          <span class="rooms-counter" id="roomsCounter">
+            <%= salas.length %> sala<%= salas.length === 1 ? '' : 's' %> encontrada<%= salas.length === 1 ? '' : 's' %>
+          </span>
+        </header>
+
+        <% if (salas.length === 0) { %>
+          <div class="rooms-empty" id="roomsEmpty">
+            <div class="rooms-empty-icon" aria-hidden="true">🗓️</div>
+            <h3>Nenhuma sala disponível neste horário</h3>
+            <p>Tente outro período ou escolha uma data diferente.</p>
+          </div>
+        <% } else { %>
+          <div class="rooms-grid" id="roomsGrid">
+            <% salas.forEach(function (sala) { %>
+              <button
+                type="button"
+                class="room-card"
+                data-room-id="<%= sala.id %>"
+                data-room-name="<%= sala.nome %>"
+                aria-pressed="false"
+              >
+                <div class="room-card-header">
+                  <h3 class="room-card-name"><%= sala.nome %></h3>
+                  <span class="room-card-capacity">
+                    👥 <%= sala.capacidade %> lugares
+                  </span>
+                </div>
+
+                <ul class="room-card-resources">
+                  <% sala.recursos.forEach(function (r) { %>
+                    <li class="room-resource-tag"><%= r %></li>
+                  <% }); %>
+                </ul>
+
+                <span class="room-card-check" aria-hidden="true">✓</span>
+              </button>
+            <% }); %>
+          </div>
+        <% } %>
+      </section>
+
+      <!-- Bloco 3: confirmação -->
+      <section class="booking-confirm">
+        <div class="booking-summary" id="bookingSummary" hidden>
+          <h3>Resumo da reserva</h3>
+          <ul class="booking-summary-list">
+            <li><strong>Sala:</strong> <span id="summarySala">—</span></li>
+            <li><strong>Data:</strong> <span id="summaryData">—</span></li>
+            <li><strong>Horário:</strong> <span id="summaryHorario">—</span></li>
+            <li><strong>Turma:</strong> <span id="summaryTurma">—</span></li>
+          </ul>
+        </div>
+
+        <button type="button" class="btn btn-primary" id="btnConfirmar" disabled>
+          Confirmar Reserva
+        </button>
+      </section>
+
+      <!-- Feedback mockado (sem popup real) -->
+      <div class="alert-success" id="alertSucesso" hidden>
+        ✅ Reserva confirmada com sucesso! Você receberá um e-mail com os detalhes.
+      </div>
+    </main>
+  </div>
+
+  <script src="/js/room-booking.js"></script>
+</body>
+</html>

@@ -6,7 +6,6 @@
 (function () {
   'use strict';
 
-  /* ---------- 1) Toggle mostrar/ocultar senha ---------- */
   const toggleButtons = document.querySelectorAll('.toggle-password');
   toggleButtons.forEach(function (btn) {
     btn.addEventListener('click', function () {
@@ -24,7 +23,6 @@
     });
   });
 
-  /* ---------- 2) Validação do formulário de informações ---------- */
   const formInfo = document.getElementById('formInfo');
   if (formInfo) {
     formInfo.addEventListener('submit', function (e) {
@@ -47,7 +45,6 @@
     });
   }
 
-  /* ---------- 3) Validação do formulário de senha ---------- */
   const formSenha = document.getElementById('formSenha');
   const feedback = document.getElementById('senhaFeedback');
 
