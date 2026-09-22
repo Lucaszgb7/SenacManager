@@ -204,4 +204,10 @@
 }
 
 /* --- Responsivo --- */
-@media (max-width: 640
+@media (max-width: 640px) {
+  .data-table thead th,
+  .data-table tbody td {
+    padding: 10px 12px;
+    font-size: 0.82rem;
+  }
+}
