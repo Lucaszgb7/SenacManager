@@ -1,4 +1,4 @@
-# SenacManager# 🎓 SenacManager
+# 🎓 SenacManager
 
 Plataforma centralizada de gerenciamento de salas, horários e aulas para cursos técnicos e Ensino Médio Técnico (Médio Tec) do Senac.
 
