@@ -1,0 +1,176 @@
+/* =========================================================
+   SenacManager — Tela NOA (Núcleo de Oportunidades e Atividades)
+   ========================================================= */
+
+/* --- Texto explicativo do topo --- */
+.noa-intro {
+  background: #ffffff;
+  border-radius: var(--radius-md, 12px);
+  box-shadow: var(--shadow-sm, 0 1px 2px rgba(0, 0, 0, 0.05));
+  padding: 20px 24px;
+  margin-bottom: 24px;
+  border-left: 4px solid var(--color-primary, #0b5ed7);
+}
+.noa-intro__title {
+  margin: 0 0 8px;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--color-text, #111827);
+}
+.noa-intro__text {
+  margin: 0;
+  font-size: 0.9rem;
+  line-height: 1.55;
+  color: var(--color-muted, #4b5563);
+}
+
+/* --- Badge NOA (destaque, pill) --- */
+.noa-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  border-radius: 999px;
+  background: #fef3c7;
+  color: #92400e;
+  border: 1px solid #fcd34d;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+.noa-badge--sm {
+  padding: 2px 8px;
+  font-size: 0.62rem;
+}
+
+/* --- Grid de cards de atividades --- */
+.noa-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 18px;
+  margin-bottom: 32px;
+}
+@media (min-width: 640px)  { .noa-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (min-width: 1024px) { .noa-grid { grid-template-columns: repeat(3, 1fr); } }
+
+.noa-card {
+  background: #ffffff;
+  border-radius: var(--radius-md, 12px);
+  box-shadow: var(--shadow-sm, 0 1px 2px rgba(0, 0, 0, 0.05));
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+.noa-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+}
+
+.noa-card__title {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--color-text, #111827);
+}
+.noa-card__description {
+  margin: 0;
+  font-size: 0.86rem;
+  line-height: 1.5;
+  color: var(--color-muted, #4b5563);
+  flex: 1;
+}
+.noa-card__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 14px;
+  font-size: 0.8rem;
+  color: var(--color-muted, #6b7280);
+}
+.noa-card__meta strong {
+  color: var(--color-text, #374151);
+}
+.noa-card__footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  margin-top: 4px;
+}
+
+/* Vagas disponíveis */
+.noa-vagas {
+  font-size: 0.78rem;
+  color: var(--color-muted, #6b7280);
+}
+.noa-vagas--esgotadas {
+  color: #b91c1c;
+  font-weight: 600;
+}
+
+/* Botão "Inscrever-se" — estado desabilitado quando vagas = 0 */
+.noa-card .btn.btn-primary[disabled],
+.noa-card .btn.btn-primary.is-disabled {
+  background: #d1d5db;
+  color: #6b7280;
+  cursor: not-allowed;
+  border-color: #d1d5db;
+  box-shadow: none;
+  opacity: 1;
+}
+.noa-card .btn.btn-primary[disabled]:hover,
+.noa-card .btn.btn-primary.is-disabled:hover {
+  background: #d1d5db;
+  transform: none;
+}
+
+/* --- Seção "Minhas inscrições NOA" --- */
+.noa-inscricoes {
+  margin-top: 8px;
+}
+.noa-inscricoes__title {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--color-text, #111827);
+  margin: 0 0 14px;
+}
+
+.noa-inscricao-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+  background: #ffffff;
+  border-radius: var(--radius-md, 10px);
+  box-shadow: var(--shadow-sm, 0 1px 2px rgba(0, 0, 0, 0.05));
+  margin-bottom: 10px;
+  flex-wrap: wrap;
+}
+.noa-inscricao-item__info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+.noa-inscricao-item__name {
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: var(--color-text, #111827);
+}
+.noa-inscricao-item__meta {
+  font-size: 0.78rem;
+  color: var(--color-muted, #6b7280);
+}
+
+.noa-inscricoes__empty {
+  text-align: center;
+  padding: 28px 16px;
+  color: var(--color-muted, #6b7280);
+  background: #ffffff;
+  border-radius: var(--radius-md, 12px);
+  box-shadow: var(--shadow-sm, 0 1px 2px rgba(0, 0, 0, 0.05));
+  font-size: 0.88rem;
+}

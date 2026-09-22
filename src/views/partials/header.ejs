@@ -1,0 +1,63 @@
+<header class="app-header">
+  <div class="app-header__left">
+    <button
+      type="button"
+      class="hamburger-btn"
+      id="hamburgerBtn"
+      aria-label="Abrir menu"
+      aria-expanded="false"
+    >
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
+
+    <a href="/dashboard" class="app-header__logo">
+      Senac<span>Manager</span>
+    </a>
+  </div>
+
+  <div class="app-header__right">
+    <div class="avatar-menu" id="avatarMenu">
+      <button
+        type="button"
+        class="avatar-menu__trigger"
+        id="avatarTrigger"
+        aria-haspopup="true"
+        aria-expanded="false"
+      >
+        <span class="avatar avatar--sm">
+          <%= (usuario && usuario.nome ? usuario.nome : 'Usuário')
+                .split(' ')
+                .filter(Boolean)
+                .slice(0, 2)
+                .map(function(n){ return n[0].toUpperCase(); })
+                .join('') %>
+        </span>
+        <span class="avatar-menu__name">
+          <%= usuario && usuario.nome ? usuario.nome : 'Usuário' %>
+        </span>
+        <svg class="avatar-menu__caret" width="12" height="12" viewBox="0 0 12 12" aria-hidden="true">
+          <path d="M2 4l4 4 4-4" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+
+      <div class="avatar-menu__dropdown" id="avatarDropdown" hidden>
+        <a href="/profile" class="avatar-menu__item">
+          <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true">
+            <circle cx="12" cy="8" r="4" fill="none" stroke="currentColor" stroke-width="1.8"/>
+            <path d="M4 21c1.5-4 5-6 8-6s6.5 2 8 6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+          </svg>
+          <span>Meu perfil</span>
+        </a>
+        <a href="/auth/logout" class="avatar-menu__item avatar-menu__item--danger">
+          <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M15 12H3m0 0l4-4m-4 4l4 4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M13 4h5a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+          </svg>
+          <span>Sair</span>
+        </a>
+      </div>
+    </div>
+  </div>
+</header>

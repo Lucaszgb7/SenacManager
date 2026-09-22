@@ -1,0 +1,265 @@
+<%- include('../partials/head', { title: 'Painel Administrativo' }) %>
+<link rel="stylesheet" href="/css/dashboard.css" />
+<link rel="stylesheet" href="/css/admin-panel.css" />
+
+<%- include('../partials/header', {
+  usuario: { nome: 'Admin Senac', perfil: 'admin' }
+}) %>
+<%- include('../partials/sidebar', { perfil: 'admin', paginaAtual: 'admin' }) %>
+
+<%
+  // ---------- DADOS MOCKADOS ----------
+  var salas = [
+    { id: 1, nome: 'Lab 03 — Bloco B', capacidade: 30, recursos: 'Projetor, Ar-condicionado, 30 PCs' },
+    { id: 2, nome: 'Sala 12 — Bloco A', capacidade: 40, recursos: 'Projetor, Ar-condicionado' },
+    { id: 3, nome: 'Auditório',         capacidade: 120, recursos: 'Projetor, Som, Palco' },
+    { id: 4, nome: 'Lab 05 — Bloco C',  capacidade: 25, recursos: 'Projetor, 25 PCs' }
+  ];
+
+  var horarios = [
+    { id: 1, disciplina: 'Desenvolvimento Web II', professor: 'Prof. Ana Ribeiro', sala: 'Lab 03 — Bloco B', dia: 'Segunda',  horario: '08:00 — 09:40' },
+    { id: 2, disciplina: 'Banco de Dados',         professor: 'Prof. Carlos Souza', sala: 'Sala 12 — Bloco A', dia: 'Segunda', horario: '10:00 — 11:40' },
+    { id: 3, disciplina: 'Projeto Integrador',     professor: 'Prof. Marina Lima',  sala: 'Lab 05 — Bloco C', dia: 'Terça',    horario: '14:00 — 15:40' }
+  ];
+
+  var usuarios = [
+    { id: 1, nome: 'Ana Ribeiro',   email: 'ana.ribeiro@senac.br',   perfil: 'professor', ativo: true  },
+    { id: 2, nome: 'Lucas Martins', email: 'lucas.martins@senac.br', perfil: 'aluno',     ativo: true  },
+    { id: 3, nome: 'Admin Senac',   email: 'admin@senac.br',         perfil: 'admin',     ativo: true  },
+    { id: 4, nome: 'Marina Lima',   email: 'marina.lima@senac.br',   perfil: 'professor', ativo: false }
+  ];
+
+  function labelPerfil(p) {
+    return { professor: 'Professor', aluno: 'Aluno', admin: 'Admin' }[p] || p;
+  }
+%>
+
+<main class="app-main">
+  <div class="app-main__inner">
+
+    <h1 class="page-title">Painel Administrativo</h1>
+    <p class="page-subtitle">Gerencie salas, horários e usuários do sistema</p>
+
+    <!-- ---------- Abas ---------- -->
+    <div class="tabs" role="tablist">
+      <button class="tab is-active" data-tab="salas" role="tab">Salas</button>
+      <button class="tab" data-tab="horarios" role="tab">Horários</button>
+      <button class="tab" data-tab="usuarios" role="tab">Usuários</button>
+    </div>
+
+    <!-- ================= ABA SALAS ================= -->
+    <section class="tab-panel is-active" data-panel="salas">
+      <div class="panel-toolbar">
+        <input type="search" class="input-search" placeholder="Buscar salas..." data-search="salas" />
+        <button class="btn btn-primary" data-open-modal="modal-sala">+ Nova Sala</button>
+      </div>
+
+      <div class="table-wrap">
+        <table class="data-table" data-table="salas">
+          <thead>
+            <tr>
+              <th>Nome</th>
+              <th>Capacidade</th>
+              <th>Recursos</th>
+              <th class="col-actions">Ações</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% salas.forEach(function(s) { %>
+              <tr>
+                <td><%= s.nome %></td>
+                <td><%= s.capacidade %></td>
+                <td><%= s.recursos %></td>
+                <td class="col-actions">
+                  <button class="btn-link" data-action="editar">Editar</button>
+                  <button class="btn-link btn-link--danger" data-action="excluir">Excluir</button>
+                </td>
+              </tr>
+            <% }); %>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ================= ABA HORÁRIOS ================= -->
+    <section class="tab-panel" data-panel="horarios">
+      <div class="panel-toolbar">
+        <input type="search" class="input-search" placeholder="Buscar horários..." data-search="horarios" />
+        <button class="btn btn-primary" data-open-modal="modal-horario">+ Novo Horário</button>
+      </div>
+
+      <div class="table-wrap">
+        <table class="data-table" data-table="horarios">
+          <thead>
+            <tr>
+              <th>Disciplina</th>
+              <th>Professor</th>
+              <th>Sala</th>
+              <th>Dia</th>
+              <th>Horário</th>
+              <th class="col-actions">Ações</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% horarios.forEach(function(h) { %>
+              <tr>
+                <td><%= h.disciplina %></td>
+                <td><%= h.professor %></td>
+                <td><%= h.sala %></td>
+                <td><%= h.dia %></td>
+                <td><%= h.horario %></td>
+                <td class="col-actions">
+                  <button class="btn-link" data-action="editar">Editar</button>
+                  <button class="btn-link btn-link--danger" data-action="excluir">Excluir</button>
+                </td>
+              </tr>
+            <% }); %>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ================= ABA USUÁRIOS ================= -->
+    <section class="tab-panel" data-panel="usuarios">
+      <div class="panel-toolbar">
+        <input type="search" class="input-search" placeholder="Buscar usuários..." data-search="usuarios" />
+        <button class="btn btn-primary" data-open-modal="modal-usuario">+ Novo Usuário</button>
+      </div>
+
+      <div class="table-wrap">
+        <table class="data-table" data-table="usuarios">
+          <thead>
+            <tr>
+              <th>Nome</th>
+              <th>E-mail</th>
+              <th>Perfil</th>
+              <th>Status</th>
+              <th class="col-actions">Ações</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% usuarios.forEach(function(u) { %>
+              <tr>
+                <td><%= u.nome %></td>
+                <td><%= u.email %></td>
+                <td><span class="badge badge--<%= u.perfil %>"><%= labelPerfil(u.perfil) %></span></td>
+                <td>
+                  <span class="badge <%= u.ativo ? 'badge--ativo' : 'badge--inativo' %>">
+                    <%= u.ativo ? 'Ativo' : 'Inativo' %>
+                  </span>
+                </td>
+                <td class="col-actions">
+                  <button class="btn-link" data-action="editar">Editar</button>
+                  <button class="btn-link btn-link--danger" data-action="excluir">Excluir</button>
+                </td>
+              </tr>
+            <% }); %>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+  </div>
+</main>
+
+<!-- ================= MODAIS ================= -->
+<div class="modal" id="modal-sala" hidden>
+  <div class="modal__overlay" data-close-modal></div>
+  <div class="modal__card" role="dialog" aria-modal="true">
+    <header class="modal__header">
+      <h3>Nova Sala</h3>
+      <button class="modal__close" data-close-modal aria-label="Fechar">×</button>
+    </header>
+    <form class="modal__body">
+      <div class="input-group">
+        <label>Nome da sala</label>
+        <input type="text" placeholder="Ex.: Lab 10 — Bloco D" />
+      </div>
+      <div class="input-group">
+        <label>Capacidade</label>
+        <input type="number" min="1" placeholder="Ex.: 30" />
+      </div>
+      <div class="input-group">
+        <label>Recursos</label>
+        <input type="text" placeholder="Ex.: Projetor, Ar-condicionado" />
+      </div>
+      <footer class="modal__footer">
+        <button type="button" class="btn" data-close-modal>Cancelar</button>
+        <button type="submit" class="btn btn-primary">Salvar</button>
+      </footer>
+    </form>
+  </div>
+</div>
+
+<div class="modal" id="modal-horario" hidden>
+  <div class="modal__overlay" data-close-modal></div>
+  <div class="modal__card" role="dialog" aria-modal="true">
+    <header class="modal__header">
+      <h3>Novo Horário</h3>
+      <button class="modal__close" data-close-modal aria-label="Fechar">×</button>
+    </header>
+    <form class="modal__body">
+      <div class="input-group">
+        <label>Disciplina</label>
+        <input type="text" />
+      </div>
+      <div class="input-group">
+        <label>Professor</label>
+        <input type="text" />
+      </div>
+      <div class="input-group">
+        <label>Sala</label>
+        <input type="text" />
+      </div>
+      <div class="input-group">
+        <label>Dia da semana</label>
+        <input type="text" placeholder="Ex.: Segunda" />
+      </div>
+      <div class="input-group">
+        <label>Horário</label>
+        <input type="text" placeholder="Ex.: 08:00 — 09:40" />
+      </div>
+      <footer class="modal__footer">
+        <button type="button" class="btn" data-close-modal>Cancelar</button>
+        <button type="submit" class="btn btn-primary">Salvar</button>
+      </footer>
+    </form>
+  </div>
+</div>
+
+<div class="modal" id="modal-usuario" hidden>
+  <div class="modal__overlay" data-close-modal></div>
+  <div class="modal__card" role="dialog" aria-modal="true">
+    <header class="modal__header">
+      <h3>Novo Usuário</h3>
+      <button class="modal__close" data-close-modal aria-label="Fechar">×</button>
+    </header>
+    <form class="modal__body">
+      <div class="input-group">
+        <label>Nome completo</label>
+        <input type="text" />
+      </div>
+      <div class="input-group">
+        <label>E-mail</label>
+        <input type="email" />
+      </div>
+      <div class="input-group">
+        <label>Perfil</label>
+        <select>
+          <option value="professor">Professor</option>
+          <option value="aluno">Aluno</option>
+          <option value="admin">Administrador</option>
+        </select>
+      </div>
+      <footer class="modal__footer">
+        <button type="button" class="btn" data-close-modal>Cancelar</button>
+        <button type="submit" class="btn btn-primary">Salvar</button>
+      </footer>
+    </form>
+  </div>
+</div>
+
+<%- include('../partials/footer') %>
+
+<script src="/js/sidebar.js"></script>
+<script src="/js/admin-panel.js"></script>

@@ -1,0 +1,76 @@
+<%- include('../partials/head', { title: 'Dashboard — Aluno' }) %>
+<link rel="stylesheet" href="/css/dashboard.css" />
+<link rel="stylesheet" href="/css/dashboard-extra.css" />
+
+<%- include('../partials/header', {
+  usuario: { nome: 'Lucas Martins', perfil: 'aluno' }
+}) %>
+<%- include('../partials/sidebar', { perfil: 'aluno', paginaAtual: 'dashboard' }) %>
+
+<%
+  var usuario = { nome: 'Lucas Martins', perfil: 'aluno', curso: 'Técnico em Informática', turma: '3º Módulo — Turma B' };
+
+  var proximaAula = {
+    disciplina: 'Desenvolvimento Web II',
+    horario: '10:00 — 11:40',
+    sala: 'Lab 03 — Bloco B',
+    professor: 'Prof. Ana Ribeiro',
+    isNoa: false
+  };
+
+  var cronograma = [
+    { horario: '08:00 — 09:40', disciplina: 'Banco de Dados',       sala: 'Sala 12 — Bloco A', professor: 'Prof. Carlos Souza', isNoa: false },
+    { horario: '10:00 — 11:40', disciplina: 'Desenvolvimento Web II',sala: 'Lab 03 — Bloco B',  professor: 'Prof. Ana Ribeiro', isNoa: false },
+    { horario: '13:00 — 14:40', disciplina: 'Atividade NOA — Lógica',sala: 'Ambiente Virtual',   professor: '—',                  isNoa: true  },
+    { horario: '15:00 — 16:40', disciplina: 'Projeto Integrador',   sala: 'Lab 05 — Bloco C',   professor: 'Prof. Marina Lima', isNoa: false }
+  ];
+%>
+
+<main class="app-main">
+  <div class="app-main__inner">
+
+    <h1 class="page-title">Olá, <%= usuario.nome %></h1>
+    <p class="page-subtitle"><%= usuario.curso %> · <%= usuario.turma %></p>
+
+    <div class="card-grid">
+
+      <section class="card card--highlight">
+        <h2 class="card__title">Sua próxima aula</h2>
+        <div class="next-class">
+          <div class="next-class__discipline"><%= proximaAula.disciplina %></div>
+          <div class="next-class__meta">
+            <span><strong>Horário:</strong> <%= proximaAula.horario %></span>
+            <span><strong>Sala:</strong> <%= proximaAula.sala %></span>
+            <span><strong>Professor:</strong> <%= proximaAula.professor %></span>
+          </div>
+          <% if (proximaAula.isNoa) { %>
+            <span class="badge badge--noa">NOA</span>
+          <% } %>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2 class="card__title">Cronograma de hoje</h2>
+        <ul class="list-clean">
+          <% cronograma.forEach(function(a) { %>
+            <li class="list-clean__item">
+              <strong class="list-clean__time"><%= a.horario %></strong>
+              <div>
+                <div class="list-clean__primary">
+                  <%= a.disciplina %>
+                  <% if (a.isNoa) { %><span class="badge badge--noa badge--sm">NOA</span><% } %>
+                </div>
+                <div class="list-clean__secondary"><%= a.sala %> · <%= a.professor %></div>
+              </div>
+            </li>
+          <% }); %>
+        </ul>
+      </section>
+
+    </div>
+  </div>
+</main>
+
+<%- include('../partials/footer') %>
+
+<script src="/js/sidebar.js"></script>

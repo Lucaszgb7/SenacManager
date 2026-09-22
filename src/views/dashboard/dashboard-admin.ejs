@@ -1,0 +1,58 @@
+<%- include('../partials/head', { title: 'Dashboard — Administrador' }) %>
+<link rel="stylesheet" href="/css/dashboard.css" />
+<link rel="stylesheet" href="/css/dashboard-extra.css" />
+
+<%- include('../partials/header', {
+  usuario: { nome: 'Admin Senac', perfil: 'admin' }
+}) %>
+<%- include('../partials/sidebar', { perfil: 'admin', paginaAtual: 'dashboard' }) %>
+
+<%
+  var usuario = { nome: 'Admin Senac', perfil: 'admin' };
+
+  var metricas = [
+    { label: 'Total de salas',       valor: 42,  hint: '8 blocos'          },
+    { label: 'Salas ocupadas agora', valor: 17,  hint: 'de 42 salas'       },
+    { label: 'Total de professores', valor: 58,  hint: 'ativos no semestre'},
+    { label: 'Total de alunos',      valor: 1240,hint: 'matriculados'      }
+  ];
+
+  var atalhos = [
+    { label: 'Gerenciar salas',    href: '/admin', icon: 'salas'    },
+    { label: 'Gerenciar horários', href: '/admin', icon: 'horarios' },
+    { label: 'Gerenciar usuários', href: '/admin', icon: 'usuarios' }
+  ];
+%>
+
+<main class="app-main">
+  <div class="app-main__inner">
+
+    <h1 class="page-title">Painel administrativo</h1>
+    <p class="page-subtitle">Visão geral do sistema SenacManager</p>
+
+    <div class="metric-grid">
+      <% metricas.forEach(function(m) { %>
+        <div class="metric-card">
+          <div class="metric-card__value"><%= m.valor %></div>
+          <div class="metric-card__label"><%= m.label %></div>
+          <div class="metric-card__hint"><%= m.hint %></div>
+        </div>
+      <% }); %>
+    </div>
+
+    <h2 class="page-title" style="font-size: 1.1rem; margin-top: 32px;">Atalhos</h2>
+    <div class="shortcut-grid">
+      <% atalhos.forEach(function(a) { %>
+        <a href="<%= a.href %>" class="shortcut-card">
+          <span class="shortcut-card__label"><%= a.label %></span>
+          <span class="shortcut-card__arrow" aria-hidden="true">→</span>
+        </a>
+      <% }); %>
+    </div>
+
+  </div>
+</main>
+
+<%- include('../partials/footer') %>
+
+<script src="/js/sidebar.js"></script>

@@ -1,0 +1,67 @@
+<%
+  // perfil: 'professor' | 'aluno' | 'admin'
+  // paginaAtual (opcional): string identificadora da página ativa
+  var _perfil = typeof perfil !== 'undefined' ? perfil : 'aluno';
+  var _pagina = typeof paginaAtual !== 'undefined' ? paginaAtual : '';
+
+  var menus = {
+    professor: [
+      { id: 'dashboard',  label: 'Dashboard',         href: '/dashboard',
+        icon: '<path d="M3 12l9-8 9 8" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M5 10v10h14V10" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>' },
+      { id: 'rooms-available', label: 'Salas Disponíveis', href: '/rooms/available',
+        icon: '<rect x="3" y="4" width="18" height="16" rx="2" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M3 10h18" stroke="currentColor" stroke-width="1.8"/>' },
+      { id: 'rooms-booking', label: 'Reservar Sala',  href: '/rooms/booking',
+        icon: '<rect x="3" y="5" width="18" height="16" rx="2" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M8 3v4M16 3v4M3 11h18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M12 14v4M10 16h4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>' },
+      { id: 'bookings-my', label: 'Minhas Reservas',  href: '/bookings/my',
+        icon: '<path d="M5 4h11l3 3v13H5z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M8 10h8M8 14h8M8 18h5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>' },
+      { id: 'search', label: 'Pesquisar',             href: '/search',
+        icon: '<circle cx="11" cy="11" r="6" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M20 20l-4-4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>' },
+      { id: 'profile', label: 'Meu Perfil',           href: '/profile',
+        icon: '<circle cx="12" cy="8" r="4" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M4 21c1.5-4 5-6 8-6s6.5 2 8 6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>' }
+    ],
+    aluno: [
+      { id: 'dashboard', label: 'Dashboard', href: '/dashboard',
+        icon: '<path d="M3 12l9-8 9 8" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M5 10v10h14V10" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>' },
+      { id: 'noa', label: 'NOA', href: '/noa',
+        icon: '<circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 7v5l3 2" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>' },
+      { id: 'search', label: 'Pesquisar', href: '/search',
+        icon: '<circle cx="11" cy="11" r="6" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M20 20l-4-4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>' },
+      { id: 'profile', label: 'Meu Perfil', href: '/profile',
+        icon: '<circle cx="12" cy="8" r="4" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M4 21c1.5-4 5-6 8-6s6.5 2 8 6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>' }
+    ],
+    admin: [
+      { id: 'dashboard', label: 'Dashboard', href: '/dashboard',
+        icon: '<path d="M3 12l9-8 9 8" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M5 10v10h14V10" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>' },
+      { id: 'admin', label: 'Painel Administrativo', href: '/admin',
+        icon: '<rect x="3" y="4" width="7" height="7" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.8"/><rect x="14" y="4" width="7" height="7" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.8"/><rect x="3" y="14" width="7" height="7" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.8"/><rect x="14" y="14" width="7" height="7" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.8"/>' },
+      { id: 'rooms-available', label: 'Salas Disponíveis', href: '/rooms/available',
+        icon: '<rect x="3" y="4" width="18" height="16" rx="2" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M3 10h18" stroke="currentColor" stroke-width="1.8"/>' },
+      { id: 'search', label: 'Pesquisar', href: '/search',
+        icon: '<circle cx="11" cy="11" r="6" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M20 20l-4-4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>' },
+      { id: 'profile', label: 'Meu Perfil', href: '/profile',
+        icon: '<circle cx="12" cy="8" r="4" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M4 21c1.5-4 5-6 8-6s6.5 2 8 6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>' }
+    ]
+  };
+
+  var links = menus[_perfil] || menus.aluno;
+%>
+<aside class="app-sidebar" id="appSidebar" aria-label="Menu lateral">
+  <nav class="app-sidebar__nav">
+    <ul class="app-sidebar__list">
+      <% links.forEach(function(link) { %>
+        <li class="app-sidebar__item">
+          <a
+            href="<%= link.href %>"
+            class="app-sidebar__link <%= _pagina === link.id ? 'is-active' : '' %>"
+          >
+            <svg class="app-sidebar__icon" width="20" height="20" viewBox="0 0 24 24" aria-hidden="true">
+              <%- link.icon %>
+            </svg>
+            <span><%= link.label %></span>
+          </a>
+        </li>
+      <% }); %>
+    </ul>
+  </nav>
+</aside>
+<div class="app-sidebar__backdrop" id="sidebarBackdrop" hidden></div>

@@ -1,0 +1,327 @@
+/* =========================================================
+   SenacManager — Layout base (header + sidebar + conteúdo)
+   Requer: global.css e components.css carregados antes.
+   ========================================================= */
+
+/* ---------------------------------------------------------
+   Variáveis locais de layout (com fallback)
+   --------------------------------------------------------- */
+:root {
+  --layout-header-h: 64px;
+  --layout-sidebar-w: 240px;
+  --layout-sidebar-w-mobile: 260px;
+  --layout-content-max: 1200px;
+  --layout-gap: 24px;
+}
+
+/* ---------------------------------------------------------
+   Estrutura geral (body com header + sidebar fixos)
+   --------------------------------------------------------- */
+body {
+  background: var(--color-bg, #f5f7fa);
+  font-family: var(--font-family, system-ui, sans-serif);
+}
+
+.app-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: var(--layout-header-h);
+  background: #ffffff;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+  box-shadow: var(--shadow-sm, 0 1px 2px rgba(0, 0, 0, 0.04));
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+  z-index: 100;
+}
+
+.app-header__left,
+.app-header__right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.app-header__logo {
+  font-weight: 700;
+  font-size: 1.125rem;
+  color: var(--color-primary, #0b5ed7);
+  text-decoration: none;
+  letter-spacing: -0.01em;
+}
+.app-header__logo span {
+  color: var(--color-text, #1f2937);
+  font-weight: 500;
+}
+
+/* Hambúrguer (mobile) */
+.hamburger-btn {
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  gap: 4px;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  border-radius: var(--radius-md, 8px);
+}
+.hamburger-btn span {
+  display: block;
+  height: 2px;
+  width: 22px;
+  margin: 0 auto;
+  background: var(--color-text, #1f2937);
+  border-radius: 2px;
+  transition: transform 0.2s ease, opacity 0.2s ease;
+}
+.hamburger-btn.is-open span:nth-child(1) {
+  transform: translateY(6px) rotate(45deg);
+}
+.hamburger-btn.is-open span:nth-child(2) {
+  opacity: 0;
+}
+.hamburger-btn.is-open span:nth-child(3) {
+  transform: translateY(-6px) rotate(-45deg);
+}
+
+/* ---------------------------------------------------------
+   Avatar / dropdown do header
+   --------------------------------------------------------- */
+.avatar-menu {
+  position: relative;
+}
+
+.avatar-menu__trigger {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 10px;
+  background: transparent;
+  border: none;
+  border-radius: var(--radius-md, 8px);
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 0.9rem;
+  color: var(--color-text, #1f2937);
+  transition: background 0.15s ease;
+}
+.avatar-menu__trigger:hover {
+  background: rgba(0, 0, 0, 0.04);
+}
+.avatar-menu__caret {
+  color: var(--color-muted, #6b7280);
+}
+
+.avatar-menu__name {
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: var(--color-primary, #0b5ed7);
+  color: #ffffff;
+  font-weight: 600;
+  user-select: none;
+  flex-shrink: 0;
+}
+.avatar--sm {
+  width: 32px;
+  height: 32px;
+  font-size: 0.75rem;
+}
+
+.avatar-menu__dropdown {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  min-width: 200px;
+  background: #ffffff;
+  border-radius: var(--radius-md, 10px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  padding: 6px;
+  z-index: 200;
+  animation: dropdownFade 0.15s ease-out;
+}
+
+@keyframes dropdownFade {
+  from { opacity: 0; transform: translateY(-4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.avatar-menu__item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: var(--radius-md, 8px);
+  color: var(--color-text, #1f2937);
+  text-decoration: none;
+  font-size: 0.9rem;
+  transition: background 0.15s ease;
+}
+.avatar-menu__item:hover {
+  background: rgba(0, 0, 0, 0.05);
+}
+.avatar-menu__item--danger {
+  color: #b91c1c;
+}
+.avatar-menu__item--danger:hover {
+  background: rgba(185, 28, 28, 0.08);
+}
+
+/* ---------------------------------------------------------
+   Sidebar
+   --------------------------------------------------------- */
+.app-sidebar {
+  position: fixed;
+  top: var(--layout-header-h);
+  left: 0;
+  bottom: 0;
+  width: var(--layout-sidebar-w);
+  background: #ffffff;
+  border-right: 1px solid rgba(0, 0, 0, 0.06);
+  padding: 16px 12px;
+  overflow-y: auto;
+  z-index: 90;
+  transition: transform 0.25s ease;
+}
+
+.app-sidebar__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.app-sidebar__link {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  border-radius: var(--radius-md, 8px);
+  color: var(--color-text, #374151);
+  text-decoration: none;
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+.app-sidebar__link:hover {
+  background: rgba(11, 94, 215, 0.08);
+  color: var(--color-primary, #0b5ed7);
+}
+.app-sidebar__link.is-active {
+  background: var(--color-primary, #0b5ed7);
+  color: #ffffff;
+}
+.app-sidebar__link.is-active .app-sidebar__icon {
+  color: #ffffff;
+}
+
+.app-sidebar__icon {
+  flex-shrink: 0;
+  color: var(--color-muted, #6b7280);
+}
+.app-sidebar__link:hover .app-sidebar__icon {
+  color: var(--color-primary, #0b5ed7);
+}
+
+/* Backdrop (mobile) */
+.app-sidebar__backdrop {
+  position: fixed;
+  inset: var(--layout-header-h) 0 0 0;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: 85;
+  animation: backdropFade 0.2s ease;
+}
+@keyframes backdropFade {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* ---------------------------------------------------------
+   Conteúdo principal
+   --------------------------------------------------------- */
+.app-main {
+  margin-left: var(--layout-sidebar-w);
+  padding: calc(var(--layout-header-h) + var(--layout-gap)) var(--layout-gap) var(--layout-gap);
+  min-height: 100vh;
+}
+
+.app-main__inner {
+  max-width: var(--layout-content-max);
+  margin: 0 auto;
+}
+
+.page-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin: 0 0 4px;
+  color: var(--color-text, #111827);
+}
+.page-subtitle {
+  color: var(--color-muted, #6b7280);
+  font-size: 0.9rem;
+  margin: 0 0 24px;
+}
+
+/* Grid de cards responsivo */
+.card-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--layout-gap);
+}
+@media (min-width: 700px) {
+  .card-grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (min-width: 1024px) {
+  .card-grid--3 { grid-template-columns: repeat(3, 1fr); }
+}
+
+/* ---------------------------------------------------------
+   Rodapé
+   --------------------------------------------------------- */
+.app-footer {
+  margin-left: var(--layout-sidebar-w);
+  padding: 20px;
+  text-align: center;
+  font-size: 0.8rem;
+  color: var(--color-muted, #9ca3af);
+}
+
+/* ---------------------------------------------------------
+   Responsivo — mobile (< 900px)
+   --------------------------------------------------------- */
+@media (max-width: 900px) {
+  .hamburger-btn { display: flex; }
+  .avatar-menu__name { display: none; }
+
+  .app-sidebar {
+    width: var(--layout-sidebar-w-mobile);
+    transform: translateX(-100%);
+    box-shadow: 4px 0 24px rgba(0, 0, 0, 0.08);
+  }
+  .app-sidebar.is-open {
+    transform: translateX(0);
+  }
+
+  .app-main,
+  .app-footer {
+    margin-left: 0;
+  }
+
+  .app-main {
+    padding: calc(var(--layout-header-h) + 16px) 16px 16px;
+  }
+}
