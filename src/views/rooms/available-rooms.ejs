@@ -1,0 +1,127 @@
+<%- include('../partials/head', { title: 'Salas Disponíveis' }) %>
+
+<link rel="stylesheet" href="/css/available-rooms.css" />
+
+<body>
+  <%- include('../partials/header', { usuario: usuario }) %>
+
+  <div class="dashboard-layout">
+    <%- include('../partials/sidebar', { perfil: perfil }) %>
+
+    <main class="dashboard-main">
+      <section class="page-header">
+        <div>
+          <h1 class="page-title">Salas Disponíveis</h1>
+          <p class="page-subtitle">
+            Veja em tempo real quais salas estão livres agora e quem está usando as ocupadas.
+          </p>
+        </div>
+      </section>
+
+      <!-- Filtros: busca + abas -->
+      <section class="rooms-toolbar">
+        <div class="input-group rooms-search">
+          <label for="buscaSala" class="sr-only">Buscar sala</label>
+          <input
+            type="search"
+            id="buscaSala"
+            placeholder="🔍  Buscar por nome da sala..."
+            autocomplete="off"
+          />
+        </div>
+
+        <div class="rooms-tabs" role="tablist" aria-label="Filtro de status">
+          <button
+            type="button"
+            class="rooms-tab is-active"
+            data-filter="todas"
+            role="tab"
+            aria-selected="true"
+          >
+            Todas <span class="rooms-tab-count" data-count="todas"></span>
+          </button>
+          <button
+            type="button"
+            class="rooms-tab"
+            data-filter="disponivel"
+            role="tab"
+            aria-selected="false"
+          >
+            Disponíveis <span class="rooms-tab-count" data-count="disponivel"></span>
+          </button>
+          <button
+            type="button"
+            class="rooms-tab"
+            data-filter="ocupada"
+            role="tab"
+            aria-selected="false"
+          >
+            Ocupadas <span class="rooms-tab-count" data-count="ocupada"></span>
+          </button>
+        </div>
+      </section>
+
+      <!-- Grid de salas -->
+      <section class="rooms-grid-wrap">
+        <div class="rooms-grid" id="roomsGrid">
+          <% salas.forEach(function (sala) { %>
+            <article
+              class="room-card <%= sala.status === 'ocupada' ? 'is-ocupada' : 'is-disponivel' %>"
+              data-room-id="<%= sala.id %>"
+              data-room-name="<%= sala.nome.toLowerCase() %>"
+              data-room-status="<%= sala.status %>"
+            >
+              <header class="room-card-top">
+                <div>
+                  <h2 class="room-card-name"><%= sala.nome %></h2>
+                  <span class="room-card-capacity">👥 <%= sala.capacidade %> lugares</span>
+                </div>
+
+                <% if (sala.status === 'disponivel') { %>
+                  <span class="status-badge status-badge--livre">Disponível</span>
+                <% } else { %>
+                  <span class="status-badge status-badge--ocupada">Ocupada</span>
+                <% } %>
+              </header>
+
+              <% if (sala.status === 'ocupada' && sala.ocupacaoAtual) { %>
+                <div class="room-card-usage">
+                  <p class="room-usage-line">
+                    <span class="room-usage-label">Professor:</span>
+                    <span class="room-usage-value"><%= sala.ocupacaoAtual.professor %></span>
+                  </p>
+                  <p class="room-usage-line">
+                    <span class="room-usage-label">Disciplina:</span>
+                    <span class="room-usage-value"><%= sala.ocupacaoAtual.disciplina %></span>
+                  </p>
+                  <p class="room-usage-line">
+                    <span class="room-usage-label">Livre às:</span>
+                    <span class="room-usage-value"><%= sala.ocupacaoAtual.horarioFim %></span>
+                  </p>
+                </div>
+              <% } else { %>
+                <div class="room-card-usage room-card-usage--empty">
+                  <p class="room-usage-hint">Nenhuma aula em andamento neste momento.</p>
+                </div>
+
+                <a href="/rooms/booking" class="btn btn-primary room-card-action">
+                  Reservar
+                </a>
+              <% } %>
+            </article>
+          <% }); %>
+        </div>
+
+        <!-- Estado vazio (mostrado pelo JS quando filtro/busca não retornam nada) -->
+        <div class="rooms-empty" id="roomsEmpty" hidden>
+          <div class="rooms-empty-icon" aria-hidden="true">🔍</div>
+          <h3>Nenhuma sala encontrada</h3>
+          <p>Tente ajustar a busca ou trocar o filtro selecionado.</p>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script src="/js/available-rooms.js"></script>
+</body>
+</html>
