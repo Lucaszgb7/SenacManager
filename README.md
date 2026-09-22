@@ -240,10 +240,12 @@ Projeto acadêmico desenvolvido para o Senac — uso educacional.
 
 Projeto desenvolvido por estudantes do curso técnico/Médio Tec do Senac.
 
-- Gabriel
-- Mateus
+- Gabriel Costa
+- Mateus Vinicius
 - Heytor Andrade
-- Max
+- Max Antonio
+- Rosalvo Davi
+- Lucas Gabriel
 
 ---
 
