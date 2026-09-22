@@ -1,0 +1,7 @@
+<aside class="dashboard-sidebar">
+  <p>Minha conta</p>
+  <nav aria-label="Menu principal">
+    <a href="/perfil?perfil=<%= perfil %>" aria-current="page">Meu Perfil</a>
+  </nav>
+  <span><%= perfil === 'admin' ? 'Administrador' : perfil === 'aluno' ? 'Aluno' : 'Professor' %></span>
+</aside>

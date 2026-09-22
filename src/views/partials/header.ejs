@@ -1,0 +1,8 @@
+<a class="dashboard-skip link" href="#conteudo">Ir para o conteúdo</a>
+<header class="dashboard-header">
+  <a class="dashboard-brand" href="/perfil">SenacManager</a>
+  <details class="dashboard-user">
+    <summary><span class="dashboard-avatar" data-user-initials aria-hidden="true"><%= usuario.nome.trim().split(/\s+/).map(p => p[0]).slice(0, 2).join('').toUpperCase() %></span><span data-user-name><%= usuario.nome %></span></summary>
+    <nav aria-label="Conta"><a class="link" href="/perfil?perfil=<%= usuario.perfil %>">Meu Perfil</a></nav>
+  </details>
+</header>

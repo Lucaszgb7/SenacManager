@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<%- include('../partials/head', { title: 'Meu Perfil', pageCss: 'profile.css' }) %>
+<body class="dashboard-layout">
+  <%- include('../partials/header', { usuario: usuario }) %>
+  <%- include('../partials/sidebar', { perfil: usuario.perfil }) %>
+  <main class="dashboard-main profile-page" id="conteudo">
+    <header class="profile-heading">
+      <h1>Meu Perfil</h1>
+      <p>Cuide das suas informações e dos dados de acesso.</p>
+    </header>
+    <section class="card profile-summary" aria-label="Resumo do perfil">
+      <span class="profile-avatar" id="profile-avatar" aria-hidden="true"><%= usuario.nome.trim().split(/\s+/).map(p => p[0]).slice(0, 2).join('').toUpperCase() %></span>
+      <div>
+        <h2 id="profile-name"><%= usuario.nome %></h2>
+        <p id="profile-email"><%= usuario.email %></p>
+        <span class="profile-role"><%= usuario.perfil === 'admin' ? 'Administrador' : usuario.perfil === 'aluno' ? 'Aluno' : 'Professor' %></span>
+      </div>
+    </section>
+    <p class="profile-demo">Demonstração: as alterações valem apenas enquanto esta página estiver aberta.</p>
+    <div class="profile-columns">
+      <section class="card" aria-labelledby="personal-title">
+        <h2 id="personal-title">Informações pessoais</h2>
+        <p class="profile-description">Mantenha seus dados de contato atualizados.</p>
+        <form id="personal-form" method="post">
+          <% for (const campo of [
+            { id: 'nome', label: 'Nome', type: 'text', autocomplete: 'name' },
+            { id: 'email', label: 'E-mail', type: 'email', autocomplete: 'email' },
+            { id: 'telefone', label: 'Telefone', type: 'tel', autocomplete: 'tel' }
+          ]) { %>
+            <div class="input-group">
+              <label for="<%= campo.id %>"><%= campo.label %></label>
+              <input id="<%= campo.id %>" name="<%= campo.id %>" type="<%= campo.type %>" autocomplete="<%= campo.autocomplete %>" value="<%= usuario[campo.id] %>" required aria-describedby="<%= campo.id %>-error">
+              <span class="error-message" id="<%= campo.id %>-error" data-error-for="<%= campo.id %>"></span>
+            </div>
+          <% } %>
+          <% if (usuario.perfil === 'professor') { %>
+            <div class="profile-academic">
+              <h3>Disciplinas que leciona</h3>
+              <ul class="profile-tags">
+                <% usuario.disciplinas.forEach(disciplina => { %>
+                  <li><%= disciplina %></li>
+                <% }) %>
+              </ul>
+            </div>
+          <% } else if (usuario.perfil === 'aluno') { %>
+            <dl class="profile-academic">
+              <dt>Curso</dt><dd><%= usuario.curso %></dd>
+              <dt>Turma</dt><dd><%= usuario.turma %></dd>
+            </dl>
+          <% } %>
+          <button class="btn btn-primary" type="submit" disabled>Salvar alterações</button>
+          <p class="profile-feedback" id="personal-feedback" role="status"></p>
+        </form>
+      </section>
+      <section class="card" aria-labelledby="password-title">
+        <h2 id="password-title">Alterar senha</h2>
+        <p class="profile-description">Preencha os três campos para simular a alteração.</p>
+        <form id="password-form" method="post">
+          <% for (const campo of [
+            { id: 'senha-atual', label: 'Senha atual', autocomplete: 'current-password' },
+            { id: 'nova-senha', label: 'Nova senha', autocomplete: 'new-password' },
+            { id: 'confirmar-senha', label: 'Confirmar nova senha', autocomplete: 'new-password' }
+          ]) { %>
+            <div class="input-group">
+              <label for="<%= campo.id %>"><%= campo.label %></label>
+              <div class="profile-password">
+                <input type="password" id="<%= campo.id %>" name="<%= campo.id %>" autocomplete="<%= campo.autocomplete %>" required aria-describedby="<%= campo.id %>-error">
+                <button type="button" class="toggle-password" data-password-target="<%= campo.id %>" aria-controls="<%= campo.id %>" aria-label="Mostrar <%= campo.label.toLowerCase() %>" aria-pressed="false">Mostrar</button>
+              </div>
+              <span class="error-message" id="<%= campo.id %>-error" data-error-for="<%= campo.id %>"></span>
+            </div>
+          <% } %>
+          <button class="btn btn-primary" type="submit" disabled>Alterar senha</button>
+          <p class="profile-feedback" id="password-feedback" role="status"></p>
+        </form>
+      </section>
+    </div>
+    <noscript><p>Ative o JavaScript para editar os dados nesta demonstração.</p></noscript>
+  </main>
+  <script src="/js/profile.js" defer></script>
+</body>
+</html>
