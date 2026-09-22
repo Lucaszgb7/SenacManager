@@ -1,0 +1,101 @@
+<%- include('../partials/head', { title: aula.disciplina + ' — Detalhes' }) %>
+
+<%- include('../partials/header', { usuario: usuario }) %>
+
+<div class="dashboard-layout">
+  <%- include('../partials/sidebar', { perfil: usuario.perfil }) %>
+
+  <main class="dashboard-main">
+    <!-- Voltar -->
+    <a href="javascript:history.back()" class="back-link">
+      <span class="back-link-icon" aria-hidden="true">←</span>
+      Voltar
+    </a>
+
+    <!-- Card principal -->
+    <article class="card class-hero">
+      <div class="class-hero-top">
+        <div class="class-hero-title-wrap">
+          <h1 class="class-title"><%= aula.disciplina %></h1>
+          <% if (aula.isNoa) { %>
+            <span class="badge badge-noa" title="Núcleo de Oportunidades e Aprendizagem">
+              NOA
+            </span>
+          <% } %>
+        </div>
+      </div>
+
+      <div class="class-hero-grid">
+        <!-- Professor -->
+        <div class="class-info-item">
+          <span class="class-info-label">Professor responsável</span>
+          <div class="class-professor">
+            <span class="avatar-initials" aria-hidden="true">
+              <%= aula.professor.iniciais %>
+            </span>
+            <span class="class-professor-name"><%= aula.professor.nome %></span>
+          </div>
+        </div>
+
+        <!-- Sala -->
+        <div class="class-info-item">
+          <span class="class-info-label">Sala</span>
+          <div class="class-info-value">
+            <strong><%= aula.sala %></strong>
+            <% if (aula.predio) { %>
+              <span class="class-info-sub"><%= aula.predio %></span>
+            <% } %>
+          </div>
+        </div>
+
+        <!-- Horário -->
+        <div class="class-info-item">
+          <span class="class-info-label">Horário</span>
+          <div class="class-info-value">
+            <strong><%= aula.diaSemana %></strong>
+            <span class="class-info-sub">
+              <%= aula.horarioInicio %> — <%= aula.horarioFim %>
+            </span>
+          </div>
+        </div>
+
+        <!-- Turma -->
+        <div class="class-info-item">
+          <span class="class-info-label">Turma / Curso</span>
+          <div class="class-info-value">
+            <strong><%= aula.turma %></strong>
+          </div>
+        </div>
+      </div>
+
+      <!-- Ações condicionais por perfil -->
+      <% if (usuario.perfil === 'professor' && aula.professor.id === usuario.id) { %>
+        <div class="class-hero-actions">
+          <a href="/classes/<%= aula.id %>/edit" class="btn btn-primary">Editar</a>
+          <button type="button" class="btn btn-danger-outline js-cancel-class">
+            Cancelar aula
+          </button>
+        </div>
+      <% } else if (usuario.perfil === 'admin') { %>
+        <div class="class-hero-actions">
+          <a href="/classes/<%= aula.id %>/edit" class="btn btn-primary">Editar</a>
+          <button type="button" class="btn btn-danger-outline js-remove-class">
+            Remover
+          </button>
+        </div>
+      <% } %>
+    </article>
+
+    <!-- Sobre a aula -->
+    <section class="card class-about">
+      <h2 class="class-section-title">Sobre a aula</h2>
+      <p class="class-about-text"><%= aula.descricao %></p>
+    </section>
+  </main>
+</div>
+
+<link rel="stylesheet" href="/css/class-details.css" />
+<script src="/js/class-details.js" defer></script>
+
+</body>
+</html>
