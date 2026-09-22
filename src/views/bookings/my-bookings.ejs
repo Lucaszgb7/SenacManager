@@ -1,0 +1,129 @@
+<%- include('../partials/head', { title: 'Minhas Reservas' }) %>
+
+<%- include('../partials/header', { usuario: usuario }) %>
+
+<div class="dashboard-layout">
+  <%- include('../partials/sidebar', { perfil: 'professor' }) %>
+
+  <main class="dashboard-main">
+    <div class="page-header">
+      <div>
+        <h1 class="page-title">Minhas Reservas</h1>
+        <p class="page-subtitle">Acompanhe e gerencie suas reservas de sala</p>
+      </div>
+      <a href="/rooms/booking" class="btn btn-primary">
+        + Nova Reserva
+      </a>
+    </div>
+
+    <!-- Abas -->
+    <div class="tabs" role="tablist">
+      <button
+        type="button"
+        class="tab is-active"
+        data-tab="proximas"
+        role="tab"
+        aria-selected="true"
+      >
+        Próximas
+        <span class="tab-count"><%= reservasFuturas.length %></span>
+      </button>
+      <button
+        type="button"
+        class="tab"
+        data-tab="historico"
+        role="tab"
+        aria-selected="false"
+      >
+        Histórico
+        <span class="tab-count"><%= reservasPassadas.length %></span>
+      </button>
+    </div>
+
+    <!-- Painel: Próximas -->
+    <section class="tab-panel is-active" data-panel="proximas">
+      <% if (reservasFuturas.length === 0) { %>
+        <div class="empty-state">
+          <h3 class="empty-state-title">Você ainda não tem reservas futuras</h3>
+          <p class="empty-state-text">
+            Que tal agendar uma sala para suas próximas aulas?
+          </p>
+          <a href="/rooms/booking" class="btn btn-primary">+ Nova Reserva</a>
+        </div>
+      <% } else { %>
+        <div class="bookings-list">
+          <% reservasFuturas.forEach(function (reserva) { %>
+            <article class="card booking-card" data-booking-id="<%= reserva.id %>">
+              <div class="booking-card-main">
+                <div class="booking-info">
+                  <div class="booking-when">
+                    <span class="booking-date"><%= reserva.data %></span>
+                    <span class="booking-time"><%= reserva.horario %></span>
+                  </div>
+                  <h3 class="booking-room"><%= reserva.sala %></h3>
+                  <p class="booking-subject">
+                    <%= reserva.disciplina %>
+                  </p>
+                </div>
+                <span class="badge badge-<%= reserva.status %>">
+                  <%= reserva.status === 'confirmada' ? 'Confirmada' : 'Cancelada' %>
+                </span>
+              </div>
+              <div class="booking-card-actions">
+                <button
+                  type="button"
+                  class="btn btn-danger-outline js-cancel-booking"
+                  data-booking-id="<%= reserva.id %>"
+                  data-booking-label="<%= reserva.sala %> — <%= reserva.data %> às <%= reserva.horario %>"
+                >
+                  Cancelar reserva
+                </button>
+              </div>
+            </article>
+          <% }); %>
+        </div>
+      <% } %>
+    </section>
+
+    <!-- Painel: Histórico -->
+    <section class="tab-panel" data-panel="historico">
+      <% if (reservasPassadas.length === 0) { %>
+        <div class="empty-state">
+          <h3 class="empty-state-title">Nenhum histórico de reservas</h3>
+          <p class="empty-state-text">
+            Suas reservas passadas aparecerão aqui.
+          </p>
+        </div>
+      <% } else { %>
+        <div class="bookings-list">
+          <% reservasPassadas.forEach(function (reserva) { %>
+            <article class="card booking-card booking-card-past">
+              <div class="booking-card-main">
+                <div class="booking-info">
+                  <div class="booking-when">
+                    <span class="booking-date"><%= reserva.data %></span>
+                    <span class="booking-time"><%= reserva.horario %></span>
+                  </div>
+                  <h3 class="booking-room"><%= reserva.sala %></h3>
+                  <p class="booking-subject"><%= reserva.disciplina %></p>
+                </div>
+                <span class="badge badge-<%= reserva.status %>">
+                  <%= reserva.status === 'confirmada' ? 'Confirmada' : 'Cancelada' %>
+                </span>
+              </div>
+            </article>
+          <% }); %>
+        </div>
+      <% } %>
+    </section>
+  </main>
+</div>
+
+<!-- CSS específico da tela -->
+<link rel="stylesheet" href="/css/my-bookings.css" />
+
+<!-- JS específico da tela -->
+<script src="/js/my-bookings.js" defer></script>
+
+</body>
+</html>
