@@ -1,0 +1,257 @@
+/* ============================================================
+   Tela: Salas Disponíveis (Professor / Admin)
+   Classes específicas desta tela — não vão em components.css
+   ============================================================ */
+
+/* Acessibilidade: texto apenas para leitores de tela */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.page-header {
+  margin-bottom: 20px;
+}
+
+.page-title {
+  font-size: 1.6rem;
+  font-weight: 600;
+  color: var(--color-text, #1f2937);
+  margin: 0;
+}
+
+.page-subtitle {
+  margin: 4px 0 0;
+  color: var(--color-text-muted, #6b7280);
+  font-size: 0.95rem;
+}
+
+/* ---------- Toolbar (busca + abas) ---------- */
+.rooms-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.rooms-search {
+  flex: 1 1 260px;
+  margin: 0;
+}
+
+.rooms-search input {
+  width: 100%;
+}
+
+/* ---------- Abas de filtro ---------- */
+.rooms-tabs {
+  display: inline-flex;
+  background: #fff;
+  border: 1px solid var(--color-border, #e5e7eb);
+  border-radius: var(--radius-md, 8px);
+  padding: 4px;
+  gap: 4px;
+}
+
+.rooms-tab {
+  border: none;
+  background: transparent;
+  font-family: inherit;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--color-text-muted, #6b7280);
+  padding: 8px 14px;
+  border-radius: calc(var(--radius-md, 8px) - 2px);
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.rooms-tab:hover {
+  color: var(--color-text, #1f2937);
+  background: #f3f4f6;
+}
+
+.rooms-tab.is-active {
+  background: var(--color-primary, #004a8f);
+  color: #fff;
+}
+
+.rooms-tab.is-active:hover {
+  background: var(--color-primary, #004a8f);
+  color: #fff;
+}
+
+.rooms-tab-count {
+  font-size: 0.75rem;
+  background: rgba(0, 0, 0, 0.08);
+  color: inherit;
+  padding: 1px 7px;
+  border-radius: 999px;
+  font-weight: 600;
+}
+
+.rooms-tab.is-active .rooms-tab-count {
+  background: rgba(255, 255, 255, 0.25);
+}
+
+/* ---------- Grid de salas ---------- */
+.rooms-grid-wrap {
+  position: relative;
+}
+
+.rooms-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+}
+
+/* ---------- Card de sala ---------- */
+.room-card {
+  background: #fff;
+  border: 1px solid var(--color-border, #e5e7eb);
+  border-left: 4px solid var(--color-border, #e5e7eb);
+  border-radius: var(--radius-md, 8px);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  box-shadow: var(--shadow-sm, 0 1px 3px rgba(0, 0, 0, 0.06));
+  transition: transform 0.1s ease, box-shadow 0.15s ease;
+}
+
+.room-card:hover {
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+}
+
+.room-card.is-disponivel {
+  border-left-color: #16a34a;
+}
+
+.room-card.is-ocupada {
+  border-left-color: #dc2626;
+}
+
+/* ---------- Cabeçalho do card ---------- */
+.room-card-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.room-card-name {
+  font-size: 1.05rem;
+  font-weight: 600;
+  margin: 0;
+  color: var(--color-text, #1f2937);
+}
+
+.room-card-capacity {
+  display: inline-block;
+  font-size: 0.8rem;
+  color: var(--color-text-muted, #6b7280);
+  margin-top: 2px;
+}
+
+/* ---------- Badge de status ---------- */
+.status-badge {
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  padding: 3px 9px;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+
+.status-badge--livre {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.status-badge--ocupada {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+/* ---------- Detalhes de uso ---------- */
+.room-card-usage {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 0.88rem;
+  padding-top: 8px;
+  border-top: 1px dashed var(--color-border, #e5e7eb);
+}
+
+.room-card-usage--empty {
+  color: var(--color-text-muted, #6b7280);
+}
+
+.room-usage-line {
+  margin: 0;
+  display: flex;
+  gap: 6px;
+}
+
+.room-usage-label {
+  color: var(--color-text-muted, #6b7280);
+  font-weight: 500;
+  min-width: 78px;
+}
+
+.room-usage-value {
+  color: var(--color-text, #1f2937);
+  font-weight: 500;
+}
+
+.room-usage-hint {
+  margin: 0;
+  font-size: 0.85rem;
+  font-style: italic;
+}
+
+/* ---------- Ação dentro do card ---------- */
+.room-card-action {
+  align-self: flex-start;
+  margin-top: auto;
+  padding: 8px 16px;
+  font-size: 0.88rem;
+}
+
+/* ---------- Estado vazio ---------- */
+.rooms-empty {
+  text-align: center;
+  padding: 48px 20px;
+  background: #fff;
+  border: 1px dashed var(--color-border, #e5e7eb);
+  border-radius: var(--radius-md, 8px);
+  color: var(--color-text-muted, #6b7280);
+}
+
+.rooms-empty-icon {
+  font-size: 2rem;
+  margin-bottom: 8px;
+}
+
+.rooms-empty h3 {
+  margin: 0 0 6px;
+  color: var(--color-text, #1f2937);
+  font-size: 1.05rem;
+}
+
+.rooms-empty p {
+  margin: 0;
+  font-size: 0.9rem;
+}
