@@ -107,7 +107,7 @@ export class Reserva {
     if (!valor || !regex.test(valor)) {
       throw new Error('Data deve estar no formato YYYY-MM-DD.');
     }
-    const [ano, mes, dia] = valor.split('-').map(Number);
+    const [ano = NaN, mes = NaN, dia = NaN] = valor.split('-').map(Number);
     const d = new Date(ano, mes - 1, dia);
     const valida =
       d.getFullYear() === ano &&
@@ -153,7 +153,7 @@ export class Reserva {
    */
   private validarFormatoHora(valor: string): boolean {
     if (!valor || !/^\d{2}:\d{2}$/.test(valor)) return false;
-    const [h, m] = valor.split(':').map(Number);
+    const [h = NaN, m = NaN] = valor.split(':').map(Number);
     return h >= 0 && h <= 23 && m >= 0 && m <= 59;
   }
 
@@ -161,7 +161,7 @@ export class Reserva {
    * Converte 'HH:mm' em minutos desde a meia-noite, para comparação.
    */
   private minutosDoDia(horario: string): number {
-    const [h, m] = horario.split(':').map(Number);
+    const [h = NaN, m = NaN] = horario.split(':').map(Number);
     return h * 60 + m;
   }
 
