@@ -145,12 +145,12 @@ export class AulaGrade {
 
   private validarFormatoHora(valor: string): boolean {
     if (!valor || !/^\d{2}:\d{2}$/.test(valor)) return false;
-    const [h, m] = valor.split(':').map(Number);
+    const [h = NaN, m = NaN] = valor.split(':').map(Number);
     return h >= 0 && h <= 23 && m >= 0 && m <= 59;
   }
 
   private minutosDoDia(horario: string): number {
-    const [h, m] = horario.split(':').map(Number);
+    const [h = NaN, m = NaN] = horario.split(':').map(Number);
     return h * 60 + m;
   }
 
