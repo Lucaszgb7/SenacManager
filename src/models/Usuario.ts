@@ -1,3 +1,4 @@
+// src/models/Usuario.ts
 import { randomUUID } from 'crypto';
 
 /**
@@ -20,13 +21,19 @@ export abstract class Usuario {
   private _perfil: Perfil;
   private _criadoEm: Date;
 
+  // ✅ ADICIONADOS: campos para telefone e foto de perfil.
+  private _telefone: string | null;
+  private _fotoUrl: string | null;
+
   constructor(
     nome: string,
     email: string,
     senhaHash: string,
     perfil: Perfil,
     id?: string,
-    criadoEm?: Date
+    criadoEm?: Date,
+    telefone?: string | null,
+    fotoUrl?: string | null,
   ) {
     this._id = id ?? randomUUID();
     this._nome = '';
@@ -34,6 +41,10 @@ export abstract class Usuario {
     this._senhaHash = '';
     this._perfil = perfil;
     this._criadoEm = criadoEm ?? new Date();
+
+    // ✅ Atribui telefone e foto (aceita undefined → null).
+    this._telefone = telefone ?? null;
+    this._fotoUrl = fotoUrl ?? null;
 
     // Usa os setters para aproveitar as validações
     this.nome = nome;
@@ -65,6 +76,15 @@ export abstract class Usuario {
 
   get criadoEm(): Date {
     return this._criadoEm;
+  }
+
+  // ✅ Getters adicionados
+  get telefone(): string | null {
+    return this._telefone;
+  }
+
+  get fotoUrl(): string | null {
+    return this._fotoUrl;
   }
 
   // ---------- Setters com validação ----------
@@ -102,6 +122,15 @@ export abstract class Usuario {
     this._senhaHash = valor;
   }
 
+  // ✅ Setters adicionados (permitem o ProfileController atualizar)
+  set telefone(valor: string | null) {
+    this._telefone = valor ? valor.trim() : null;
+  }
+
+  set fotoUrl(valor: string | null) {
+    this._fotoUrl = valor ? valor.trim() : null;
+  }
+
   // ---------- Serialização ----------
 
   /**
@@ -116,6 +145,9 @@ export abstract class Usuario {
       senhaHash: this._senhaHash,
       perfil: this._perfil,
       criadoEm: this._criadoEm.toISOString(),
+      // ✅ Agora serializa telefone e fotoUrl
+      telefone: this._telefone,
+      fotoUrl: this._fotoUrl,
     };
   }
 
