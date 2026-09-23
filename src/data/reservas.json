@@ -1,0 +1,46 @@
+[
+  {
+    "id": "c3d4e5f6-0001-4000-8000-000000000001",
+    "professorId": "a1b2c3d4-0001-4000-8000-000000000001",
+    "salaId": "b2c3d4e5-0001-4000-8000-000000000001",
+    "data": "2024-06-10",
+    "horaInicio": "19:00",
+    "horaFim": "22:00",
+    "status": "confirmada",
+    "observacoes": "Aula prática de desenvolvimento web",
+    "criadoEm": "2024-06-01T10:00:00.000Z"
+  },
+  {
+    "id": "c3d4e5f6-0002-4000-8000-000000000002",
+    "professorId": "a1b2c3d4-0002-4000-8000-000000000002",
+    "salaId": "b2c3d4e5-0002-4000-8000-000000000002",
+    "data": "2024-06-11",
+    "horaInicio": "19:00",
+    "horaFim": "22:00",
+    "status": "confirmada",
+    "observacoes": "Aula de modelagem de banco de dados",
+    "criadoEm": "2024-06-02T11:30:00.000Z"
+  },
+  {
+    "id": "c3d4e5f6-0003-4000-8000-000000000003",
+    "professorId": "a1b2c3d4-0001-4000-8000-000000000001",
+    "salaId": "b2c3d4e5-0003-4000-8000-000000000003",
+    "data": "2024-06-12",
+    "horaInicio": "20:30",
+    "horaFim": "22:00",
+    "status": "confirmada",
+    "observacoes": "Aula prática de redes com projetos reais",
+    "criadoEm": "2024-06-03T09:15:00.000Z"
+  },
+  {
+    "id": "c3d4e5f6-0004-4000-8000-000000000004",
+    "professorId": "a1b2c3d4-0002-4000-8000-000000000002",
+    "salaId": "b2c3d4e5-0004-4000-8000-000000000004",
+    "data": "2024-06-15",
+    "horaInicio": "14:00",
+    "horaFim": "17:00",
+    "status": "cancelada",
+    "observacoes": "Palestra cancelada por motivo de força maior",
+    "criadoEm": "2024-06-05T16:45:00.000Z"
+  }
+]

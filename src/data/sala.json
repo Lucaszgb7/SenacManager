@@ -1,0 +1,52 @@
+[
+  {
+    "id": "b2c3d4e5-0001-4000-8000-000000000001",
+    "nome": "Laboratório 101",
+    "predio": "Bloco A",
+    "andar": 1,
+    "capacidade": 30,
+    "recursos": ["projetor", "computadores", "ar-condicionado", "quadro-branco"],
+    "ativa": true,
+    "criadoEm": "2023-11-15T08:00:00.000Z"
+  },
+  {
+    "id": "b2c3d4e5-0002-4000-8000-000000000002",
+    "nome": "Sala 202",
+    "predio": "Bloco A",
+    "andar": 2,
+    "capacidade": 40,
+    "recursos": ["projetor", "ar-condicionado", "quadro-branco"],
+    "ativa": true,
+    "criadoEm": "2023-11-15T08:05:00.000Z"
+  },
+  {
+    "id": "b2c3d4e5-0003-4000-8000-000000000003",
+    "nome": "Laboratório de Redes",
+    "predio": "Bloco B",
+    "andar": 1,
+    "capacidade": 25,
+    "recursos": ["computadores", "switches", "roteadores", "projetor", "ar-condicionado"],
+    "ativa": true,
+    "criadoEm": "2023-11-20T09:30:00.000Z"
+  },
+  {
+    "id": "b2c3d4e5-0004-4000-8000-000000000004",
+    "nome": "Auditório Principal",
+    "predio": "Bloco C",
+    "andar": 0,
+    "capacidade": 120,
+    "recursos": ["projetor", "som", "microfone", "ar-condicionado", "palco"],
+    "ativa": true,
+    "criadoEm": "2023-11-22T10:00:00.000Z"
+  },
+  {
+    "id": "b2c3d4e5-0005-4000-8000-000000000005",
+    "nome": "Sala de Estudos 305",
+    "predio": "Bloco B",
+    "andar": 3,
+    "capacidade": 15,
+    "recursos": ["quadro-branco", "ar-condicionado"],
+    "ativa": false,
+    "criadoEm": "2023-11-25T11:20:00.000Z"
+  }
+]
