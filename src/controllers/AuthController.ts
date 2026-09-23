@@ -1,4 +1,3 @@
-// src/controllers/AuthController.ts
 import { Request, Response } from 'express';
 import bcrypt from 'bcrypt';
 
@@ -8,9 +7,6 @@ import { Aluno } from '../models/Aluno';
 import { Administrador } from '../models/Administrador';
 
 export class AuthController {
-  /**
-   * POST /auth/login
-   */
   async login(req: Request, res: Response): Promise<void> {
     try {
       const { email, password } = req.body as {
@@ -25,7 +21,8 @@ export class AuthController {
         return;
       }
 
-      const usuario = await new UsuarioRepository().buscarPorEmail(email);
+      const usuarioRepository = new UsuarioRepository();
+      const usuario = await usuarioRepository.buscarPorEmail(email);
 
       if (!usuario) {
         res.status(401).render('auth/login', {
@@ -63,9 +60,6 @@ export class AuthController {
     }
   }
 
-  /**
-   * POST /auth/logout
-   */
   async logout(req: Request, res: Response): Promise<void> {
     req.session.destroy((err) => {
       if (err) {
@@ -87,9 +81,6 @@ export class AuthController {
     });
   }
 
-  /**
-   * POST /auth/registrar
-   */
   async registrar(req: Request, res: Response): Promise<void> {
     try {
       const {
@@ -115,7 +106,6 @@ export class AuthController {
           success: false,
           message: 'Campos obrigatórios: nome, email, senha e perfil.',
         });
-
         return;
       }
 
@@ -128,7 +118,6 @@ export class AuthController {
           success: false,
           message: 'Já existe um usuário com este e-mail.',
         });
-
         return;
       }
 
@@ -152,7 +141,6 @@ export class AuthController {
               success: false,
               message: 'Curso e turma são obrigatórios para aluno.',
             });
-
             return;
           }
 
@@ -179,7 +167,6 @@ export class AuthController {
             message:
               'Perfil inválido. Use: professor, aluno ou administrador.',
           });
-
           return;
       }
 
