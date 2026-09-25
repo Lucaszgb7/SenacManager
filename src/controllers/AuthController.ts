@@ -6,18 +6,6 @@ import { Professor } from '../models/Professor';
 import { Aluno } from '../models/Aluno';
 import { Administrador } from '../models/Administrador';
 
-// Estende o tipo do express-session diretamente no arquivo para evitar falhas de carregamento de arquivos .d.ts externos
-declare module 'express-session' {
-  interface SessionData {
-    usuario: {
-      id: any;
-      nome: string;
-      email: string;
-      perfil: string;
-    };
-  }
-}
-
 export class AuthController {
   private usuarioRepository: UsuarioRepository;
 

@@ -9,7 +9,7 @@
     // See also https://aka.ms/tsconfig/module
     "module": "commonjs",
     "target": "esnext",
-    "types": [],
+    "types": ["node", "jest"],
     "lib": ["es2020"],
     // For nodejs:
     // "lib": ["esnext"],
