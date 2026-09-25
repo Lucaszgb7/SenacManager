@@ -31,8 +31,14 @@ app.use(express.json());
 // Sessão — ANTES de qualquer rota que use req.session.
 app.use(sessionMiddleware);
 
+// Entrada principal da aplicação.
+app.get("/", (_req, res) => {
+  res.redirect("/login");
+});
+
 // Rotas públicas
 app.use(authRoutes);
+
 
 // Rotas autenticadas
 app.use(roomRoutes);
