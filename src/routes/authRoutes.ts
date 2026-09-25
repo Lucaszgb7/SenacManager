@@ -31,19 +31,4 @@ authRoutes.post(
   AuthController.logout.bind(AuthController)
 );
 
-
-/**
- * POST /auth/registrar
- * Cria nova conta. IMPORTANTE: em produção, envolver com middleware
- * `isAuthenticated` + `isAdmin` para impedir cadastro público indevido.
- * Ex.: router.post('/auth/registrar', isAuthenticated, isAdmin, AuthController.registrar)
- */
-authRoutes.post('/auth/registrar', AuthController.registrar);
-
-/**
- * POST /auth/logout
- * Encerra a sessão.
- */
-authRoutes.post('/auth/logout', AuthController.logout);
-
 export default authRoutes;

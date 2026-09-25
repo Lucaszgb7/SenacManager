@@ -52,15 +52,16 @@ export class AuthController {
       }
 
       // Linha 54 corrigida com asserção preventiva para evitar incompatibilidades de campos do banco
-        req.session.usuario = {
-        id: usuario.id,
-        nome: usuario.nome,
-        email: usuario.email,
-        perfil:
-      usuario.perfil === "admin"
-        ? "administrador"
-        : usuario.perfil,
-       } as any;
+req.session.usuario = {
+  id: usuario.id,
+  nome: usuario.nome,
+  email: usuario.email,
+  perfil:
+    usuario.perfil === "admin"
+      ? "administrador"
+      : usuario.perfil,
+} as any;
+
 
 
       res.redirect('/dashboard');

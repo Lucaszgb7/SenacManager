@@ -30,19 +30,25 @@ export class UsuarioRepository extends BaseRepository {
    * Constrói a instância correta conforme o `perfil` do JSON.
    * Centraliza a lógica que antes ficaria duplicada em cada método.
    */
-  protected fromJSON(dados: any): Usuario {
-    switch (dados.perfil) {
-      case "professor":
-        return Professor.fromJSON(dados);
-      case "aluno":
-        return Aluno.fromJSON(dados);
-      case "admin":
-        case "administrador":
-        return Administrador.fromJSON(dados);
-      default:
-        throw new Error(`Perfil desconhecido em usuarios.json: ${dados.perfil}`);
-    }
+protected fromJSON(dados: any): Usuario {
+  switch (dados.perfil) {
+    case "professor":
+      return Professor.fromJSON(dados);
+
+    case "aluno":
+      return Aluno.fromJSON(dados);
+
+    case "admin":
+    case "administrador":
+      return Administrador.fromJSON(dados);
+
+    default:
+      throw new Error(
+        `Perfil desconhecido em usuarios.json: ${dados.perfil}`
+      );
   }
+}
+
 
   /**
    * Lista todos os usuários.
