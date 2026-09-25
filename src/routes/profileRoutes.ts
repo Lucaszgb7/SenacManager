@@ -68,34 +68,30 @@ function tratarErrosMulter(
   });
 }
 
-/**
- * GET /profile
- * Exibe a tela do perfil do usuário logado.
- */
-profileRoutes.get("/profile", autenticado, ProfileController.verPerfil);
+profileRoutes.get(
+  "/profile",
+  autenticado,
+  ProfileController.verPerfil.bind(ProfileController)
+);
 
-/**
- * PUT /profile
- * Atualiza dados cadastrais. Chamada via fetch → JSON.
- */
-profileRoutes.put("/profile", autenticado, ProfileController.atualizarInfo);
+profileRoutes.put(
+  "/profile",
+  autenticado,
+  ProfileController.atualizarInfo.bind(ProfileController)
+);
 
-/**
- * PUT /profile/senha
- * Troca de senha. Chamada via fetch → JSON.
- */
-profileRoutes.put("/profile/senha", autenticado, ProfileController.alterarSenha);
+profileRoutes.put(
+  "/profile/senha",
+  autenticado,
+  ProfileController.alterarSenha.bind(ProfileController)
+);
 
-/**
- * POST /profile/foto
- * Upload do avatar. O wrapper tratarErrosMulter intercepta erros do
- * Multer e responde JSON amigável antes de chamar o controller.
- */
 profileRoutes.post(
   "/profile/foto",
   autenticado,
   tratarErrosMulter,
-  ProfileController.uploadFoto
+  ProfileController.uploadFoto.bind(ProfileController)
 );
+
 
 export default profileRoutes;

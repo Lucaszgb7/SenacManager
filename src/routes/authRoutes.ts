@@ -11,6 +11,7 @@ authRoutes.get('/login', (_req: Request, res: Response) => {
   res.render('auth/login', { error: null });
 });
 
+<<<<<<< HEAD
 
 authRoutes.post('/auth/login', AuthController.login);
 
@@ -19,5 +20,25 @@ authRoutes.post('/auth/registrar', autenticado, permitirPerfis('administrador'),
 
 
 authRoutes.post('/auth/logout', AuthController.logout);
+=======
+/**
+ * POST /auth/login
+ * Autentica o usuário e cria a sessão.
+ */
+authRoutes.post(
+  '/auth/login',
+  AuthController.login.bind(AuthController)
+);
+
+authRoutes.post(
+  '/auth/registrar',
+  AuthController.registrar.bind(AuthController)
+);
+
+authRoutes.post(
+  '/auth/logout',
+  AuthController.logout.bind(AuthController)
+);
+>>>>>>> bb0b303c275aac728f4e4111562a362c213d064b
 
 export default authRoutes;

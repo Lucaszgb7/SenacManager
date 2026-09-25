@@ -3,11 +3,65 @@ import { BaseRepository } from './BaseRepository';
 import { dataPath } from '../services/store';
 import { userModel } from '../services/SchoolService';
 export class UsuarioRepository extends BaseRepository {
-  private get caminhoArquivo() { return dataPath('usuarios'); }
-  protected fromJSON(dados: any): Usuario { return userModel(dados); }
-  async listarTodos(): Promise<Usuario[]> { return (await this.lerArquivo(this.caminhoArquivo)).map(u => this.fromJSON(u)); }
-  async buscarPorEmail(email: string): Promise<Usuario | null> { return (await this.listarTodos()).find(u => u.email === email.trim().toLowerCase()) || null; }
-  async buscarPorId(id: string): Promise<Usuario | null> { return (await this.listarTodos()).find(u => u.id === id) || null; }
+  private readonly caminhoArquivo = resolve(
+    __dirname,
+    "../../src/data",
+    "usuarios.json"
+  );
+
+  constructor() {
+    super();
+  }
+
+  /**
+   * Constrói a instância correta conforme o `perfil` do JSON.
+   * Centraliza a lógica que antes ficaria duplicada em cada método.
+   */
+  protected fromJSON(dados: any): Usuario {
+    switch (dados.perfil) {
+      case "professor":
+        return Professor.fromJSON(dados);
+      case "aluno":
+        return Aluno.fromJSON(dados);
+      case "admin":
+        return Administrador.fromJSON(dados);
+      default:
+        throw new Error(`Perfil desconhecido em usuarios.json: ${dados.perfil}`);
+    }
+  }
+
+  /**
+   * Lista todos os usuários.
+   */
+  async listarTodos(): Promise<Usuario[]> {
+    const dados = await this.lerArquivo(this.caminhoArquivo);
+    return dados.map((item: any) => this.fromJSON(item));
+  }
+
+  /**
+   * Busca por e-mail (case-insensitive).
+   */
+  async buscarPorEmail(email: string): Promise<Usuario | null> {
+    const usuarios = await this.listarTodos();
+    const alvo = email.toLowerCase().trim();
+    const encontrado = usuarios.find(
+      (u) => u.email.toLowerCase() === alvo
+    );
+    return encontrado ?? null;
+  }
+
+  /**
+   * Busca por id.
+   */
+  async buscarPorId(id: string): Promise<Usuario | null> {
+    const usuarios = await this.listarTodos();
+    const encontrado = usuarios.find((u) => u.id === id);
+    return encontrado ?? null;
+  }
+
+  /**
+   * Cria um novo usuário.
+   */
   async criar(usuario: Usuario): Promise<Usuario> {
     return this.transacao(async () => {
       const rows = await this.lerArquivo(this.caminhoArquivo);
