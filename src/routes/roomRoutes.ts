@@ -22,8 +22,9 @@ roomRoutes.get(
   "/rooms/booking",
   autenticado,
   permitirPerfis("professor"),
-  RoomController.telaReserva
+  RoomController.telaReserva.bind(RoomController)
 );
+
 
 /**
  * POST /rooms/booking
@@ -33,7 +34,8 @@ roomRoutes.post(
   "/rooms/booking",
   autenticado,
   permitirPerfis("professor"),
-  RoomController.confirmarReserva
+  RoomController.confirmarReserva.bind(RoomController)
 );
+
 
 export default roomRoutes;

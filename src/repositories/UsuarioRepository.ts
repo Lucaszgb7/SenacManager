@@ -37,6 +37,7 @@ export class UsuarioRepository extends BaseRepository {
       case "aluno":
         return Aluno.fromJSON(dados);
       case "admin":
+        case "administrador":
         return Administrador.fromJSON(dados);
       default:
         throw new Error(`Perfil desconhecido em usuarios.json: ${dados.perfil}`);

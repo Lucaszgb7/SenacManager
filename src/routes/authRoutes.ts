@@ -16,7 +16,21 @@ authRoutes.get('/login', (_req: Request, res: Response) => {
  * POST /auth/login
  * Autentica o usuário e cria a sessão.
  */
-authRoutes.post('/auth/login', AuthController.login);
+authRoutes.post(
+  '/auth/login',
+  AuthController.login.bind(AuthController)
+);
+
+authRoutes.post(
+  '/auth/registrar',
+  AuthController.registrar.bind(AuthController)
+);
+
+authRoutes.post(
+  '/auth/logout',
+  AuthController.logout.bind(AuthController)
+);
+
 
 /**
  * POST /auth/registrar
