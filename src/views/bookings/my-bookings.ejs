@@ -1,129 +1,20 @@
-<%- include('../partials/head', { title: 'Minhas Reservas' }) %>
+<!DOCTYPE html>
+<html lang="pt-BR">
+<%- include('../partials/head', { title: 'Minhas reservas', pageCss: 'my-bookings.css' }) %>
+<body>
+<%- include('../partials/header', { usuario }) %>
+<%- include('../partials/sidebar', { perfil: usuario.perfil }) %>
+<main class="app-main"><div class="app-main__inner">
+<h1 class="page-title">Minhas reservas</h1>
 
-<%- include('../partials/header', { usuario: usuario }) %>
-
-<div class="dashboard-layout">
-  <%- include('../partials/sidebar', { perfil: 'professor' }) %>
-
-  <main class="dashboard-main">
-    <div class="page-header">
-      <div>
-        <h1 class="page-title">Minhas Reservas</h1>
-        <p class="page-subtitle">Acompanhe e gerencie suas reservas de sala</p>
-      </div>
-      <a href="/rooms/booking" class="btn btn-primary">
-        + Nova Reserva
-      </a>
-    </div>
-
-    <!-- Abas -->
-    <div class="tabs" role="tablist">
-      <button
-        type="button"
-        class="tab is-active"
-        data-tab="proximas"
-        role="tab"
-        aria-selected="true"
-      >
-        Próximas
-        <span class="tab-count"><%= reservasFuturas.length %></span>
-      </button>
-      <button
-        type="button"
-        class="tab"
-        data-tab="historico"
-        role="tab"
-        aria-selected="false"
-      >
-        Histórico
-        <span class="tab-count"><%= reservasPassadas.length %></span>
-      </button>
-    </div>
-
-    <!-- Painel: Próximas -->
-    <section class="tab-panel is-active" data-panel="proximas">
-      <% if (reservasFuturas.length === 0) { %>
-        <div class="empty-state">
-          <h3 class="empty-state-title">Você ainda não tem reservas futuras</h3>
-          <p class="empty-state-text">
-            Que tal agendar uma sala para suas próximas aulas?
-          </p>
-          <a href="/rooms/booking" class="btn btn-primary">+ Nova Reserva</a>
-        </div>
-      <% } else { %>
-        <div class="bookings-list">
-          <% reservasFuturas.forEach(function (reserva) { %>
-            <article class="card booking-card" data-booking-id="<%= reserva.id %>">
-              <div class="booking-card-main">
-                <div class="booking-info">
-                  <div class="booking-when">
-                    <span class="booking-date"><%= reserva.data %></span>
-                    <span class="booking-time"><%= reserva.horario %></span>
-                  </div>
-                  <h3 class="booking-room"><%= reserva.sala %></h3>
-                  <p class="booking-subject">
-                    <%= reserva.disciplina %>
-                  </p>
-                </div>
-                <span class="badge badge-<%= reserva.status %>">
-                  <%= reserva.status === 'confirmada' ? 'Confirmada' : 'Cancelada' %>
-                </span>
-              </div>
-              <div class="booking-card-actions">
-                <button
-                  type="button"
-                  class="btn btn-danger-outline js-cancel-booking"
-                  data-booking-id="<%= reserva.id %>"
-                  data-booking-label="<%= reserva.sala %> — <%= reserva.data %> às <%= reserva.horario %>"
-                >
-                  Cancelar reserva
-                </button>
-              </div>
-            </article>
-          <% }); %>
-        </div>
-      <% } %>
-    </section>
-
-    <!-- Painel: Histórico -->
-    <section class="tab-panel" data-panel="historico">
-      <% if (reservasPassadas.length === 0) { %>
-        <div class="empty-state">
-          <h3 class="empty-state-title">Nenhum histórico de reservas</h3>
-          <p class="empty-state-text">
-            Suas reservas passadas aparecerão aqui.
-          </p>
-        </div>
-      <% } else { %>
-        <div class="bookings-list">
-          <% reservasPassadas.forEach(function (reserva) { %>
-            <article class="card booking-card booking-card-past">
-              <div class="booking-card-main">
-                <div class="booking-info">
-                  <div class="booking-when">
-                    <span class="booking-date"><%= reserva.data %></span>
-                    <span class="booking-time"><%= reserva.horario %></span>
-                  </div>
-                  <h3 class="booking-room"><%= reserva.sala %></h3>
-                  <p class="booking-subject"><%= reserva.disciplina %></p>
-                </div>
-                <span class="badge badge-<%= reserva.status %>">
-                  <%= reserva.status === 'confirmada' ? 'Confirmada' : 'Cancelada' %>
-                </span>
-              </div>
-            </article>
-          <% }); %>
-        </div>
-      <% } %>
-    </section>
-  </main>
-</div>
-
-<!-- CSS específico da tela -->
-<link rel="stylesheet" href="/css/my-bookings.css" />
-
-<!-- JS específico da tela -->
-<script src="/js/my-bookings.js" defer></script>
-
-</body>
-</html>
+<p class="toolbar"><a href="/rooms/booking" class="btn btn-primary">Nova reserva</a></p>
+<div class="tabs" role="tablist"><button type="button" class="tab is-active" data-tab="proximas" role="tab" aria-selected="true">Próximas (<%= reservasFuturas.length %>)</button><button type="button" class="tab" data-tab="historico" role="tab" aria-selected="false">Histórico (<%= reservasPassadas.length %>)</button></div>
+<% [['proximas', reservasFuturas], ['historico', reservasPassadas]].forEach(([tab, rows]) => { %>
+<section data-panel="<%= tab %>" <%= tab === 'historico' ? 'hidden' : '' %>>
+<% if (!rows.length) { %><p>Nenhuma reserva nesta lista.</p><% } %>
+<% rows.forEach(r => { %><article class="card booking-card"><h2><%= r.sala %></h2><p><%= r.data %> · <%= r.horario %></p><p><%= r.disciplina %> · <%= r.turma %></p><p><%= r.status === 'confirmada' ? 'Confirmada' : 'Cancelada' %></p>
+<% if (tab === 'proximas') { %><button type="button" class="btn btn-danger-outline" data-api-action="/bookings/<%= r.id %>/cancelar" data-confirm="Cancelar esta reserva?">Cancelar reserva</button><% } %><p data-feedback role="status" hidden></p></article><% }) %>
+</section><% }) %>
+</div></main>
+<%- include('../partials/footer') %>
+</body></html>

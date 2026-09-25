@@ -58,7 +58,7 @@ export class Professor extends Usuario {
    * Reconstrói um Professor a partir de um objeto plano.
    */
   static fromJSON(data: any): Professor {
-    return new Professor(
+    const usuario = new Professor(
       data.nome,
       data.email,
       data.senhaHash,
@@ -66,5 +66,9 @@ export class Professor extends Usuario {
       data.id,
       data.criadoEm ? new Date(data.criadoEm) : undefined
     );
+    usuario.telefone = data.telefone ?? null;
+    usuario.fotoUrl = data.fotoUrl ?? null;
+    usuario.ativo = data.ativo !== false;
+    return usuario;
   }
 }

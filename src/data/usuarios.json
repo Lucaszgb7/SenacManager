@@ -27,7 +27,8 @@
     "perfil": "aluno",
     "criadoEm": "2024-02-01T14:00:00.000Z",
     "matricula": "2024001",
-    "curso": "Análise e Desenvolvimento de Sistemas"
+    "curso": "Análise e Desenvolvimento de Sistemas",
+    "turma": "TURMA DEMONSTRACAO"
   },
   {
     "id": "a1b2c3d4-0004-4000-8000-000000000004",
@@ -37,7 +38,8 @@
     "perfil": "aluno",
     "criadoEm": "2024-02-03T09:45:00.000Z",
     "matricula": "2024002",
-    "curso": "Análise e Desenvolvimento de Sistemas"
+    "curso": "Análise e Desenvolvimento de Sistemas",
+    "turma": "TURMA DEMONSTRACAO"
   },
   {
     "id": "a1b2c3d4-0005-4000-8000-000000000005",

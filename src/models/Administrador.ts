@@ -2,7 +2,7 @@ import { Usuario } from './Usuario';
 
 /**
  * Representa um administrador do SenacManager.
- * Não possui propriedades extras — apenas força o perfil 'admin'.
+ * Não possui propriedades extras — apenas força o perfil 'administrador'.
  */
 export class Administrador extends Usuario {
   constructor(
@@ -12,8 +12,8 @@ export class Administrador extends Usuario {
     id?: string,
     criadoEm?: Date
   ) {
-    // Perfil fixo: 'admin'
-    super(nome, email, senhaHash, 'admin', id, criadoEm);
+    // Perfil fixo: 'administrador'
+    super(nome, email, senhaHash, 'administrador', id, criadoEm);
   }
 
   toJSON(): Record<string, any> {
@@ -26,12 +26,16 @@ export class Administrador extends Usuario {
    * Reconstrói um Administrador a partir de um objeto plano.
    */
   static fromJSON(data: any): Administrador {
-    return new Administrador(
+    const usuario = new Administrador(
       data.nome,
       data.email,
       data.senhaHash,
       data.id,
       data.criadoEm ? new Date(data.criadoEm) : undefined
     );
+    usuario.telefone = data.telefone ?? null;
+    usuario.fotoUrl = data.fotoUrl ?? null;
+    usuario.ativo = data.ativo !== false;
+    return usuario;
   }
 }

@@ -65,7 +65,7 @@ export class Aluno extends Usuario {
    * Reconstrói um Aluno a partir de um objeto plano.
    */
   static fromJSON(data: any): Aluno {
-    return new Aluno(
+    const usuario = new Aluno(
       data.nome,
       data.email,
       data.senhaHash,
@@ -74,5 +74,9 @@ export class Aluno extends Usuario {
       data.id,
       data.criadoEm ? new Date(data.criadoEm) : undefined
     );
+    usuario.telefone = data.telefone ?? null;
+    usuario.fotoUrl = data.fotoUrl ?? null;
+    usuario.ativo = data.ativo !== false;
+    return usuario;
   }
 }

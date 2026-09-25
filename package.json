@@ -3,9 +3,12 @@
   "version": "1.0.0",
   "scripts": {
     "dev": "ts-node-dev --respawn src/server.ts",
-    "build": "tsc && cp -R src/views dist/views",
+    "build": "node scripts/build.cjs",
     "start": "node dist/server.js",
-    "test": "jest"
+    "test": "jest",
+    "typecheck": "tsc --noEmit",
+    "admin:create": "node dist/scripts/create-admin.js",
+    "test:browser": "npm run build && node scripts/browser-test.cjs"
   },
   "dependencies": {
     "bcrypt": "^6.0.0",
@@ -15,6 +18,7 @@
     "multer": "^2.4.0"
   },
   "devDependencies": {
+    "@playwright/test": "^1.63.0",
     "@types/bcrypt": "^6.0.0",
     "@types/express": "^5.0.6",
     "@types/express-session": "^1.19.0",
@@ -25,5 +29,8 @@
     "ts-jest": "^29.4.13",
     "ts-node-dev": "^2.0.0",
     "typescript": "^5.9.3"
+  },
+  "engines": {
+    "node": ">=22"
   }
 }

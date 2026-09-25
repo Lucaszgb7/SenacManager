@@ -6,6 +6,7 @@ import { randomUUID } from 'crypto';
  * prédio e, opcionalmente, andar.
  */
 export class Sala {
+  ativa = true;
   private _id: string;
   private _nome: string;
   private _capacidade: number;
@@ -135,6 +136,7 @@ export class Sala {
   toJSON(): Record<string, any> {
     const obj: Record<string, any> = {
       id: this._id,
+      ativa: this.ativa,
       nome: this._nome,
       capacidade: this._capacidade,
       recursos: this._recursos,
@@ -150,7 +152,7 @@ export class Sala {
    * Reconstrói uma Sala a partir de um objeto plano lido do .json.
    */
   static fromJSON(data: any): Sala {
-    return new Sala(
+    const sala = new Sala(
       data.nome,
       data.capacidade,
       data.recursos ?? [],
@@ -158,5 +160,7 @@ export class Sala {
       data.andar,
       data.id
     );
+    sala.ativa = data.ativa !== false;
+    return sala;
   }
 }

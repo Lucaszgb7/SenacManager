@@ -1,127 +1,33 @@
-<%- include('../partials/head', { title: 'Meu Perfil' }) %>
-<link rel="stylesheet" href="/css/dashboard.css" />
-<link rel="stylesheet" href="/css/profile.css" />
+<!DOCTYPE html>
+<html lang="pt-BR">
+<%- include('../partials/head', { title: 'Meu perfil', pageCss: 'profile.css' }) %>
+<body>
+<%- include('../partials/header', { usuario }) %>
+<%- include('../partials/sidebar', { perfil: usuario.perfil }) %>
+<main class="app-main"><div class="app-main__inner">
+<h1 class="page-title">Meu perfil</h1>
 
-<%- include('../partials/header', {
-  usuario: { nome: 'Prof. Ana Ribeiro', perfil: 'professor' }
-}) %>
-<%- include('../partials/sidebar', { perfil: 'professor', paginaAtual: 'profile' }) %>
-
-<%
-  // ---------- DADOS MOCKADOS ----------
-  var usuario = {
-    nome: 'Prof. Ana Ribeiro',
-    email: 'ana.ribeiro@senac.br',
-    telefone: '(11) 98888-1234',
-    perfil: 'professor', // 'professor' | 'aluno' | 'admin'
-    disciplinas: ['Desenvolvimento Web II', 'Banco de Dados', 'Projeto Integrador'],
-    curso: null,
-    turma: null
-  };
-
-  var iniciais = usuario.nome
-    .split(' ').filter(Boolean).slice(0, 2)
-    .map(function(n){ return n[0].toUpperCase(); }).join('');
-
-  var labelPerfil = { professor: 'Professor', aluno: 'Aluno', admin: 'Administrador' }[usuario.perfil];
-%>
-
-<main class="app-main">
-  <div class="app-main__inner">
-
-    <h1 class="page-title">Meu Perfil</h1>
-    <p class="page-subtitle">Gerencie suas informações pessoais e senha de acesso</p>
-
-    <section class="card profile-header">
-      <div class="profile-header__avatar avatar avatar--lg"><%= iniciais %></div>
-      <div class="profile-header__info">
-        <h2 class="profile-header__name"><%= usuario.nome %></h2>
-        <p class="profile-header__email"><%= usuario.email %></p>
-        <span class="badge badge--perfil"><%= labelPerfil %></span>
-      </div>
-    </section>
-
-    <section class="card">
-      <h2 class="card__title">Informações pessoais</h2>
-      <form id="formInfo" novalidate>
-        <div class="input-group">
-          <label for="nome">Nome completo</label>
-          <input type="text" id="nome" name="nome" value="<%= usuario.nome %>" required />
-        </div>
-
-        <div class="input-group">
-          <label for="email">E-mail</label>
-          <input type="email" id="email" name="email" value="<%= usuario.email %>" required />
-        </div>
-
-        <div class="input-group">
-          <label for="telefone">Telefone</label>
-          <input type="tel" id="telefone" name="telefone" value="<%= usuario.telefone %>" />
-        </div>
-
-        <% if (usuario.perfil === 'professor') { %>
-          <div class="input-group">
-            <label>Disciplinas</label>
-            <div class="tag-list">
-              <% usuario.disciplinas.forEach(function(d) { %>
-                <span class="tag"><%= d %></span>
-              <% }); %>
-            </div>
-          </div>
-        <% } %>
-
-        <% if (usuario.perfil === 'aluno') { %>
-          <div class="input-group">
-            <label for="curso">Curso</label>
-            <input type="text" id="curso" name="curso" value="<%= usuario.curso || '' %>" />
-          </div>
-          <div class="input-group">
-            <label for="turma">Turma</label>
-            <input type="text" id="turma" name="turma" value="<%= usuario.turma || '' %>" />
-          </div>
-        <% } %>
-
-        <button type="submit" class="btn btn-primary">Salvar alterações</button>
-      </form>
-    </section>
-
-    <section class="card">
-      <h2 class="card__title">Alterar senha</h2>
-      <form id="formSenha" novalidate>
-        <div class="input-group">
-          <label for="senhaAtual">Senha atual</label>
-          <div class="password-wrap">
-            <input type="password" id="senhaAtual" name="senhaAtual" required />
-            <button type="button" class="toggle-password" data-target="senhaAtual" aria-label="Mostrar senha">👁</button>
-          </div>
-        </div>
-
-        <div class="input-group">
-          <label for="novaSenha">Nova senha</label>
-          <div class="password-wrap">
-            <input type="password" id="novaSenha" name="novaSenha" required />
-            <button type="button" class="toggle-password" data-target="novaSenha" aria-label="Mostrar senha">👁</button>
-          </div>
-        </div>
-
-        <div class="input-group">
-          <label for="confirmarSenha">Confirmar nova senha</label>
-          <div class="password-wrap">
-            <input type="password" id="confirmarSenha" name="confirmarSenha" required />
-            <button type="button" class="toggle-password" data-target="confirmarSenha" aria-label="Mostrar senha">👁</button>
-          </div>
-        </div>
-
-        <p id="senhaFeedback" class="error-message" hidden></p>
-
-        <button type="submit" class="btn btn-primary">Alterar senha</button>
-      </form>
-    </section>
-
-  </div>
-</main>
-
+<section class="card profile-header">
+<% if (usuario.fotoUrl) { %><img class="profile-photo" src="<%= usuario.fotoUrl %>" alt="Foto de <%= usuario.nome %>"><% } %>
+<div><h2><%= usuario.nome %></h2><p><%= usuario.email %></p><p><%= usuario.perfil %></p></div>
+</section>
+<section class="card"><h2 class="card__title">Informações pessoais</h2>
+<form action="/profile" method="post" data-api-form data-method="PUT" data-redirect="/profile">
+<div class="form-grid"><label class="input-group">Nome<input name="nome" value="<%= usuario.nome %>" minlength="3" required></label>
+<label class="input-group">E-mail<input name="email" type="email" value="<%= usuario.email %>" required></label>
+<label class="input-group">Telefone<input name="telefone" type="tel" value="<%= usuario.telefone || '' %>"></label>
+<% if (usuario.perfil === 'professor') { %><label class="input-group">Disciplinas (separadas por vírgula)<input name="disciplinas" data-array value="<%= (usuario.disciplinas || []).join(', ') %>"></label><% } %>
+<% if (usuario.perfil === 'aluno') { %><label class="input-group">Curso<input name="curso" value="<%= usuario.curso %>" minlength="2" required></label><label class="input-group">Turma<input name="turma" value="<%= usuario.turma %>" required></label><% } %>
+</div><p data-feedback role="status" hidden></p><button type="submit" class="btn btn-primary">Salvar dados</button></form></section>
+<section class="card"><h2 class="card__title">Alterar senha</h2>
+<form action="/profile/senha" method="post" data-api-form data-method="PUT" data-reset>
+<div class="form-grid"><label class="input-group">Senha atual<input type="password" name="senhaAtual" autocomplete="current-password" required></label>
+<label class="input-group">Nova senha<input type="password" name="novaSenha" autocomplete="new-password" minlength="8" required></label>
+<label class="input-group">Confirmar nova senha<input type="password" name="confirmarSenha" autocomplete="new-password" minlength="8" required></label></div>
+<p data-feedback role="status" hidden></p><button class="btn btn-primary" type="submit">Alterar senha</button></form></section>
+<section class="card"><h2 class="card__title">Foto de perfil</h2><form action="/profile/foto" method="post" enctype="multipart/form-data" data-api-form data-redirect="/profile">
+<label class="input-group">Imagem JPG, PNG ou WebP de até 2 MB<input type="file" name="avatar" accept="image/jpeg,image/png,image/webp" required></label>
+<p data-feedback role="status" hidden></p><button class="btn btn-primary" type="submit">Salvar foto</button></form></section>
+</div></main>
 <%- include('../partials/footer') %>
-
-<script src="/js/sidebar.js"></script>
-<script src="/js/profile.js"></script>
+</body></html>

@@ -5,11 +5,14 @@
     "salaId": "b2c3d4e5-0001-4000-8000-000000000001",
     "disciplina": "Desenvolvimento Web I",
     "diaSemana": "segunda",
-    "horaInicio": "08:00",
-    "horaFim": "10:00",
     "isNoa": true,
     "semestre": "2024.1",
-    "criadoEm": "2024-02-10T08:00:00.000Z"
+    "criadoEm": "2024-02-10T08:00:00.000Z",
+    "horarioInicio": "08:00",
+    "horarioFim": "10:00",
+    "turma": "TURMA DEMONSTRACAO",
+    "ativa": true,
+    "vagasTotal": 20
   },
   {
     "id": "d4e5f6a7-0002-4000-8000-000000000002",
@@ -17,11 +20,14 @@
     "salaId": "b2c3d4e5-0002-4000-8000-000000000002",
     "disciplina": "Banco de Dados I",
     "diaSemana": "segunda",
-    "horaInicio": "10:00",
-    "horaFim": "12:00",
     "isNoa": true,
     "semestre": "2024.1",
-    "criadoEm": "2024-02-10T08:05:00.000Z"
+    "criadoEm": "2024-02-10T08:05:00.000Z",
+    "horarioInicio": "10:00",
+    "horarioFim": "12:00",
+    "turma": "TURMA DEMONSTRACAO",
+    "ativa": true,
+    "vagasTotal": 20
   },
   {
     "id": "d4e5f6a7-0003-4000-8000-000000000003",
@@ -29,11 +35,13 @@
     "salaId": "b2c3d4e5-0003-4000-8000-000000000003",
     "disciplina": "Desenvolvimento Web II",
     "diaSemana": "terca",
-    "horaInicio": "19:00",
-    "horaFim": "22:00",
     "isNoa": false,
     "semestre": "2024.1",
-    "criadoEm": "2024-02-10T08:10:00.000Z"
+    "criadoEm": "2024-02-10T08:10:00.000Z",
+    "horarioInicio": "19:00",
+    "horarioFim": "22:00",
+    "turma": "TURMA DEMONSTRACAO",
+    "ativa": true
   },
   {
     "id": "d4e5f6a7-0004-4000-8000-000000000004",
@@ -41,11 +49,13 @@
     "salaId": "b2c3d4e5-0001-4000-8000-000000000001",
     "disciplina": "Banco de Dados II",
     "diaSemana": "quarta",
-    "horaInicio": "19:00",
-    "horaFim": "22:00",
     "isNoa": false,
     "semestre": "2024.1",
-    "criadoEm": "2024-02-10T08:15:00.000Z"
+    "criadoEm": "2024-02-10T08:15:00.000Z",
+    "horarioInicio": "19:00",
+    "horarioFim": "22:00",
+    "turma": "TURMA DEMONSTRACAO",
+    "ativa": true
   },
   {
     "id": "d4e5f6a7-0005-4000-8000-000000000005",
@@ -53,11 +63,13 @@
     "salaId": "b2c3d4e5-0002-4000-8000-000000000002",
     "disciplina": "Projeto Integrador",
     "diaSemana": "quinta",
-    "horaInicio": "19:00",
-    "horaFim": "22:00",
     "isNoa": false,
     "semestre": "2024.1",
-    "criadoEm": "2024-02-10T08:20:00.000Z"
+    "criadoEm": "2024-02-10T08:20:00.000Z",
+    "horarioInicio": "19:00",
+    "horarioFim": "22:00",
+    "turma": "TURMA DEMONSTRACAO",
+    "ativa": true
   },
   {
     "id": "d4e5f6a7-0006-4000-8000-000000000006",
@@ -65,10 +77,12 @@
     "salaId": "b2c3d4e5-0004-4000-8000-000000000004",
     "disciplina": "Tópicos Avançados em TI",
     "diaSemana": "sexta",
-    "horaInicio": "14:00",
-    "horaFim": "17:00",
     "isNoa": false,
     "semestre": "2024.1",
-    "criadoEm": "2024-02-10T08:25:00.000Z"
+    "criadoEm": "2024-02-10T08:25:00.000Z",
+    "horarioInicio": "14:00",
+    "horarioFim": "17:00",
+    "turma": "TURMA DEMONSTRACAO",
+    "ativa": true
   }
 ]

@@ -212,8 +212,8 @@ export class Reserva {
       data.disciplina,
       data.turma,
       data.data,
-      data.horarioInicio,
-      data.horarioFim,
+      data.horarioInicio ?? data.horaInicio,
+      data.horarioFim ?? data.horaFim,
       data.status ?? 'confirmada',
       data.id,
       data.criadoEm ? new Date(data.criadoEm) : undefined

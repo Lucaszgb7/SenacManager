@@ -1,138 +1,87 @@
-import { Router, Request, Response } from "express";
-
-import { autenticado } from "../middlewares/authMiddleware";
-import { permitirPerfis } from "../middlewares/perfilMiddleware";
-
-const pageRoutes = Router();
-
-type UsuarioSessao = NonNullable<Request["session"]["usuario"]>;
-
-function usuarioDaSessao(req: Request): UsuarioSessao {
-  return req.session.usuario as UsuarioSessao;
+import { Router } from 'express';
+import { autenticado } from '../middlewares/authMiddleware';
+import { permitirPerfis } from '../middlewares/perfilMiddleware';
+import { state, classView, enroll, saveRoom, saveClass, saveUser, removeRecord, cancelClass, safeUser } from '../services/SchoolService';
+import { schoolNow, vigente, semesterRange, HttpError } from '../services/validation';
+const router = Router();
+router.use(autenticado);
+router.get('/dashboard', async (req, res) => {
+  const s = await state(), user = res.locals.usuario;
+  const today = schoolNow().slice(0, 10);
+  const aulas = s.aulas.filter(a => a.ativa !== false && (user.perfil === 'administrador' || a.professorId === user.id || (user.perfil === 'aluno' && (a.turma === user.turma || s.inscricoes.some(i => i.aulaId === a.id && i.alunoId === user.id))))).filter(a => vigente(a, today)).map(a => classView(a, s));
+  res.render('dashboard/dashboard', { aulas, metricas: { salas: s.salas.length, professores: s.usuarios.filter(u => u.perfil === 'professor' && u.ativo).length, alunos: s.usuarios.filter(u => u.perfil === 'aluno' && u.ativo).length, reservas: s.reservas.filter(r => r.status === 'confirmada' && r.data + 'T' + r.horarioFim > schoolNow()).length } });
+});
+router.get('/search', async (req, res) => {
+  const s = await state();
+  const busca = typeof req.query.q === 'string' ? req.query.q.trim().toLocaleLowerCase('pt-BR') : '';
+  const aulas = s.aulas.map(a => classView(a, s)).filter(a => [a.disciplina, a.professor.nome, a.sala, a.turma, a.diaSemana, a.semestre].join(' ').toLocaleLowerCase('pt-BR').includes(busca));
+  res.render('search/search-filters', { aulas, busca });
+});
+router.get('/classes', (_req, res) => { res.redirect('/search'); });
+router.get('/classes/details', async (req, res) => {
+  const s = await state(), id = String(req.query.id || '');
+  const aula = s.aulas.find(a => a.id === id);
+  if (!aula) throw new HttpError(404, 'Aula não encontrada.');
+  res.render('classes/class-details', { aula: classView(aula, s) });
+});
+router.get('/classes/:id/edit', permitirPerfis('professor', 'administrador'), async (req, res) => {
+  const s = await state(), aula = s.aulas.find(a => a.id === req.params.id);
+  if (!aula) throw new HttpError(404, 'Aula não encontrada.');
+  if (res.locals.usuario.perfil !== 'administrador' && aula.professorId !== res.locals.usuario.id) throw new HttpError(403, 'Esta aula pertence a outro professor.');
+  res.render('admin/edit', { kind: 'aulas-grade', record: aula, salas: s.salas, professores: s.usuarios.filter(u => u.perfil === 'professor'), endpoint: '/classes/' + aula.id, back: '/classes/details?id=' + aula.id });
+});
+router.put('/classes/:id', permitirPerfis('professor', 'administrador'), async (req, res) => {
+  await saveClass(req.body || {}, res.locals.usuario, String(req.params.id));
+  res.json({ success: true, message: 'Aula atualizada.' });
+});
+router.post('/classes/:id/cancelar', permitirPerfis('professor', 'administrador'), async (req, res) => {
+  await cancelClass(String(req.params.id), res.locals.usuario);
+  res.json({ success: true, message: 'Aula cancelada.' });
+});
+router.get('/noa', permitirPerfis('aluno'), async (req, res) => {
+  const s = await state(), today = schoolNow().slice(0,10);
+  const activities = s.aulas.filter(a => a.isNoa).map(a => {
+    const [start, end] = semesterRange(a.semestre);
+    return { ...classView(a, s), disponivel: a.ativa !== false && today >= start && today <= end && s.salas.some(r => r.id === a.salaId && r.ativa !== false) && s.usuarios.some(u => u.id === a.professorId && u.ativo), vagasOcupadas: s.inscricoes.filter(i => i.aulaId === a.id).length, inscrito: s.inscricoes.some(i => i.aulaId === a.id && i.alunoId === req.session.usuario!.id) };
+  });
+  res.render('noa/noa', { atividades: activities.filter(a => a.disponivel), minhasInscricoes: activities.filter(a => a.inscrito) });
+});
+router.post('/noa/:id/inscrever', permitirPerfis('aluno'), async (req, res) => {
+  await enroll(req.session.usuario!.id, String(req.params.id));
+  res.status(201).json({ success: true, message: 'Inscrição confirmada.' });
+});
+router.post('/noa/:id/cancelar', permitirPerfis('aluno'), async (req, res) => {
+  await enroll(req.session.usuario!.id, String(req.params.id), true);
+  res.json({ success: true, message: 'Inscrição cancelada.' });
+});
+router.get('/admin', permitirPerfis('administrador'), async (_req, res) => {
+  const s = await state();
+  res.render('admin/admin-panel', { salas: s.salas, aulas: s.aulas.map(a => classView(a, s)), usuarios: s.usuarios.map(safeUser) });
+});
+const kinds = ['salas','usuarios','aulas-grade'] as const;
+function kindOf(value: string): typeof kinds[number] {
+  if (!(kinds as readonly string[]).includes(value)) throw new HttpError(404, 'Cadastro não encontrado.');
+  return value as typeof kinds[number];
 }
-
-// Dashboard
-pageRoutes.get(
-  "/dashboard",
-  autenticado,
-  (req: Request, res: Response) => {
-    const usuario = usuarioDaSessao(req);
-
-    if (usuario.perfil === "professor") {
-      res.render("dashboard/dashboard-professor", { usuario });
-      return;
-    }
-
-    if (usuario.perfil === "aluno") {
-      res.render("dashboard/dashboard-aluno", { usuario });
-      return;
-    }
-
-    if (usuario.perfil === "administrador") {
-      res.render("dashboard/dashboard-admin", { usuario });
-      return;
-    }
-
-    res.status(403).send("Perfil de usuário inválido.");
-  }
-);
-
-// Tela NOA — somente alunos
-pageRoutes.get(
-  "/noa",
-  autenticado,
-  permitirPerfis("aluno"),
-  (req: Request, res: Response) => {
-    const usuario = usuarioDaSessao(req);
-
-    res.render("noa/noa", {
-      usuario,
-      atividades: [
-        {
-          nome: "Lógica de Programação",
-          horario: "Terça-feira — 13:00 às 14:40",
-          professor: "Prof. Ana Ribeiro",
-          sala: "Ambiente Virtual",
-          vagasTotal: 30,
-          vagasOcupadas: 18,
-        },
-        {
-          nome: "Oficina de Portfólio Digital",
-          horario: "Quinta-feira — 15:00 às 16:40",
-          professor: "Prof. Marina Lima",
-          sala: "Laboratório 04",
-          vagasTotal: 20,
-          vagasOcupadas: 20,
-        },
-      ],
-      minhasInscricoes: [],
-    });
-  }
-);
-
-// Pesquisa — qualquer usuário autenticado
-pageRoutes.get(
-  "/search",
-  autenticado,
-  (req: Request, res: Response) => {
-    const usuario = usuarioDaSessao(req);
-
-    res.render("search/search-filters", {
-      usuario,
-      perfil:
-        usuario.perfil === "administrador"
-          ? "admin"
-          : usuario.perfil,
-    });
-  }
-);
-
-// Detalhes de uma aula
-pageRoutes.get(
-  "/classes/details",
-  autenticado,
-  (req: Request, res: Response) => {
-    const usuario = usuarioDaSessao(req);
-
-    res.render("classes/class-details", {
-      usuario,
-      aula: {
-        id: String(req.query.id ?? "1"),
-        disciplina: "Desenvolvimento Web II",
-        isNoa: false,
-        professor: {
-          id: "a1b2c3d4-0001-4000-8000-000000000001",
-          nome: "Prof. Ana Ribeiro",
-          iniciais: "AR",
-        },
-        sala: "Lab 03 — Bloco B",
-        predio: "Bloco B",
-        diaSemana: "Terça-feira",
-        horarioInicio: "10:00",
-        horarioFim: "11:40",
-        turma: "3º Módulo — Técnico em Informática",
-        descricao:
-          "Aula prática de desenvolvimento de aplicações web.",
-      },
-    });
-  }
-);
-
-// Painel administrativo — somente administradores
-pageRoutes.get(
-  "/admin",
-  autenticado,
-  permitirPerfis("administrador"),
-  (req: Request, res: Response) => {
-    const usuario = usuarioDaSessao(req);
-
-    res.render("admin/admin-panel", {
-      usuario: {
-        ...usuario,
-        perfil: "admin",
-      },
-    });
-  }
-);
-
-export default pageRoutes;
+router.get('/admin/:kind/edit', permitirPerfis('administrador'), async (req, res) => {
+  const s = await state(), kind = kindOf(String(req.params.kind));
+  const rows = kind === 'salas' ? s.salas : kind === 'usuarios' ? s.usuarios : s.aulas;
+  const record = req.query.id ? rows.find(r => r.id === req.query.id) : {};
+  if (!record) throw new HttpError(404, 'Registro não encontrado.');
+  res.render('admin/edit', { kind, record: kind === 'usuarios' ? safeUser(record) : record, salas: s.salas, professores: s.usuarios.filter(u => u.perfil === 'professor'), endpoint: '/admin/' + kind + (record.id ? '/' + record.id : ''), back: '/admin' });
+});
+router.post('/admin/:kind', permitirPerfis('administrador'), async (req, res) => {
+  const kind = kindOf(String(req.params.kind));
+  const record = kind === 'salas' ? await saveRoom(req.body || {}) : kind === 'usuarios' ? await saveUser(req.body || {}) : await saveClass(req.body || {}, res.locals.usuario);
+  res.status(201).json({ success: true, record });
+});
+router.put('/admin/:kind/:id', permitirPerfis('administrador'), async (req, res) => {
+  const kind = kindOf(String(req.params.kind)), id = String(req.params.id);
+  const record = kind === 'salas' ? await saveRoom(req.body || {}, id) : kind === 'usuarios' ? await saveUser(req.body || {}, id, req.session.usuario!.id) : await saveClass(req.body || {}, res.locals.usuario, id);
+  res.json({ success: true, record });
+});
+router.delete('/admin/:kind/:id', permitirPerfis('administrador'), async (req, res) => {
+  await removeRecord(kindOf(String(req.params.kind)), String(req.params.id), req.session.usuario!.id);
+  res.json({ success: true, message: 'Registro removido.' });
+});
+export default router;

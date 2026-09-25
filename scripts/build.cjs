@@ -1,0 +1,11 @@
+const fs = require('node:fs');
+const path = require('node:path');
+const { spawnSync } = require('node:child_process');
+const root = path.resolve(__dirname, '..');
+const output = path.resolve(root, 'dist');
+if (path.dirname(output) !== root || path.basename(output) !== 'dist') throw new Error('Destino de build inválido.');
+fs.rmSync(output, { recursive: true, force: true });
+const result = spawnSync(process.execPath, [path.join(root, 'node_modules/typescript/bin/tsc'), '--noEmitOnError'], { cwd: root, stdio: 'inherit' });
+if (result.error) throw result.error;
+if (result.status !== 0) process.exit(result.status || 1);
+fs.cpSync(path.join(root, 'src/views'), path.join(output, 'views'), { recursive: true });

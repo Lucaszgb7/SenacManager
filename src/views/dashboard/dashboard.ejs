@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<%- include('../partials/head', { title: 'Dashboard', pageCss: 'dashboard-extra.css' }) %>
+<body>
+<%- include('../partials/header', { usuario }) %>
+<%- include('../partials/sidebar', { perfil: usuario.perfil }) %>
+<main class="app-main"><div class="app-main__inner">
+<h1 class="page-title">Dashboard</h1>
+
+<p class="page-subtitle">Olá, <%= usuario.nome %></p>
+<% if (usuario.perfil === 'administrador') { %>
+<div class="metric-grid">
+<% Object.entries(metricas).forEach(([label, value]) => { %>
+<div class="metric-card"><strong class="metric-card__value"><%= value %></strong><span class="metric-card__label"><%= label %></span></div>
+<% }) %></div><p><a class="btn btn-primary" href="/admin">Painel administrativo</a></p>
+<% } %>
+<% if (usuario.perfil === 'professor') { %><p class="toolbar"><a class="btn btn-primary" href="/rooms/booking">Reservar sala</a> <a class="btn" href="/bookings/my">Minhas reservas</a></p><% } %>
+<section class="card"><h2 class="card__title">Aulas de hoje</h2>
+<% if (!aulas.length) { %><p>Nenhuma aula prevista para hoje.</p><% } %>
+<ul class="list-clean"><% aulas.forEach(a => { %><li class="list-clean__item"><a href="/classes/details?id=<%= a.id %>"><strong><%= a.disciplina %></strong> — <%= a.horario %> · <%= a.sala %> · <%= a.professor.nome %></a></li><% }) %></ul>
+</section>
+</div></main>
+<%- include('../partials/footer') %>
+</body></html>

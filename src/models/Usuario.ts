@@ -5,7 +5,7 @@ import { randomUUID } from 'crypto';
  * Tipo que representa os perfis possíveis de usuário no sistema.
  * Usado para controle de acesso e diferenciação nas views.
  */
-export type Perfil = 'professor' | 'aluno' | 'admin';
+export type Perfil = 'professor' | 'aluno' | 'administrador';
 
 /**
  * Classe base abstrata Usuario.
@@ -14,6 +14,7 @@ export type Perfil = 'professor' | 'aluno' | 'admin';
  * Aluno ou Administrador.
  */
 export abstract class Usuario {
+  ativo = true;
   private _id: string;
   private _nome: string;
   private _email: string;
@@ -93,7 +94,7 @@ export abstract class Usuario {
    * Valida se o nome não está vazio e possui ao menos 3 caracteres.
    */
   set nome(valor: string) {
-    if (!valor || valor.trim().length < 3) {
+    if (typeof valor !== 'string' || valor.trim().length < 3) {
       throw new Error('Nome deve ter pelo menos 3 caracteres.');
     }
     this._nome = valor.trim();
@@ -104,7 +105,7 @@ export abstract class Usuario {
    */
   set email(valor: string) {
     const regexEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!valor || !regexEmail.test(valor)) {
+    if (typeof valor !== 'string' || !regexEmail.test(valor.trim())) {
       throw new Error('E-mail inválido.');
     }
     this._email = valor.toLowerCase().trim();
@@ -140,6 +141,7 @@ export abstract class Usuario {
   toJSON(): Record<string, any> {
     return {
       id: this._id,
+      ativo: this.ativo,
       nome: this._nome,
       email: this._email,
       senhaHash: this._senhaHash,

@@ -6,3 +6,9 @@ dist/
 .env
 *.log
 .DS_Store
+
+# Skills locais de agentes
+/skills/
+/.agents/skills/
+/.codex/skills/
+/codex-personal-skills/

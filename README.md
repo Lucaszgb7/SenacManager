@@ -1,252 +1,94 @@
-# 🎓 SenacManager
+# SenacManager
 
-Plataforma centralizada de gerenciamento de salas, horários e aulas para cursos técnicos e Ensino Médio Técnico (Médio Tec) do Senac.
+Aplicação escolar em TypeScript, Express e EJS, com persistência em arquivos JSON. Não requer banco de dados.
 
----
+## Executar no Windows
 
-## 📋 Sobre o Projeto
+Pré-requisito: Node.js 22 ou superior com npm.
 
-O **SenacManager** é um sistema web que resolve um problema real do ambiente escolar: a dificuldade de organização de salas, horários e aulas.
-
-Professores frequentemente não sabem quais salas estão disponíveis, onde outros colegas estão dando aula ou quais espaços já estão ocupados. Alunos, por sua vez, têm dificuldade em acompanhar mudanças de horário, sala e professor. A administração precisa de uma ferramenta centralizada para cadastrar e organizar tudo isso.
-
-### 🎯 Objetivo
-
-Centralizar as informações escolares em um único lugar, permitindo que:
-
-- **Professores** consultem salas disponíveis em tempo real, saibam onde outros professores estão lecionando e reservem salas sem conflitos de horário.
-- **Alunos** acessem o cronograma de aulas, vejam informações de disciplina, sala, horário e professor, e se inscrevam em atividades extras (NOA).
-- **Administradores** cadastrem e gerenciem salas, horários e usuários de forma simples e eficiente.
-
----
-
-## 🚀 Stack Técnica
-
-| Camada | Tecnologia |
-|--------|-----------|
-| Runtime | Node.js |
-| Linguagem | TypeScript |
-| Framework Web | Express (padrão MVC) |
-| Template Engine | EJS puro (sem SPA) |
-| Estilização | CSS puro (sem frameworks) |
-| Client-side | JavaScript vanilla (sem libs) |
-
-> ⚠️ **Sem React, Vue, Tailwind, Bootstrap ou jQuery.** O projeto segue uma arquitetura MVC simples com renderização server-side via EJS.
-
----
-
-## 👥 Perfis de Usuário
-
-| Perfil | Descrição |
-|--------|-----------|
-| **Professor** | Consulta salas, reserva espaços, gerencia suas reservas |
-| **Aluno** | Consulta cronograma, visualiza detalhes das aulas, inscreve-se em NOA |
-| **Administrador** | Cadastra/edita salas, horários e usuários |
-
----
-
-## 🖥️ Telas do Sistema
-
-| # | Tela | Perfil | Rota sugerida |
-|---|------|--------|---------------|
-| 1 | Login | Todos | `/login` |
-| 2 | Dashboard | Todos | `/dashboard` |
-| 3 | Reserva de Sala | Professor | `/rooms/booking` |
-| 4 | Salas Disponíveis | Professor / Admin | `/rooms/available` |
-| 5 | Minhas Reservas | Professor | `/bookings/my-bookings` |
-| 6 | NOA — Novas Oportunidades de Aprendizagem | Aluno | `/noa` |
-| 7 | Pesquisa / Filtros | Todos | `/search` |
-| 8 | Detalhes da Aula | Todos | `/classes/details` |
-| 9 | Perfil | Todos | `/profile` |
-| 10 | Painel Administrador | Admin | `/admin` |
-
----
-
-## 📁 Estrutura de Pastas
-
-```
-SenacManager/
-├── public/
-│   ├── css/
-│   │   ├── global.css              # variáveis, reset, tipografia base
-│   │   ├── components.css          # .btn, .card, .input-group, etc.
-│   │   ├── dashboard.css           # layout header + sidebar + cards
-│   │   ├── room-booking.css
-│   │   ├── available-rooms.css
-│   │   ├── my-bookings.css
-│   │   ├── noa.css
-│   │   ├── search-filters.css
-│   │   ├── class-details.css
-│   │   ├── profile.css
-│   │   └── admin-panel.css
-│   └── js/
-│       ├── login.js                # toggle de senha
-│       ├── room-booking.js
-│       ├── search-filters.js
-│       ├── profile.js
-│       └── admin-panel.js
-│
-├── src/
-│   ├── views/
-│   │   ├── partials/
-│   │   │   ├── head.ejs
-│   │   │   ├── header.ejs
-│   │   │   └── sidebar.ejs
-│   │   ├── auth/
-│   │   │   └── login.ejs
-│   │   ├── dashboard/
-│   │   │   ├── dashboard-professor.ejs
-│   │   │   ├── dashboard-aluno.ejs
-│   │   │   └── dashboard-admin.ejs
-│   │   ├── rooms/
-│   │   │   ├── room-booking.ejs
-│   │   │   └── available-rooms.ejs
-│   │   ├── bookings/
-│   │   │   └── my-bookings.ejs
-│   │   ├── noa/
-│   │   │   └── noa.ejs
-│   │   ├── search/
-│   │   │   └── search-filters.ejs
-│   │   ├── classes/
-│   │   │   └── class-details.ejs
-│   │   ├── profile/
-│   │   │   └── profile.ejs
-│   │   └── admin/
-│   │       └── admin-panel.ejs
-│   │
-│   ├── controllers/
-│   ├── models/
-│   ├── routes/
-│   └── app.ts
-│
-├── package.json
-├── tsconfig.json
-└── README.md
+```powershell
+npm.cmd ci
+npm.cmd run dev
 ```
 
----
+Acesse http://localhost:3000. No PowerShell, use `npm.cmd` caso a política de execução bloqueie `npm.ps1`.
 
-## 🎨 Padrões de Projeto
+## Build e verificações
 
-### Layout padrão de toda tela
-
-Toda view deve seguir o layout de **header + sidebar**, incluindo os partials:
-
-```ejs
-<%- include('../partials/head', { title: '...' }) %>
-<%- include('../partials/header', { usuario: usuario }) %>
-<%- include('../partials/sidebar', { perfil: '...' }) %>
+```powershell
+npm.cmd run typecheck
+npm.cmd test -- --runInBand
+npm.cmd run build
+npm.cmd start
+npm.cmd run test:browser
 ```
 
-### Regras de CSS
+O teste de navegador usa o Microsoft Edge instalado, em modo headless. Testes HTTP, repositories e navegador usam diretórios temporários e não alteram os dados da aplicação.
 
-1. **Reaproveitar** sempre as classes já existentes em `components.css`:
-   `.btn`, `.btn-primary`, `.card`, `.input-group`, `.error-message`, `.alert-error`, `.checkbox-group`, `.link`, `.toggle-password`.
-2. Classes novas devem ser **específicas da tela** e ir no CSS daquela tela — **nunca** em `components.css`.
-3. Nomes de classe em **minúsculo**, semânticos (ex: `.room-card`, `.status-badge`).
+O build limpa somente `dist/`, compila TypeScript e copia as views usando Node, sem depender de `cp` do Unix.
 
-### Dados
+## Criar um administrador local
 
-Todo o front-end usa **dados mockados** (arrays/objetos fixos em memória ou passados pelo controller). O backend real (banco/repository) será implementado em etapa posterior.
+Os registros de demonstração mantêm os hashes originais. Nenhuma senha padrão foi introduzida. Para criar uma conta com senha conhecida, faça o build e execute:
 
----
-
-## 🧪 Como rodar o projeto
-
-### Pré-requisitos
-
-- Node.js 18+
-- npm ou yarn
-
-### Instalação
-
-```bash
-# clonar o repositório
-git clone <url-do-repositorio>
-cd SenacManager
-
-# instalar dependências
-npm install
+```powershell
+npm.cmd run build
+$senhaAdmin = Read-Host "Senha do novo administrador" -AsSecureString
+$env:SENAC_ADMIN_PASSWORD = [System.Net.NetworkCredential]::new('', $senhaAdmin).Password
+npm.cmd run admin:create -- "Seu Nome" "seu.email@exemplo.com"
+Remove-Item Env:SENAC_ADMIN_PASSWORD
 ```
 
-### Executar em modo de desenvolvimento
+O e-mail deve ser diferente dos já cadastrados. O comando grava apenas um hash bcrypt. O cadastro web de outras contas exige um administrador autenticado. Recuperação de senha é feita pela administração, editando o cadastro; não há serviço de e-mail.
 
-```bash
-npm run dev
-```
+## Funcionalidades
 
-### Executar em modo de produção
+- Login, logout por POST, opção lembrar-me e autorização por perfil.
+- Professor: consulta salas, verifica disponibilidade, cria/cancela reservas e edita/cancela suas aulas.
+- Aluno: consulta aulas e se inscreve/cancela inscrição em NOA com controle de vagas.
+- Administrador: cadastra, edita e remove salas, usuários e grade. Registros vinculados não são excluídos.
+- Perfil: dados pessoais, troca de senha e avatar JPG/PNG/WebP de até 2 MB.
+- Pesquisa e detalhes exibem aulas persistidas; dashboards usam o usuário autenticado.
+- Formulários só mostram sucesso após confirmação do servidor.
 
-```bash
-npm run build
-npm start
-```
+Reservas verificam sala ativa, data futura e conflitos de sala/professor com reservas e grade vigente. Intervalos adjacentes são permitidos. Datas escolares são interpretadas em America/Sao_Paulo.
 
-A aplicação estará disponível em `http://localhost:3000`.
+## Configuração
 
----
+| Variável | Uso |
+| --- | --- |
+| `PORT` | Porta HTTP; padrão 3000. |
+| `DATA_DIR` | Diretório de JSON; padrão `src/data` relativo ao projeto, também no build. |
+| `AVATAR_DIR` | Diretório de avatars; padrão `public/uploads/avatars`. |
+| `SESSION_SECRET` | Segredo das sessões; obrigatório quando `NODE_ENV=production`. |
+| `NODE_ENV` | Em produção exige HTTPS para cookies. |
+| `TRUST_PROXY=1` | Usar apenas atrás de um proxy HTTPS confiável. |
+| `SENAC_ADMIN_PASSWORD` | Senha temporária para o comando local de criação de administrador. |
 
-## 🤝 Fluxo de Contribuição (Git)
+Variáveis devem ser definidas no ambiente do processo. Arquivos `.env` não são carregados automaticamente.
 
-Cada tela do sistema foi desenvolvida de forma independente por um membro da equipe. O padrão de commits segue o modelo **Conventional Commits**:
+## Dados e limites operacionais
 
-```
-feat: cria tela de reserva de sala para o professor
-feat: cria tela de salas disponiveis em tempo real
-feat: cria tela de minhas reservas do professor
-feat: cria tela NOA de novas oportunidades de aprendizagem
-feat: cria tela de pesquisa e filtros de aulas
-feat: cria tela de detalhes da aula
-feat: cria tela de perfil do usuario
-feat: cria painel administrativo de salas, horarios e usuarios
-```
+Os arquivos são `usuarios.json`, `salas.json`, `reservas.json`, `aulas-grade.json` e `inscricoes-noa.json`.
 
-### Divisão de tarefas
+As alterações são serializadas e cada arquivo é substituído atomicamente. Execute **um único processo escritor**: o bloqueio é em memória e não coordena múltiplas instâncias, edição manual concorrente ou gravações de outros programas. Faça backups com o servidor parado. A migração para banco de dados fica para uma etapa posterior.
 
-| Tela | Responsável |
-|------|-------------|
-| Reserva de Sala | Gabriel |
-| Salas Disponíveis | Gabriel |
-| Minhas Reservas | Mateus |
-| NOA | Heytor Andrade |
-| Pesquisa / Filtros | Max |
-| Detalhes da Aula | — |
-| Perfil | — |
-| Painel Administrador | — |
+As sessões também são mantidas em memória e expiram quando o processo reinicia. Não há envio automático de e-mails ou notificações.
 
----
+Os dados iniciais são exemplos históricos. As aulas do semestre 2024.1 não ocupam salas no semestre atual. Para testar NOA com inscrições, cadastre uma atividade no semestre corrente e configure vagas. As reservas de 2024 permanecem no histórico.
 
-## 🔮 Roadmap / Evoluções Futuras
+Correções dos exemplos: padronização de `horarioInicio/horarioFim`; alunos e aulas sem turma receberam `TURMA DEMONSTRACAO`; reservas sem disciplina receberam `Atividade de demonstracao`. Esses valores são demonstrativos, não informações escolares verificadas. IDs, hashes e datas originais foram preservados.
 
-- [ ] Implementação do backend real (banco de dados + repository)
-- [ ] Autenticação e autorização por perfil (JWT/sessão)
-- [ ] Notificações de mudança de sala em tempo real
-- [ ] Avisos para alunos e professores
-- [ ] Calendário integrado
-- [ ] Registro de presença
-- [ ] Integração com outros sistemas da escola
-- [ ] Upload real de avatar no perfil
-- [ ] Relatórios administrativos (ocupação de salas, etc.)
+## Estrutura
 
----
+- `src/models`: validação e serialização de entidades.
+- `src/services`: persistência JSON, transações no processo e regras de negócio.
+- `src/repositories`: operações de acesso a entidades sobre a mesma infraestrutura de persistência.
+- `src/controllers` e `src/routes`: HTTP e preparação dos dados das páginas.
+- `src/views`: páginas EJS.
+- `public/js/app.js`: formulários, ações, abas e filtros; `sidebar.js` controla menus.
+- `src/__tests__` e `scripts/browser-test.cjs`: regressões e navegação automatizada.
 
-## 📄 Licença
+Pastas locais `skills/`, `.agents/skills/`, `.codex/skills/` e `codex-personal-skills/` são ignoradas pelo Git. Skills globais em `C:\\Users\\<usuário>\\.codex\\skills` ficam fora do repositório.
 
-Projeto acadêmico desenvolvido para o Senac — uso educacional.
-
----
-
-## 👨‍💻 Equipe
-
-Projeto desenvolvido por estudantes do curso técnico/Médio Tec do Senac.
-
-- Gabriel Costa
-- Mateus Vinicius
-- Heytor Andrade
-- Max Antonio
-- Rosalvo Davi
-- Lucas Gabriel
-
----
-
-> **SenacManager** — organização escolar simples, centralizada e eficiente. 🎓
+Projeto acadêmico desenvolvido para uso educacional.

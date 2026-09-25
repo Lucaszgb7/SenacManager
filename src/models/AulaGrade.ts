@@ -192,8 +192,8 @@ export class AulaGrade {
       data.salaId,
       data.turma,
       data.diaSemana,
-      data.horarioInicio,
-      data.horarioFim,
+      data.horarioInicio ?? data.horaInicio,
+      data.horarioFim ?? data.horaFim,
       data.isNoa ?? false,
       data.id
     );

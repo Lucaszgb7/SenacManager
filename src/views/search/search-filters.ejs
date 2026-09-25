@@ -1,140 +1,16 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-
-<%- include('../partials/head', { title: 'Pesquisar' }) %>
-
-<link rel="stylesheet" href="/css/dashboard.css">
-<link rel="stylesheet" href="/css/search-filters.css">
-
+<%- include('../partials/head', { title: 'Pesquisar aulas', pageCss: 'search-filters.css' }) %>
 <body>
+<%- include('../partials/header', { usuario }) %>
+<%- include('../partials/sidebar', { perfil: usuario.perfil }) %>
+<main class="app-main"><div class="app-main__inner">
+<h1 class="page-title">Pesquisar aulas</h1>
 
-  <%- include('../partials/header', { usuario: usuario }) %>
-  <%- include('../partials/sidebar', { perfil: perfil }) %>
-
-  <main class="search-page">
-
-    <section class="search-header">
-      <div>
-        <h1>Pesquisar</h1>
-        <p>Encontre aulas, professores, salas e horários.</p>
-      </div>
-    </section>
-
-    <!-- Barra de pesquisa -->
-    <section class="card search-box">
-      <div class="input-group">
-        <label for="search-input">Buscar</label>
-
-        <input
-          type="text"
-          id="search-input"
-          placeholder="Digite uma disciplina, professor ou sala..."
-          autocomplete="off"
-        >
-      </div>
-    </section>
-
-    <!-- Filtros -->
-    <section class="card filters-panel">
-
-      <div class="filters-header">
-        <h2>Filtros</h2>
-
-        <button
-          type="button"
-          id="clear-filters"
-          class="btn"
-        >
-          Limpar filtros
-        </button>
-      </div>
-
-      <div class="filters-grid">
-
-        <div class="input-group">
-          <label for="filter-disciplina">Disciplina</label>
-          <select id="filter-disciplina">
-            <option value="">Todas as disciplinas</option>
-          </select>
-        </div>
-
-        <div class="input-group">
-          <label for="filter-professor">Professor</label>
-          <select id="filter-professor">
-            <option value="">Todos os professores</option>
-          </select>
-        </div>
-
-        <div class="input-group">
-          <label for="filter-sala">Sala</label>
-          <select id="filter-sala">
-            <option value="">Todas as salas</option>
-          </select>
-        </div>
-
-        <div class="input-group">
-          <label for="filter-turno">Turno</label>
-
-          <select id="filter-turno">
-            <option value="">Todos os turnos</option>
-            <option value="Manhã">Manhã</option>
-            <option value="Tarde">Tarde</option>
-            <option value="Noite">Noite</option>
-          </select>
-        </div>
-
-        <div class="input-group">
-          <label for="filter-dia">Dia da semana</label>
-
-          <select id="filter-dia">
-            <option value="">Todos os dias</option>
-            <option value="Segunda-feira">Segunda-feira</option>
-            <option value="Terça-feira">Terça-feira</option>
-            <option value="Quarta-feira">Quarta-feira</option>
-            <option value="Quinta-feira">Quinta-feira</option>
-            <option value="Sexta-feira">Sexta-feira</option>
-          </select>
-        </div>
-
-      </div>
-
-    </section>
-
-    <!-- Resultados -->
-    <section class="results-section">
-
-      <div class="results-header">
-        <h2>Resultados</h2>
-
-        <span id="results-count">
-          0 aulas encontradas
-        </span>
-      </div>
-
-      <!-- Cards criados pelo JavaScript -->
-      <div
-        id="search-results"
-        class="search-results"
-      ></div>
-
-      <!-- Estado vazio -->
-      <div
-        id="empty-state"
-        class="card empty-state"
-        hidden
-      >
-        <h3>Nenhum resultado para sua busca</h3>
-
-        <p>
-          Tente alterar ou remover alguns dos filtros.
-        </p>
-      </div>
-
-    </section>
-
-  </main>
-
-  <script src="/js/search-filters.js"></script>
-
-</body>
-</html>
+<form action="/search" method="get" class="card toolbar"><label class="input-group">Disciplina, professor, sala, turma, dia ou semestre<input type="search" name="q" value="<%= busca %>"></label><button class="btn btn-primary" type="submit">Pesquisar</button></form>
+<p><%= aulas.length %> aula(s) encontrada(s).</p>
+<div class="card-grid"><% aulas.forEach(a => { %><a class="card" href="/classes/details?id=<%= a.id %>"><h2><%= a.disciplina %></h2><p><%= a.professor.nome %> · <%= a.sala %></p><p><%= a.diaSemana %> · <%= a.horario %> · <%= a.semestre %></p><p><%= a.ativa === false ? 'Cancelada' : 'Ativa' %></p></a><% }) %></div>
+<% if (!aulas.length) { %><p>Nenhuma aula encontrada. Tente outro termo.</p><% } %>
+</div></main>
+<%- include('../partials/footer') %>
+</body></html>

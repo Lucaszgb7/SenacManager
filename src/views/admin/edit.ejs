@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<%- include('../partials/head', { title: 'Editar cadastro', pageCss: 'admin-panel.css' }) %>
+<body>
+<%- include('../partials/header', { usuario }) %>
+<%- include('../partials/sidebar', { perfil: usuario.perfil }) %>
+<main class="app-main"><div class="app-main__inner">
+<h1 class="page-title">Editar cadastro</h1>
+
+<p><a href="<%= back %>">Voltar</a></p>
+<form action="<%= endpoint %>" method="post" data-api-form data-method="<%= record.id ? 'PUT' : 'POST' %>" data-redirect="<%= back %>" class="card">
+<div class="form-grid">
+<% if (kind === 'salas') { %>
+<label class="input-group">Nome<input name="nome" value="<%= record.nome || '' %>" minlength="2" required></label>
+<label class="input-group">Prédio<input name="predio" value="<%= record.predio || '' %>" required></label>
+<label class="input-group">Andar<input name="andar" value="<%= record.andar || '' %>"></label>
+<label class="input-group">Capacidade<input name="capacidade" type="number" min="1" step="1" value="<%= record.capacidade || '' %>" required></label>
+<label class="input-group">Recursos (separados por vírgula)<input name="recursos" data-array value="<%= (record.recursos || []).join(', ') %>"></label>
+<label class="checkbox-group"><input type="checkbox" name="ativa" <%= record.ativa === false ? '' : 'checked' %>>Sala ativa</label>
+<% } else if (kind === 'usuarios') { %>
+<label class="input-group">Nome<input name="nome" value="<%= record.nome || '' %>" minlength="3" required></label>
+<label class="input-group">E-mail<input name="email" type="email" value="<%= record.email || '' %>" required></label>
+<label class="input-group">Perfil<select name="perfil" data-profile-select><% ['professor','aluno','administrador'].forEach(p => { %><option value="<%= p %>" <%= record.perfil === p ? 'selected' : '' %>><%= p %></option><% }) %></select></label>
+<label class="input-group">Senha <%= record.id ? '(deixe vazia para manter)' : '' %><input name="senha" type="password" minlength="8" autocomplete="new-password" <%= record.id ? '' : 'required' %>></label>
+<label class="input-group" data-profile-field="professor">Disciplinas (separadas por vírgula)<input name="disciplinas" data-array value="<%= (record.disciplinas || []).join(', ') %>"></label>
+<label class="input-group" data-profile-field="aluno">Curso<input name="curso" value="<%= record.curso || '' %>" minlength="2" data-required></label>
+<label class="input-group" data-profile-field="aluno">Turma<input name="turma" value="<%= record.turma || '' %>" data-required></label>
+<label class="checkbox-group"><input name="ativo" type="checkbox" <%= record.ativo === false ? '' : 'checked' %>>Usuário ativo</label>
+<% } else { %>
+<label class="input-group">Disciplina<input name="disciplina" value="<%= record.disciplina || '' %>" minlength="2" required></label>
+<label class="input-group">Professor<select name="professorId" required <%= usuario.perfil === 'administrador' ? '' : 'disabled' %>><% professores.forEach(p => { %><option value="<%= p.id %>" <%= record.professorId === p.id ? 'selected' : '' %>><%= p.nome %></option><% }) %></select></label>
+<label class="input-group">Sala<select name="salaId" required><% salas.forEach(s => { %><option value="<%= s.id %>" <%= record.salaId === s.id ? 'selected' : '' %>><%= s.nome %><%= s.ativa === false ? ' (inativa)' : '' %></option><% }) %></select></label>
+<label class="input-group">Turma<input name="turma" value="<%= record.turma || '' %>" required></label>
+<label class="input-group">Dia<select name="diaSemana" required><% ['segunda','terca','quarta','quinta','sexta','sabado'].forEach(d => { %><option value="<%= d %>" <%= record.diaSemana === d ? 'selected' : '' %>><%= d %></option><% }) %></select></label>
+<label class="input-group">Início<input type="time" name="horarioInicio" value="<%= record.horarioInicio || '' %>" required></label>
+<label class="input-group">Término<input type="time" name="horarioFim" value="<%= record.horarioFim || '' %>" required></label>
+<label class="input-group">Semestre (AAAA.1 ou AAAA.2)<input name="semestre" pattern="[0-9]{4}\.[12]" value="<%= record.semestre || '' %>" placeholder="2026.2" required></label>
+<label class="checkbox-group"><input type="checkbox" name="isNoa" <%= record.isNoa ? 'checked' : '' %>>Atividade NOA</label>
+<label class="input-group">Vagas NOA<input type="number" name="vagasTotal" min="1" step="1" value="<%= record.vagasTotal || '' %>"></label>
+<label class="checkbox-group"><input type="checkbox" name="ativa" <%= record.ativa === false ? '' : 'checked' %>>Aula ativa</label>
+<label class="input-group">Descrição<textarea name="descricao"><%= record.descricao || '' %></textarea></label>
+<% } %>
+</div><p data-feedback role="status" hidden></p><button type="submit" class="btn btn-primary">Salvar</button></form>
+</div></main>
+<%- include('../partials/footer') %>
+</body></html>
