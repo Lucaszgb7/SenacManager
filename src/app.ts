@@ -11,6 +11,8 @@ import profileRoutes from "./routes/profileRoutes";
 import { showProfile } from "./controllers/profile-controller";
 import { autenticado } from "./middlewares/authMiddleware";
 import { errorMiddleware } from "./middlewares/errorMiddleware";
+import pageRoutes from "./routes/pageRoutes";
+
 
 const app = express();
 
@@ -29,31 +31,30 @@ app.use(express.json());
 // Sessão — ANTES de qualquer rota que use req.session.
 app.use(sessionMiddleware);
 
-// ---------- Rotas públicas ----------
-app.get("/", (_req, res) => {
-  res.redirect("/login");
-});
-
+// Rotas públicas
 app.use(authRoutes);
 
-// ---------- Rotas autenticadas ----------
+// Rotas autenticadas
 app.use(roomRoutes);
 app.use(bookingRoutes);
 app.use(profileRoutes);
+app.use(pageRoutes);
 
-// (Rota legada — se você já migrou o /perfil para o profileRoutes,
-// pode remover esta linha.)
-app.get("/perfil", autenticado, showProfile);
-
-// ---------- 404 (catch-all) ----------
+// Rota 404 — deve ficar depois das rotas reais
 app.use((req, res) => {
   const accept = req.headers["accept"] ?? "";
+
   if (accept.includes("application/json")) {
-    res.status(404).json({ success: false, message: "Rota não encontrada." });
+    res.status(404).json({
+      success: false,
+      message: "Rota não encontrada.",
+    });
     return;
   }
+
   res.status(404).send("404 — Página não encontrada");
 });
+
 
 // ---------- Tratamento de erros ----------
 // SEMPRE por último.
