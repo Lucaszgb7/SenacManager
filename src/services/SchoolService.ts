@@ -110,6 +110,37 @@ export function classView(a: RecordData, s: Awaited<ReturnType<typeof state>>): 
   return { ...a, professor: { id: a.professorId, nome: professor?.nome || 'Professor indisponível', iniciais: (professor?.nome || '?').split(' ').map((x: string) => x[0]).slice(0, 2).join('') },
     sala: sala?.nome || 'Sala indisponível', predio: sala?.predio || '', horario: a.horarioInicio + ' — ' + a.horarioFim, descricao: a.descricao || '' };
 }
+/**
+ * Busca uma aula da grade OU uma reserva avulsa pelo id e devolve
+ * no formato que a view class-details.ejs espera.
+ * `tipo` indica a origem: 'aula' (aulas-grade) ou 'reserva'.
+ */
+export async function buscarAulaPorId(id: string): Promise<RecordData> {
+  const s = await state();
+  const alvo = String(id ?? '');
+
+  const aula = s.aulas.find(a => a.id === alvo);
+  if (aula) return { ...classView(aula, s), tipo: 'aula' };
+
+  const reserva = s.reservas.find(r => r.id === alvo);
+  if (reserva) {
+    const [ano, mes, dia] = String(reserva.data).split('-');
+    return {
+      ...classView({
+        ...reserva,
+        isNoa: false,
+        ativa: reserva.status === 'confirmada',
+        diaSemana: dia ? `${dia}/${mes}/${ano}` : reserva.data,
+        semestre: '—',
+        descricao: reserva.observacoes || '',
+      }, s),
+      tipo: 'reserva',
+    };
+  }
+
+  throw new HttpError(404, 'Aula não encontrada.');
+}
+
 export async function createBooking(id: string, data: RecordData) {
   return transaction(async () => {
     const s = await state();

@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { autenticado } from '../middlewares/authMiddleware';
 import { permitirPerfis } from '../middlewares/perfilMiddleware';
-import { state, classView, enroll, saveRoom, saveClass, saveUser, removeRecord, cancelClass, safeUser, atualizarStatusUsuario } from '../services/SchoolService';
+import { state, classView, enroll, saveRoom, saveClass, saveUser, removeRecord, cancelClass, safeUser, atualizarStatusUsuario, buscarAulaPorId, cancelBooking } from '../services/SchoolService';
 import { schoolNow, vigente, semesterRange, HttpError, flag } from '../services/validation';
 const router = Router();
 router.use(autenticado);
@@ -24,6 +24,10 @@ router.get('/classes/details', async (req, res) => {
   if (!aula) throw new HttpError(404, 'Aula não encontrada.');
   res.render('classes/class-details', { aula: classView(aula, s) });
 });
+router.get('/classes/:id', autenticado, async (req, res) => {
+  const aula = await buscarAulaPorId(String(req.params.id));
+  res.render('classes/class-details', { aula, usuario: res.locals.usuario });
+});
 router.get('/classes/:id/edit', permitirPerfis('professor', 'administrador'), async (req, res) => {
   const s = await state(), aula = s.aulas.find(a => a.id === req.params.id);
   if (!aula) throw new HttpError(404, 'Aula não encontrada.');
@@ -34,8 +38,19 @@ router.put('/classes/:id', permitirPerfis('professor', 'administrador'), async (
   await saveClass(req.body || {}, res.locals.usuario, String(req.params.id));
   res.json({ success: true, message: 'Aula atualizada.' });
 });
-router.post('/classes/:id/cancelar', permitirPerfis('professor', 'administrador'), async (req, res) => {
-  await cancelClass(String(req.params.id), res.locals.usuario);
+router.post('/classes/:id/cancelar', autenticado, permitirPerfis('professor', 'administrador'), async (req, res) => {
+  const usuario = res.locals.usuario;
+  const aula = await buscarAulaPorId(String(req.params.id));
+
+  if (aula.tipo === 'reserva') {
+    // cancelBooking só aceita o professor dono; para o admin usamos o dono da reserva
+    const actorId = usuario.perfil === 'administrador' ? aula.professorId : usuario.id;
+    await cancelBooking(actorId, aula.id);
+    res.json({ success: true, message: 'Reserva cancelada.' });
+    return;
+  }
+
+  await cancelClass(aula.id, usuario);
   res.json({ success: true, message: 'Aula cancelada.' });
 });
 router.get('/noa', permitirPerfis('aluno'), async (req, res) => {
