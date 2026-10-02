@@ -207,3 +207,50 @@ export async function enroll(alunoId: string, aulaId: string, cancel = false) {
     await writeData('inscricoes-noa', [...s.inscricoes, { id: randomUUID(), alunoId, aulaId, criadoEm: new Date().toISOString() }]);
   });
 }
+/**
+ * Ativa/desativa um usuário administrativamente.
+ * Não é possível desativar a si mesmo nem o último administrador ativo
+ * (mesma regra de saveUser, para manter consistência).
+ */
+export async function atualizarStatusUsuario(
+  id: string,
+  ativo: boolean,
+  actorId?: string
+): Promise<RecordData> {
+  return transaction(async () => {
+    const s = await state();
+    const alvo = mustFind(s.usuarios, required(id, 'ID'), 'Usuário');
+
+    if (actorId && actorId === id && ativo === false) {
+      throw new HttpError(409, 'Você não pode desativar sua própria conta.');
+    }
+
+    if (
+      ativo === false &&
+      alvo.perfil === 'administrador' &&
+      alvo.ativo &&
+      s.usuarios.filter(u => u.perfil === 'administrador' && u.ativo).length <= 1
+    ) {
+      throw new HttpError(409, 'Mantenha pelo menos um administrador ativo.');
+    }
+
+    const next: RecordData = { ...alvo, ativo: flag(ativo, true) };
+    await writeData(
+      'usuarios',
+      s.usuarios.map(u => (u.id === id ? next : u))
+    );
+    return safeUser(next);
+  });
+}
+// ---------- Aliases (opcionais) ----------
+export const listarSalas      = async () => (await state()).salas;
+export const listarAulasGrade = async () => (await state()).aulas;
+export const listarUsuarios   = users;
+
+export const criarSala        = (dados: RecordData) => saveRoom(dados);
+export const atualizarSala    = (id: string, dados: RecordData) => saveRoom(dados, id);
+export const removerSala      = (id: string, actorId: string) => removeRecord('salas', id, actorId);
+
+export const criarAulaGrade     = (dados: RecordData, actor: RecordData) => saveClass(dados, actor);
+export const atualizarAulaGrade = (id: string, dados: RecordData, actor: RecordData) => saveClass(dados, actor, id);
+export const removerAulaGrade   = (id: string, actorId: string) => removeRecord('aulas-grade', id, actorId);
