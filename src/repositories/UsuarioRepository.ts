@@ -1,7 +1,10 @@
+import { resolve } from 'path';
 import { Usuario } from '../models/Usuario';
+import { Professor } from '../models/Professor';
+import { Aluno } from '../models/Aluno';
+import { Administrador } from '../models/Administrador';
 import { BaseRepository } from './BaseRepository';
-import { dataPath } from '../services/store';
-import { userModel } from '../services/SchoolService';
+
 export class UsuarioRepository extends BaseRepository {
   private readonly caminhoArquivo = resolve(
     __dirname,

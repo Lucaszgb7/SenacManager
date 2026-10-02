@@ -25,17 +25,7 @@
     "email": "joao.almeida@aluno.senac.br",
     "senhaHash": "$2b$10$eImiTXuWVxfM37uY4JANjQ.5cE7tD7LhK8jv3QY9m0eX1nR2sO4uC",
     "perfil": "aluno",
-    "criadoEm": "2024-02-01T14:00:00.000Z",
-<<<<<<< HEAD
-    "matricula": "2024001",
-    "curso": "Análise e Desenvolvimento de Sistemas",
-    "turma": "TURMA DEMONSTRACAO"
-=======
-"matricula": "2024001",
-"curso": "Análise e Desenvolvimento de Sistemas",
-"turma": "3º Módulo — Turma A"
-
->>>>>>> bb0b303c275aac728f4e4111562a362c213d064b
+    "criadoEm": "2024-02-01T14:00:00.000Z"
   },
   {
     "id": "a1b2c3d4-0004-4000-8000-000000000004",
@@ -44,15 +34,7 @@
     "senhaHash": "$2b$10$eImiTXuWVxfM37uY4JANjQ.5cE7tD7LhK8jv3QY9m0eX1nR2sO4uC",
     "perfil": "aluno",
     "criadoEm": "2024-02-03T09:45:00.000Z",
-    "matricula": "2024002",
-<<<<<<< HEAD
-    "curso": "Análise e Desenvolvimento de Sistemas",
-    "turma": "TURMA DEMONSTRACAO"
-=======
-"curso": "Análise e Desenvolvimento de Sistemas",
-"turma": "3º Módulo — Turma B"
-
->>>>>>> bb0b303c275aac728f4e4111562a362c213d064b
+    "matricula": "2024002"
   },
   {
     "id": "a1b2c3d4-0005-4000-8000-000000000005",
