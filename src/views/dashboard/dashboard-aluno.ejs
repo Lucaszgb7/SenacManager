@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<%- include('../partials/head', { title: 'Dashboard — Aluno', pageCss: 'dashboard.css' }) %>
+<body>
+<%- include('../partials/header', { usuario }) %>
+<%- include('../partials/sidebar', { perfil: usuario.perfil }) %>
+<main class="app-main"><div class="app-main__inner">
+
+<h1 class="page-title">Olá, <%= usuario.nome.split(' ')[0] %></h1>
+<p class="page-subtitle">Seu cronograma e atividades NOA.</p>
+
+<section class="dashboard-metrics">
+  <article class="card"><h3>Aulas hoje</h3><p><%= aulas.length %></p></article>
+  <article class="card"><h3>Inscrições NOA</h3><p><%= inscricoesNoa.length %></p></article>
+</section>
+
+<h2>Aulas de hoje — turma <%= usuario.turma || '—' %></h2>
+<% if (!aulas.length) { %><p>Nenhuma aula programada para hoje.</p><% } %>
+<div class="card-grid">
+<% aulas.forEach(a => { %>
+  <a class="card" href="/classes/details?id=<%= a.id %>">
+    <h3><%= a.disciplina %></h3>
+    <p><%= a.professor.nome %> · <%= a.sala %></p>
+    <p><%= a.horario %></p>
+  </a>
+<% }) %>
+</div>
+
+<h2>Minhas inscrições NOA</h2>
+<% if (!inscricoesNoa.length) { %><p>Você ainda não se inscreveu em nenhuma atividade NOA. <a class="link" href="/noa">Ver atividades</a></p><% } %>
+<div class="card-grid">
+<% inscricoesNoa.forEach(a => { %>
+  <a class="card" href="/classes/details?id=<%= a.id %>">
+    <h3><%= a.disciplina %></h3>
+    <p><%= a.professor.nome %> · <%= a.sala %></p>
+    <p><%= a.diaSemana %> · <%= a.horario %></p>
+  </a>
+<% }) %>
+</div>
+
+</div></main>
+<%- include('../partials/footer') %>
+</body></html>
