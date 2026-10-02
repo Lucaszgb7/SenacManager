@@ -1,12 +1,15 @@
 import { Router } from 'express';
 import { autenticado } from '../middlewares/authMiddleware';
 import { permitirPerfis } from '../middlewares/perfilMiddleware';
+
 import {
   state, classView, enroll, saveRoom, saveClass, saveUser, removeRecord, cancelClass, safeUser,
   listarProximasAulasProfessor, listarSalasDisponiveisAgora, listarCronogramaAluno,
   listarAtividadesNoa, listarInscricoesNoaAluno, buscarAulas,
 } from '../services/SchoolService';
 import { schoolNow, vigente, semesterRange, HttpError } from '../services/validation';
+import { state, classView, enroll, saveRoom, saveClass, saveUser, removeRecord, cancelClass, safeUser, atualizarStatusUsuario } from '../services/SchoolService';
+import { schoolNow, vigente, semesterRange, HttpError, flag } from '../services/validation';
 
 const router = Router();
 router.use(autenticado);
@@ -141,8 +144,10 @@ router.get('/admin', permitirPerfis('administrador'), async (_req, res) => {
 
 const kinds = ['salas','usuarios','aulas-grade'] as const;
 function kindOf(value: string): typeof kinds[number] {
-  if (!(kinds as readonly string[]).includes(value)) throw new HttpError(404, 'Cadastro não encontrado.');
-  return value as typeof kinds[number];
+  // Normaliza o apelido público 'horarios' -> 'aulas-grade'
+  const normalized = value === 'horarios' ? 'aulas-grade' : value;
+  if (!(kinds as readonly string[]).includes(normalized)) throw new HttpError(404, 'Cadastro não encontrado.');
+  return normalized as typeof kinds[number];
 }
 
 router.get('/admin/:kind/edit', permitirPerfis('administrador'), async (req, res) => {
@@ -169,5 +174,4 @@ router.delete('/admin/:kind/:id', permitirPerfis('administrador'), async (req, r
   await removeRecord(kindOf(String(req.params.kind)), String(req.params.id), req.session.usuario!.id);
   res.json({ success: true, message: 'Registro removido.' });
 });
-
 export default router;
