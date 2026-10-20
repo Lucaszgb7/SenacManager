@@ -22,6 +22,8 @@ authRoutes.post(
 
 authRoutes.post(
   '/auth/registrar',
+  autenticado,
+  permitirPerfis('administrador'),
   AuthController.registrar.bind(AuthController)
 );
 

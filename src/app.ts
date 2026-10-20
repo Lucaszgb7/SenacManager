@@ -1,3 +1,4 @@
+/// <reference path="./types/express-session.d.ts" />
 import express from 'express';
 import path from 'path';
 import sessionMiddleware from './config/session';

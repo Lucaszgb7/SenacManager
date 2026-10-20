@@ -3,44 +3,52 @@
     "id": "a1b2c3d4-0001-4000-8000-000000000001",
     "nome": "Carlos Eduardo Silva",
     "email": "carlos.silva@senac.br",
-    "senhaHash": "$2b$10$eImiTXuWVxfM37uY4JANjQ.5cE7tD7LhK8jv3QY9m0eX1nR2sO4uC",
+    "senhaHash": "$2b$10$21hNNMhsp1702nI7a4pqXei/uQH7BlFvH/YumwDNnXbwvs6twAoA.",
     "perfil": "professor",
     "criadoEm": "2024-01-10T08:30:00.000Z",
-    "disciplina": "Desenvolvimento Web",
-    "titulacao": "Mestre"
+    "titulacao": "Mestre",
+    "disciplinas": [
+      "Desenvolvimento Web"
+    ]
   },
   {
     "id": "a1b2c3d4-0002-4000-8000-000000000002",
     "nome": "Fernanda Oliveira Costa",
     "email": "fernanda.costa@senac.br",
-    "senhaHash": "$2b$10$eImiTXuWVxfM37uY4JANjQ.5cE7tD7LhK8jv3QY9m0eX1nR2sO4uC",
+    "senhaHash": "$2b$10$21hNNMhsp1702nI7a4pqXei/uQH7BlFvH/YumwDNnXbwvs6twAoA.",
     "perfil": "professor",
     "criadoEm": "2024-01-12T10:15:00.000Z",
-    "disciplina": "Banco de Dados",
-    "titulacao": "Doutora"
+    "titulacao": "Doutora",
+    "disciplinas": [
+      "Banco de Dados"
+    ]
   },
   {
     "id": "a1b2c3d4-0003-4000-8000-000000000003",
     "nome": "João Pedro Almeida",
     "email": "joao.almeida@aluno.senac.br",
-    "senhaHash": "$2b$10$eImiTXuWVxfM37uY4JANjQ.5cE7tD7LhK8jv3QY9m0eX1nR2sO4uC",
+    "senhaHash": "$2b$10$21hNNMhsp1702nI7a4pqXei/uQH7BlFvH/YumwDNnXbwvs6twAoA.",
     "perfil": "aluno",
-    "criadoEm": "2024-02-01T14:00:00.000Z"
+    "criadoEm": "2024-02-01T14:00:00.000Z",
+    "curso": "Desenvolvimento de Sistemas",
+    "turma": "DS-2024A"
   },
   {
     "id": "a1b2c3d4-0004-4000-8000-000000000004",
     "nome": "Mariana Santos Lima",
     "email": "mariana.lima@aluno.senac.br",
-    "senhaHash": "$2b$10$eImiTXuWVxfM37uY4JANjQ.5cE7tD7LhK8jv3QY9m0eX1nR2sO4uC",
+    "senhaHash": "$2b$10$21hNNMhsp1702nI7a4pqXei/uQH7BlFvH/YumwDNnXbwvs6twAoA.",
     "perfil": "aluno",
     "criadoEm": "2024-02-03T09:45:00.000Z",
-    "matricula": "2024002"
+    "matricula": "2024002",
+    "curso": "Desenvolvimento de Sistemas",
+    "turma": "DS-2024A"
   },
   {
     "id": "a1b2c3d4-0005-4000-8000-000000000005",
     "nome": "Roberto Nunes Ferreira",
     "email": "roberto.ferreira@senac.br",
-    "senhaHash": "$2b$10$eImiTXuWVxfM37uY4JANjQ.5cE7tD7LhK8jv3QY9m0eX1nR2sO4uC",
+    "senhaHash": "$2b$10$21hNNMhsp1702nI7a4pqXei/uQH7BlFvH/YumwDNnXbwvs6twAoA.",
     "perfil": "administrador",
     "criadoEm": "2023-12-01T07:00:00.000Z",
     "nivelAcesso": "total",
