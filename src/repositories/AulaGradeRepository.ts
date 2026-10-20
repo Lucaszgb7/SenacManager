@@ -1,9 +1,7 @@
-import { resolve } from 'path';
 import { AulaGrade } from '../models/AulaGrade';
 import { BaseRepository } from './BaseRepository';
 
 export class AulaGradeRepository extends BaseRepository {
-  private get caminhoArquivo() { return resolve(process.env.DATA_DIR || resolve(__dirname, "../../src/data"), "aulas-grade.json"); }
 
   constructor() {
     super();
@@ -14,7 +12,7 @@ export class AulaGradeRepository extends BaseRepository {
   }
 
   async listarTodas(): Promise<AulaGrade[]> {
-    return (await this.lerArquivo(this.caminhoArquivo)).map((dados) => this.fromJSON(dados));
+    return (await this.lerArquivo('aulas-grade')).map((dados) => this.fromJSON(dados));
   }
 
   async listarPorAluno(turma: string): Promise<AulaGrade[]> {

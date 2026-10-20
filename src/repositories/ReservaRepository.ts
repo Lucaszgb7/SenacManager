@@ -1,28 +1,26 @@
 import { Reserva } from '../models/Reserva';
 import { BaseRepository } from './BaseRepository';
-import { dataPath } from '../services/store';
 export class ReservaRepository extends BaseRepository {
-  private get caminhoArquivo() { return dataPath('reservas'); }
   protected fromJSON(dados: any): Reserva { return Reserva.fromJSON(dados); }
-  async listarTodas(): Promise<Reserva[]> { return (await this.lerArquivo(this.caminhoArquivo)).map(r => this.fromJSON(r)); }
+  async listarTodas(): Promise<Reserva[]> { return (await this.lerArquivo('reservas')).map(r => this.fromJSON(r)); }
   async listarPorProfessor(id: string): Promise<Reserva[]> { return (await this.listarTodas()).filter(r => r.professorId === id); }
   async listarPorSala(id: string): Promise<Reserva[]> { return (await this.listarTodas()).filter(r => r.salaId === id); }
   async buscarPorId(id: string): Promise<Reserva | null> { return (await this.listarTodas()).find(r => r.id === id) || null; }
   async criar(reserva: Reserva): Promise<Reserva> {
     return this.transacao(async () => {
-      const rows = await this.lerArquivo(this.caminhoArquivo);
+      const rows = await this.lerArquivo('reservas');
       if (rows.some(r => r.id === reserva.id)) throw new Error('Identificador de reserva duplicado.');
-      await this.salvarArquivo(this.caminhoArquivo, [...rows, reserva.toJSON()]);
+      await this.salvarArquivo('reservas', [...rows, reserva.toJSON()]);
       return reserva;
     });
   }
   async cancelar(id: string): Promise<Reserva | null> {
     return this.transacao(async () => {
-      const rows = await this.lerArquivo(this.caminhoArquivo);
+      const rows = await this.lerArquivo('reservas');
       const row = rows.find(r => r.id === id);
       if (!row) return null;
       row.status = 'cancelada';
-      await this.salvarArquivo(this.caminhoArquivo, rows);
+      await this.salvarArquivo('reservas', rows);
       return this.fromJSON(row);
     });
   }

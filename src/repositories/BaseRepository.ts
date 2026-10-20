@@ -1,8 +1,8 @@
 import { randomUUID } from 'crypto';
-import { readFileRecords, writeFileRecords, transaction, RecordData } from '../services/store';
+import { readData, writeData, transaction, RecordData, Collection } from '../services/store';
 export abstract class BaseRepository {
-  protected lerArquivo(caminho: string): Promise<RecordData[]> { return readFileRecords(caminho); }
-  protected salvarArquivo(caminho: string, dados: RecordData[]): Promise<void> { return writeFileRecords(caminho, dados); }
+  protected lerArquivo(caminho: Collection): Promise<RecordData[]> { return readData(caminho); }
+  protected salvarArquivo(caminho: Collection, dados: RecordData[]): Promise<void> { return writeData(caminho, dados); }
   protected transacao<T>(operation: () => Promise<T>): Promise<T> { return transaction(operation); }
   protected gerarId(): string { return randomUUID(); }
   protected agora(): string { return new Date().toISOString(); }

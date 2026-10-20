@@ -1,4 +1,3 @@
-import { resolve } from 'path';
 import { Usuario } from '../models/Usuario';
 import { Professor } from '../models/Professor';
 import { Aluno } from '../models/Aluno';
@@ -6,11 +5,6 @@ import { Administrador } from '../models/Administrador';
 import { BaseRepository } from './BaseRepository';
 
 export class UsuarioRepository extends BaseRepository {
-  private readonly caminhoArquivo = resolve(
-    __dirname,
-    "../../src/data",
-    "usuarios.json"
-  );
 
   constructor() {
     super();
@@ -26,6 +20,7 @@ export class UsuarioRepository extends BaseRepository {
         return Professor.fromJSON(dados);
       case "aluno":
         return Aluno.fromJSON(dados);
+      case "administrador":
       case "admin":
         return Administrador.fromJSON(dados);
       default:
@@ -37,7 +32,7 @@ export class UsuarioRepository extends BaseRepository {
    * Lista todos os usuários.
    */
   async listarTodos(): Promise<Usuario[]> {
-    const dados = await this.lerArquivo(this.caminhoArquivo);
+    const dados = await this.lerArquivo('usuarios');
     return dados.map((item: any) => this.fromJSON(item));
   }
 
@@ -67,29 +62,29 @@ export class UsuarioRepository extends BaseRepository {
    */
   async criar(usuario: Usuario): Promise<Usuario> {
     return this.transacao(async () => {
-      const rows = await this.lerArquivo(this.caminhoArquivo);
+      const rows = await this.lerArquivo('usuarios');
       if (rows.some(u => u.id === usuario.id || u.email.trim().toLowerCase() === usuario.email)) throw new Error('Usuário já cadastrado.');
-      await this.salvarArquivo(this.caminhoArquivo, [...rows, usuario.toJSON()]);
+      await this.salvarArquivo('usuarios', [...rows, usuario.toJSON()]);
       return usuario;
     });
   }
   async atualizar(id: string, dados: Partial<Record<string, unknown>>): Promise<Usuario | null> {
     return this.transacao(async () => {
-      const rows = await this.lerArquivo(this.caminhoArquivo);
+      const rows = await this.lerArquivo('usuarios');
       const existing = rows.find(u => u.id === id);
       if (!existing) return null;
       const merged = { ...existing, ...dados, id, perfil: existing.perfil };
       const usuario = this.fromJSON(merged);
       if (rows.some(u => u.id !== id && u.email.trim().toLowerCase() === usuario.email)) throw new Error('E-mail já cadastrado.');
-      await this.salvarArquivo(this.caminhoArquivo, rows.map(u => u.id === id ? { ...merged, ...usuario.toJSON() } : u));
+      await this.salvarArquivo('usuarios', rows.map(u => u.id === id ? { ...merged, ...usuario.toJSON() } : u));
       return usuario;
     });
   }
   async remover(id: string): Promise<boolean> {
     return this.transacao(async () => {
-      const rows = await this.lerArquivo(this.caminhoArquivo);
+      const rows = await this.lerArquivo('usuarios');
       if (!rows.some(u => u.id === id)) return false;
-      await this.salvarArquivo(this.caminhoArquivo, rows.filter(u => u.id !== id));
+      await this.salvarArquivo('usuarios', rows.filter(u => u.id !== id));
       return true;
     });
   }
