@@ -57,6 +57,10 @@ test('login real permite renderizar todas as p?ginas de professor', async () => 
   }
   expect((await request('/admin')).status).toBe(403);
 });
+test.each([professor.email, aluno.email])('cadastro exige administrador para %s', async email => {
+  await login(email);
+  expect((await request('/auth/registrar', 'POST', {})).status).toBe(403);
+});
 test('perfil persiste telefone e senha e recusa entrada inv?lida', async () => {
   await login();
   expect((await request('/profile', 'PUT', { nome: professor.nome, email: professor.email, telefone: '11999999999' })).status).toBe(200);
