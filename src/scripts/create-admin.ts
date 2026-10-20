@@ -1,4 +1,6 @@
+import 'dotenv/config';
 import { saveUser } from '../services/SchoolService';
+import { closePool } from '../database/connection';
 async function main() {
   const [nome, email] = process.argv.slice(2);
   const senha = process.env.SENAC_ADMIN_PASSWORD;
@@ -6,4 +8,4 @@ async function main() {
   await saveUser({ nome, email, senha, perfil: 'administrador', ativo: true });
   console.log('Administrador criado. A senha não foi exibida nem gravada em texto puro.');
 }
-main().catch(error => { console.error(error.message); process.exitCode = 1; });
+main().catch(error => { console.error(error.message); process.exitCode = 1; }).finally(closePool);

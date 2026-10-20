@@ -8,10 +8,14 @@
     "test": "jest",
     "typecheck": "tsc --noEmit",
     "admin:create": "node dist/scripts/create-admin.js",
-    "test:browser": "npm run build && node scripts/browser-test.cjs"
+    "test:browser": "npm run build && node scripts/browser-test.cjs",
+    "db:init": "node scripts/database.cjs init",
+    "db:seed": "node scripts/database.cjs seed",
+    "db:reset": "node scripts/database.cjs reset"
   },
   "dependencies": {
     "bcrypt": "^6.0.0",
+    "dotenv": "^16.6.1",
     "ejs": "^6.0.1",
     "express": "^5.2.1",
     "express-session": "^1.19.0",
