@@ -9,7 +9,10 @@
     "titulacao": "Mestre",
     "disciplinas": [
       "Desenvolvimento Web"
-    ]
+    ],
+    "ativo": true,
+    "telefone": null,
+    "fotoUrl": "/uploads/avatars/37f0f820-7568-4423-a40f-16e691700d45.jpg"
   },
   {
     "id": "a1b2c3d4-0002-4000-8000-000000000002",
@@ -21,7 +24,10 @@
     "titulacao": "Doutora",
     "disciplinas": [
       "Banco de Dados"
-    ]
+    ],
+    "ativo": true,
+    "telefone": null,
+    "fotoUrl": null
   },
   {
     "id": "a1b2c3d4-0003-4000-8000-000000000003",
@@ -31,7 +37,10 @@
     "perfil": "aluno",
     "criadoEm": "2024-02-01T14:00:00.000Z",
     "curso": "Desenvolvimento de Sistemas",
-    "turma": "DS-2024A"
+    "turma": "DS-2024A",
+    "ativo": true,
+    "telefone": null,
+    "fotoUrl": null
   },
   {
     "id": "a1b2c3d4-0004-4000-8000-000000000004",
@@ -42,7 +51,10 @@
     "criadoEm": "2024-02-03T09:45:00.000Z",
     "matricula": "2024002",
     "curso": "Desenvolvimento de Sistemas",
-    "turma": "DS-2024A"
+    "turma": "DS-2024A",
+    "ativo": true,
+    "telefone": null,
+    "fotoUrl": null
   },
   {
     "id": "a1b2c3d4-0005-4000-8000-000000000005",
@@ -52,6 +64,9 @@
     "perfil": "administrador",
     "criadoEm": "2023-12-01T07:00:00.000Z",
     "nivelAcesso": "total",
-    "departamento": "Coordenação de Tecnologia"
+    "departamento": "Coordenação de Tecnologia",
+    "ativo": true,
+    "telefone": null,
+    "fotoUrl": null
   }
 ]
