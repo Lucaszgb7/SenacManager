@@ -4,7 +4,6 @@
 .input-group textarea { min-height: 100px; }
 .toolbar { display: flex; flex-wrap: wrap; align-items: end; gap: 16px; margin: 20px 0; }
 .toolbar .input-group { flex: 1; min-width: 200px; }
-.app-main .card { margin: 20px 0; }
 .profile-photo { width: 88px; height: 88px; border-radius: 50%; object-fit: cover; }
 .error-page { max-width: 620px; padding: 48px 24px; margin: 10vh auto; }
 .error-page p { margin: 24px 0; }

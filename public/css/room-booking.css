@@ -81,19 +81,19 @@
 }
 
 .room-card:hover {
-  border-color: var(--color-primary, #004a8f);
+  border-color: var(--color-primary);
   box-shadow: var(--shadow-sm, 0 1px 3px rgba(0, 0, 0, 0.08));
 }
 
 .room-card:focus-visible {
-  outline: 2px solid var(--color-primary, #004a8f);
+  outline: 2px solid var(--color-primary);
   outline-offset: 2px;
 }
 
 /* Estado selecionado */
 .room-card.is-selected {
-  border-color: var(--color-primary, #004a8f);
-  background: rgba(0, 74, 143, 0.04);
+  border-color: var(--color-primary);
+  background: rgba(227, 6, 19, 0.04);
   box-shadow: var(--shadow-sm, 0 1px 3px rgba(0, 0, 0, 0.08));
 }
 
@@ -145,7 +145,7 @@
   width: 22px;
   height: 22px;
   border-radius: 50%;
-  background: var(--color-primary, #004a8f);
+  background: var(--color-primary);
   color: #fff;
   font-size: 0.8rem;
   display: flex;

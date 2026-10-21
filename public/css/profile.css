@@ -40,9 +40,9 @@
 .badge--perfil {
   align-self: flex-start;
   margin-top: 6px;
-  background: rgba(11, 94, 215, 0.1);
-  color: var(--color-primary, #0b5ed7);
-  border: 1px solid rgba(11, 94, 215, 0.25);
+  background: rgba(227, 6, 19, 0.1);
+  color: var(--color-primary-dark);
+  border: 1px solid rgba(227, 6, 19, 0.25);
 }
 
 .card + .card {
@@ -87,9 +87,9 @@
   align-items: center;
   padding: 4px 12px;
   border-radius: 999px;
-  background: rgba(11, 94, 215, 0.08);
-  color: var(--color-primary, #0b5ed7);
-  border: 1px solid rgba(11, 94, 215, 0.2);
+  background: rgba(227, 6, 19, 0.08);
+  color: var(--color-primary-dark);
+  border: 1px solid rgba(227, 6, 19, 0.2);
   font-size: 0.78rem;
   font-weight: 500;
 }

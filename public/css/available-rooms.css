@@ -83,12 +83,12 @@
 }
 
 .rooms-tab.is-active {
-  background: var(--color-primary, #004a8f);
+  background: var(--color-primary);
   color: #fff;
 }
 
 .rooms-tab.is-active:hover {
-  background: var(--color-primary, #004a8f);
+  background: var(--color-primary);
   color: #fff;
 }
 

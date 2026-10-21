@@ -14,6 +14,9 @@
 
   --color-text: #1F2937;
   --color-text-light: #6B7280;
+  --color-muted: var(--color-text-light);
+  --color-text-muted: var(--color-text-light);
+  --color-surface: var(--color-white);
   --color-border: #E5E7EB;
 
   --color-error: #DC2626;

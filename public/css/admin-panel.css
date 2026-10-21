@@ -21,10 +21,10 @@
   color: var(--color-muted, #6b7280);
   transition: color 0.15s ease, border-color 0.15s ease;
 }
-.tab:hover { color: var(--color-primary, #0b5ed7); }
+.tab:hover { color: var(--color-primary); }
 .tab.is-active {
-  color: var(--color-primary, #0b5ed7);
-  border-bottom-color: var(--color-primary, #0b5ed7);
+  color: var(--color-primary);
+  border-bottom-color: var(--color-primary);
 }
 
 /* --- Painéis --- */
@@ -52,8 +52,8 @@
 }
 .input-search:focus {
   outline: none;
-  border-color: var(--color-primary, #0b5ed7);
-  box-shadow: 0 0 0 3px rgba(11, 94, 215, 0.15);
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(227, 6, 19, 0.14);
 }
 
 /* --- Tabela --- */
@@ -84,7 +84,7 @@
   vertical-align: middle;
 }
 .data-table tbody tr:last-child td { border-bottom: none; }
-.data-table tbody tr:hover { background: rgba(11, 94, 215, 0.04); }
+.data-table tbody tr:hover { background: rgba(227, 6, 19, 0.035); }
 
 .col-actions {
   text-align: right;
@@ -100,10 +100,10 @@
   font-family: inherit;
   font-size: 0.82rem;
   font-weight: 600;
-  color: var(--color-primary, #0b5ed7);
+  color: var(--color-primary);
   border-radius: var(--radius-md, 6px);
 }
-.btn-link:hover { background: rgba(11, 94, 215, 0.08); }
+.btn-link:hover { background: rgba(227, 6, 19, 0.08); }
 .btn-link--danger { color: #b91c1c; }
 .btn-link--danger:hover { background: rgba(185, 28, 28, 0.08); }
 
@@ -117,7 +117,7 @@
   font-weight: 600;
   letter-spacing: 0.02em;
 }
-.badge--professor { background: rgba(11, 94, 215, 0.1); color: #0b5ed7; }
+.badge--professor { background: rgba(227, 6, 19, 0.1); color: var(--color-primary-dark); }
 .badge--aluno     { background: rgba(16, 185, 129, 0.12); color: #047857; }
 .badge--admin     { background: rgba(139, 92, 246, 0.12); color: #6d28d9; }
 .badge--ativo     { background: rgba(16, 185, 129, 0.14); color: #047857; }
