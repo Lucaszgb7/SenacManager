@@ -1,0 +1,109 @@
+
+<%- include('../partials/head', { title: 'Central de Ajuda', pageCss: 'help.css' }) %>
+
+<main class="help-page">
+  <!-- Cabeçalho da central de ajuda -->
+  <header class="help-header">
+    <a href="/login" class="help-brand">SenacManager</a>
+    <h1>Central de Ajuda</h1>
+    <p>Orientações para alunos, professores e administradores.</p>
+    <a href="/login" class="help-button">Ir para o login</a>
+  </header>
+
+  <!-- Conteúdo principal do guia -->
+  <div class="help-content">
+
+    <section class="help-card">
+      <h2>1. Como fazer login</h2>
+      <ol>
+        <li>Acesse a página de login do SenacManager.</li>
+        <li>Informe seu e-mail cadastrado.</li>
+        <li>Digite sua senha.</li>
+        <li>Clique em <strong>Entrar</strong>.</li>
+      </ol>
+      <p>Se os dados não forem aceitos, confira o e-mail e a senha informados.</p>
+    </section>
+
+    <section class="help-card">
+      <h2>2. Como consultar aulas</h2>
+      <ol>
+        <li>Acesse o sistema com sua conta.</li>
+        <li>Procure a opção de aulas ou grade de horários, caso esteja disponível no seu perfil.</li>
+        <li>Consulte as informações de disciplina, professor, sala e horário que forem exibidas.</li>
+      </ol>
+      <p>A disponibilidade da consulta depende das telas e funcionalidades habilitadas no sistema.</p>
+    </section>
+
+    <section class="help-card">
+      <h2>3. Como reservar salas</h2>
+      <p>Esta orientação é destinada aos professores.</p>
+      <ol>
+        <li>Entre no sistema com uma conta de professor.</li>
+        <li>Acesse a opção de reserva de salas, quando disponível.</li>
+        <li>Confira as salas e os horários disponíveis.</li>
+        <li>Preencha os dados solicitados e confirme a reserva, se o formulário estiver habilitado.</li>
+        <li>Consulte suas reservas para verificar os registros disponíveis.</li>
+      </ol>
+      <p>O acesso à reserva é restrito ao perfil de professor nas rotas correspondentes.</p>
+    </section>
+
+    <section class="help-card">
+      <h2>4. Como visualizar atividades NOA</h2>
+      <p>Esta seção é destinada aos alunos.</p>
+      <ol>
+        <li>Entre no sistema com sua conta.</li>
+        <li>Acesse a área de atividades NOA, se estiver disponível no seu perfil.</li>
+        <li>Confira o nome da atividade, o horário, o professor, a sala e as vagas exibidas.</li>
+        <li>Consulte a área de inscrições para verificar os registros apresentados.</li>
+      </ol>
+      <p>A exibição de atividades não garante que a inscrição esteja integrada ou seja salva no sistema.</p>
+    </section>
+
+    <section class="help-card">
+      <h2>5. Como editar o perfil</h2>
+      <ol>
+        <li>Acesse o sistema e abra a opção de perfil, quando disponível.</li>
+        <li>Confira as informações apresentadas.</li>
+        <li>Se os campos de edição estiverem habilitados, altere os dados desejados.</li>
+        <li>Utilize a opção de salvar somente se ela estiver funcional.</li>
+      </ol>
+      <p>Algumas telas de perfil podem apresentar dados demonstrativos. Confirme se as alterações são realmente salvas antes de sair da página.</p>
+    </section>
+
+    <section class="help-card">
+      <h2>6. Perguntas frequentes</h2>
+
+      <details class="help-faq">
+        <summary>Não consigo entrar. O que devo fazer?</summary>
+        <p>Confira seu e-mail e sua senha. Se o problema continuar, utilize somente as opções de recuperação disponíveis na tela de login.</p>
+      </details>
+
+      <details class="help-faq">
+        <summary>Por que não consigo reservar uma sala?</summary>
+        <p>A reserva é destinada a professores e depende de uma sessão válida e da disponibilidade da funcionalidade.</p>
+      </details>
+
+      <details class="help-faq">
+        <summary>Por que não aparece uma atividade NOA?</summary>
+        <p>Verifique se a área está disponível no seu perfil e se existem atividades cadastradas para exibição.</p>
+      </details>
+
+      <details class="help-faq">
+        <summary>Minhas alterações no perfil não foram salvas. E agora?</summary>
+        <p>A tela pode não estar integrada a uma operação de gravação. Não presuma que os dados foram alterados sem confirmar o resultado.</p>
+      </details>
+
+      <details class="help-faq">
+        <summary>Todos os usuários têm as mesmas permissões?</summary>
+        <p>Não. O acesso a determinadas operações depende do perfil e das regras de autorização do sistema.</p>
+      </details>
+    </section>
+
+  </div>
+
+  <!-- Rodapé da página de ajuda -->
+  <footer class="help-footer">
+    <p>SenacManager — Guia de utilização</p>
+    <a href="/login">Voltar para o login</a>
+  </footer>
+</main>
