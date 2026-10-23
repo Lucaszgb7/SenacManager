@@ -1,0 +1,170 @@
+
+/* Configuração geral da página de ajuda */
+.help-page {
+    min-height: 100vh;
+    padding: 32px 20px;
+    background: var(--color-bg);
+    color: var(--color-text);
+  }
+  
+  /* Cabeçalho da central de ajuda */
+  .help-header {
+    max-width: 900px;
+    margin: 0 auto 28px;
+    padding: 36px 24px;
+    text-align: center;
+    background: var(--color-white);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+  }
+  
+  .help-brand {
+    display: inline-block;
+    margin-bottom: 20px;
+    color: var(--color-primary);
+    font-size: 1rem;
+    font-weight: 700;
+  }
+  
+  .help-header h1 {
+    margin-bottom: 10px;
+    font-size: clamp(1.8rem, 4vw, 2.5rem);
+  }
+  
+  .help-header p {
+    color: var(--color-text-light);
+  }
+  
+  /* Botão de retorno ao login */
+  .help-button {
+    display: inline-block;
+    margin-top: 22px;
+    padding: 12px 20px;
+    border-radius: var(--radius-md);
+    background: var(--color-primary);
+    color: var(--color-white);
+    font-weight: 600;
+    transition: background 0.2s ease;
+  }
+  
+  .help-button:hover {
+    background: var(--color-primary-dark);
+  }
+  
+  /* Limita a largura do conteúdo para facilitar a leitura */
+  .help-content {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 20px;
+    max-width: 900px;
+    margin: 0 auto;
+  }
+  
+  /* Cartões das seções */
+  .help-card {
+    min-width: 0;
+    padding: 24px;
+    background: var(--color-white);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+  }
+  
+  .help-card h2 {
+    margin-bottom: 16px;
+    color: var(--color-secondary);
+    font-size: 1.15rem;
+  }
+  
+  .help-card p {
+    margin-top: 12px;
+    color: var(--color-text-light);
+    font-size: 0.95rem;
+  }
+  
+  .help-card ol {
+    padding-left: 22px;
+  }
+  
+  .help-card li {
+    margin-bottom: 10px;
+    line-height: 1.6;
+  }
+  
+  /* Perguntas expansíveis da seção de FAQ */
+  .help-faq {
+    padding: 14px 0;
+    border-bottom: 1px solid var(--color-border);
+  }
+  
+  .help-faq:last-child {
+    border-bottom: none;
+  }
+  
+  .help-faq summary {
+    cursor: pointer;
+    font-weight: 600;
+    line-height: 1.5;
+  }
+  
+  .help-faq summary:hover {
+    color: var(--color-primary);
+  }
+  
+  .help-faq p {
+    margin-top: 10px;
+  }
+  
+  /* Rodapé */
+  .help-footer {
+    max-width: 900px;
+    margin: 28px auto 0;
+    text-align: center;
+    color: var(--color-text-light);
+    font-size: 0.9rem;
+  }
+  
+  .help-footer a {
+    display: inline-block;
+    margin-top: 8px;
+    color: var(--color-primary);
+    font-weight: 600;
+  }
+  
+  /* Adapta o conteúdo para celulares e tablets */
+  @media (max-width: 700px) {
+    .help-page {
+      padding: 18px 12px;
+    }
+  
+    .help-header {
+      padding: 28px 18px;
+    }
+  
+    .help-content {
+      grid-template-columns: 1fr;
+      gap: 14px;
+    }
+  
+    .help-card {
+      padding: 20px;
+    }
+  
+    .help-button {
+      width: 100%;
+      max-width: 280px;
+    }
+  }
+  
+  /* Reduz os espaçamentos em telas muito estreitas */
+  @media (max-width: 360px) {
+    .help-header,
+    .help-card {
+      padding: 16px;
+    }
+  
+    .help-card h2 {
+      font-size: 1.05rem;
+    }
+  }
+  
