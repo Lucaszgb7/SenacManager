@@ -1,46 +1,217 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-<%- include('../partials/head', { title: 'Editar cadastro', pageCss: 'admin-panel.css' }) %>
+<%- include('../partials/head', { title: 'Editar Cadastro', pageCss: 'admin-panel.css' }) %>
 <body>
-<%- include('../partials/header', { usuario }) %>
-<%- include('../partials/sidebar', { perfil: usuario.perfil }) %>
-<main class="app-main"><div class="app-main__inner">
-<h1 class="page-title">Editar cadastro</h1>
+<%- include('../partials/header', { usuario, title: 'Editar Cadastro' }) %>
+<%- include('../partials/sidebar', { perfil: usuario.perfil, usuario }) %>
 
-<p><a href="<%= back %>">Voltar</a></p>
-<form action="<%= endpoint %>" method="post" data-api-form data-method="<%= record.id ? 'PUT' : 'POST' %>" data-redirect="<%= back %>" class="card">
-<div class="form-grid">
-<% if (kind === 'salas') { %>
-<label class="input-group">Nome<input name="nome" value="<%= record.nome || '' %>" minlength="2" required></label>
-<label class="input-group">Prédio<input name="predio" value="<%= record.predio || '' %>" required></label>
-<label class="input-group">Andar<input name="andar" value="<%= record.andar || '' %>"></label>
-<label class="input-group">Capacidade<input name="capacidade" type="number" min="1" step="1" value="<%= record.capacidade || '' %>" required></label>
-<label class="input-group">Recursos (separados por vírgula)<input name="recursos" data-array value="<%= (record.recursos || []).join(', ') %>"></label>
-<label class="checkbox-group"><input type="checkbox" name="ativa" <%= record.ativa === false ? '' : 'checked' %>>Sala ativa</label>
-<% } else if (kind === 'usuarios') { %>
-<label class="input-group">Nome<input name="nome" value="<%= record.nome || '' %>" minlength="3" required></label>
-<label class="input-group">E-mail<input name="email" type="email" value="<%= record.email || '' %>" required></label>
-<label class="input-group">Perfil<select name="perfil" data-profile-select><% ['professor','aluno','administrador'].forEach(p => { %><option value="<%= p %>" <%= record.perfil === p ? 'selected' : '' %>><%= p %></option><% }) %></select></label>
-<label class="input-group">Senha <%= record.id ? '(deixe vazia para manter)' : '' %><input name="senha" type="password" minlength="8" autocomplete="new-password" <%= record.id ? '' : 'required' %>></label>
-<label class="input-group" data-profile-field="professor">Disciplinas (separadas por vírgula)<input name="disciplinas" data-array value="<%= (record.disciplinas || []).join(', ') %>"></label>
-<label class="input-group" data-profile-field="aluno">Curso<input name="curso" value="<%= record.curso || '' %>" minlength="2" data-required></label>
-<label class="input-group" data-profile-field="aluno">Turma<input name="turma" value="<%= record.turma || '' %>" data-required></label>
-<label class="checkbox-group"><input name="ativo" type="checkbox" <%= record.ativo === false ? '' : 'checked' %>>Usuário ativo</label>
-<% } else { %>
-<label class="input-group">Disciplina<input name="disciplina" value="<%= record.disciplina || '' %>" minlength="2" required></label>
-<label class="input-group">Professor<select name="professorId" required <%= usuario.perfil === 'administrador' ? '' : 'disabled' %>><% professores.forEach(p => { %><option value="<%= p.id %>" <%= record.professorId === p.id ? 'selected' : '' %>><%= p.nome %></option><% }) %></select></label>
-<label class="input-group">Sala<select name="salaId" required><% salas.forEach(s => { %><option value="<%= s.id %>" <%= record.salaId === s.id ? 'selected' : '' %>><%= s.nome %><%= s.ativa === false ? ' (inativa)' : '' %></option><% }) %></select></label>
-<label class="input-group">Turma<input name="turma" value="<%= record.turma || '' %>" required></label>
-<label class="input-group">Dia<select name="diaSemana" required><% ['segunda','terca','quarta','quinta','sexta','sabado'].forEach(d => { %><option value="<%= d %>" <%= record.diaSemana === d ? 'selected' : '' %>><%= d %></option><% }) %></select></label>
-<label class="input-group">Início<input type="time" name="horarioInicio" value="<%= record.horarioInicio || '' %>" required></label>
-<label class="input-group">Término<input type="time" name="horarioFim" value="<%= record.horarioFim || '' %>" required></label>
-<label class="input-group">Semestre (AAAA.1 ou AAAA.2)<input name="semestre" pattern="[0-9]{4}\.[12]" value="<%= record.semestre || '' %>" placeholder="2026.2" required></label>
-<label class="checkbox-group"><input type="checkbox" name="isNoa" <%= record.isNoa ? 'checked' : '' %>>Atividade NOA</label>
-<label class="input-group">Vagas NOA<input type="number" name="vagasTotal" min="1" step="1" value="<%= record.vagasTotal || '' %>"></label>
-<label class="checkbox-group"><input type="checkbox" name="ativa" <%= record.ativa === false ? '' : 'checked' %>>Aula ativa</label>
-<label class="input-group">Descrição<textarea name="descricao"><%= record.descricao || '' %></textarea></label>
-<% } %>
-</div><p data-feedback role="status" hidden></p><button type="submit" class="btn btn-primary">Salvar</button></form>
-</div></main>
+<main class="app-main">
+  <div class="app-main__inner">
+    <header class="page-header">
+      <div class="page-header__left">
+        <h1 class="page-title"><%= record.id ? 'Editar Cadastro' : 'Novo Cadastro' %></h1>
+        <p class="page-subtitle">Preencha as informações abaixo para salvar as alterações no sistema.</p>
+      </div>
+
+      <div class="page-header__right">
+        <a href="<%= back %>" class="btn btn-secondary">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="19" y1="12" x2="5" y2="12"></line>
+            <polyline points="12 19 5 12 12 5"></polyline>
+          </svg>
+          Voltar
+        </a>
+      </div>
+    </header>
+
+    <div class="card" style="max-width: 860px;">
+      <form
+        action="<%= endpoint %>"
+        method="post"
+        data-api-form
+        data-method="<%= record.id ? 'PUT' : 'POST' %>"
+        data-redirect="<%= back %>"
+      >
+        <div class="form-grid">
+          <% if (kind === 'salas') { %>
+            <div class="input-group">
+              <label for="sala-nome">Nome da Sala / Laboratório</label>
+              <input id="sala-nome" name="nome" value="<%= record.nome || '' %>" placeholder="Ex: Laboratório de Redes" minlength="2" required>
+            </div>
+
+            <div class="input-group">
+              <label for="sala-predio">Prédio / Bloco</label>
+              <input id="sala-predio" name="predio" value="<%= record.predio || '' %>" placeholder="Ex: Bloco A" required>
+            </div>
+
+            <div class="input-group">
+              <label for="sala-andar">Andar / Pavimento</label>
+              <input id="sala-andar" name="andar" value="<%= record.andar || '' %>" placeholder="Ex: 2º Andar">
+            </div>
+
+            <div class="input-group">
+              <label for="sala-capacidade">Capacidade (Lugares)</label>
+              <input id="sala-capacidade" name="capacidade" type="number" min="1" step="1" value="<%= record.capacidade || '' %>" required>
+            </div>
+
+            <div class="input-group" style="grid-column: 1 / -1;">
+              <label for="sala-recursos">Recursos Disponíveis (separados por vírgula)</label>
+              <input id="sala-recursos" name="recursos" data-array value="<%= (record.recursos || []).join(', ') %>" placeholder="Ex: projetor, computadores, ar-condicionado">
+            </div>
+
+            <div style="grid-column: 1 / -1; margin-top: 8px;">
+              <label class="checkbox-group">
+                <input type="checkbox" name="ativa" <%= record.ativa === false ? '' : 'checked' %>>
+                Sala ativa e disponível para agendamento
+              </label>
+            </div>
+
+          <% } else if (kind === 'usuarios') { %>
+            <div class="input-group">
+              <label for="user-nome">Nome Completo</label>
+              <input id="user-nome" name="nome" value="<%= record.nome || '' %>" minlength="3" required>
+            </div>
+
+            <div class="input-group">
+              <label for="user-email">E-mail Institucional</label>
+              <input id="user-email" name="email" type="email" value="<%= record.email || '' %>" required>
+            </div>
+
+            <div class="input-group">
+              <label for="user-perfil">Perfil de Acesso</label>
+              <select id="user-perfil" name="perfil" data-profile-select>
+                <% ['professor','aluno','administrador'].forEach(function(p) { %>
+                  <option value="<%= p %>" <%= record.perfil === p ? 'selected' : '' %>><%= p %></option>
+                <% }); %>
+              </select>
+            </div>
+
+            <div class="input-group">
+              <label for="user-senha">Senha <%= record.id ? '(deixe vazia para manter atual)' : '' %></label>
+              <input id="user-senha" name="senha" type="password" minlength="8" autocomplete="new-password" <%= record.id ? '' : 'required' %>>
+            </div>
+
+            <div class="input-group" data-profile-field="professor" style="grid-column: 1 / -1;">
+              <label for="user-disciplinas">Disciplinas Ministradas (separadas por vírgula)</label>
+              <input id="user-disciplinas" name="disciplinas" data-array value="<%= (record.disciplinas || []).join(', ') %>" placeholder="Ex: Redes, Banco de Dados">
+            </div>
+
+            <div class="input-group" data-profile-field="aluno">
+              <label for="user-curso">Curso</label>
+              <input id="user-curso" name="curso" value="<%= record.curso || '' %>" minlength="2" data-required placeholder="Ex: Análise e Desenvolvimento de Sistemas">
+            </div>
+
+            <div class="input-group" data-profile-field="aluno">
+              <label for="user-turma">Turma</label>
+              <input id="user-turma" name="turma" value="<%= record.turma || '' %>" data-required placeholder="Ex: ADS-3A">
+            </div>
+
+            <div style="grid-column: 1 / -1; margin-top: 8px;">
+              <label class="checkbox-group">
+                <input name="ativo" type="checkbox" <%= record.ativo === false ? '' : 'checked' %>>
+                Usuário ativo com permissão de login
+              </label>
+            </div>
+
+          <% } else { %>
+            <div class="input-group">
+              <label for="grade-disciplina">Nome da Disciplina</label>
+              <input id="grade-disciplina" name="disciplina" value="<%= record.disciplina || '' %>" minlength="2" required>
+            </div>
+
+            <div class="input-group">
+              <label for="grade-prof">Professor Responsável</label>
+              <select id="grade-prof" name="professorId" required <%= usuario.perfil === 'administrador' ? '' : 'disabled' %>>
+                <% professores.forEach(function(p) { %>
+                  <option value="<%= p.id %>" <%= record.professorId === p.id ? 'selected' : '' %>><%= p.nome %></option>
+                <% }); %>
+              </select>
+            </div>
+
+            <div class="input-group">
+              <label for="grade-sala">Sala Alocada</label>
+              <select id="grade-sala" name="salaId" required>
+                <% salas.forEach(function(s) { %>
+                  <option value="<%= s.id %>" <%= record.salaId === s.id ? 'selected' : '' %>>
+                    <%= s.nome %><%= s.ativa === false ? ' (inativa)' : '' %>
+                  </option>
+                <% }); %>
+              </select>
+            </div>
+
+            <div class="input-group">
+              <label for="grade-turma">Turma</label>
+              <input id="grade-turma" name="turma" value="<%= record.turma || '' %>" required placeholder="Ex: TI-1B">
+            </div>
+
+            <div class="input-group">
+              <label for="grade-dia">Dia da Semana</label>
+              <select id="grade-dia" name="diaSemana" required>
+                <% [
+                     ['segunda','Segunda-feira'],
+                     ['terca','Terça-feira'],
+                     ['quarta','Quarta-feira'],
+                     ['quinta','Quinta-feira'],
+                     ['sexta','Sexta-feira'],
+                     ['sabado','Sábado']
+                   ].forEach(function([dVal, dLabel]) { %>
+                  <option value="<%= dVal %>" <%= record.diaSemana === dVal ? 'selected' : '' %>><%= dLabel %></option>
+                <% }); %>
+              </select>
+            </div>
+
+            <div class="input-group">
+              <label for="grade-semestre">Semestre de Vigência (AAAA.1 ou AAAA.2)</label>
+              <input id="grade-semestre" name="semestre" pattern="[0-9]{4}\.[12]" value="<%= record.semestre || '' %>" placeholder="2026.2" required>
+            </div>
+
+            <div class="input-group">
+              <label for="grade-inicio">Horário de Início</label>
+              <input id="grade-inicio" type="time" name="horarioInicio" value="<%= record.horarioInicio || '' %>" required>
+            </div>
+
+            <div class="input-group">
+              <label for="grade-fim">Horário de Término</label>
+              <input id="grade-fim" type="time" name="horarioFim" value="<%= record.horarioFim || '' %>" required>
+            </div>
+
+            <div style="grid-column: 1 / -1; display: flex; flex-direction: column; gap: 8px; margin: 8px 0;">
+              <label class="checkbox-group">
+                <input type="checkbox" name="isNoa" <%= record.isNoa ? 'checked' : '' %>>
+                Atividade NOA (Novas Oportunidades de Aprendizagem)
+              </label>
+
+              <label class="checkbox-group">
+                <input type="checkbox" name="ativa" <%= record.ativa === false ? '' : 'checked' %>>
+                Aula ativa no cronograma
+              </label>
+            </div>
+
+            <div class="input-group">
+              <label for="grade-vagas">Vagas NOA (se aplicável)</label>
+              <input id="grade-vagas" type="number" name="vagasTotal" min="1" step="1" value="<%= record.vagasTotal || '' %>" placeholder="Ex: 30">
+            </div>
+
+            <div class="input-group" style="grid-column: 1 / -1;">
+              <label for="grade-descricao">Descrição / Ementa</label>
+              <textarea id="grade-descricao" name="descricao" rows="3" placeholder="Informações adicionais sobre o conteúdo da aula..."><%= record.descricao || '' %></textarea>
+            </div>
+          <% } %>
+        </div>
+
+        <p data-feedback role="status" hidden></p>
+
+        <div style="display: flex; gap: 12px; margin-top: 12px;">
+          <button type="submit" class="btn btn-primary" style="padding: 12px 28px;">
+            Salvar
+          </button>
+          <a href="<%= back %>" class="btn btn-secondary">Cancelar</a>
+        </div>
+      </form>
+    </div>
+  </div>
+</main>
+
 <%- include('../partials/footer') %>
-</body></html>
+</body>
+</html>

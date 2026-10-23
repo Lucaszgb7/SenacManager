@@ -1,237 +1,53 @@
 /* ============================================================
-   Tela: Reserva de Sala (Professor)
-   Classes específicas desta tela — não vão em components.css
+   SenacManager — room-booking.css
+   Formulário de reserva de sala com verificação de conflitos
    ============================================================ */
 
-.page-header {
+.booking-step-card {
+  background: #FFFFFF;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--color-border);
+  box-shadow: var(--shadow-sm);
+  padding: 24px;
   margin-bottom: 24px;
 }
 
-.page-title {
-  font-size: 1.6rem;
-  font-weight: 600;
-  color: var(--color-text, #1f2937);
-  margin: 0;
-}
-
-.page-subtitle {
-  margin: 4px 0 0;
-  color: var(--color-text-muted, #6b7280);
-  font-size: 0.95rem;
-}
-
-/* ---------- Formulário ---------- */
-.booking-form {
-  padding: 20px;
-  margin-bottom: 24px;
+.booking-step-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-primary);
+  background: var(--color-primary-light);
+  padding: 4px 10px;
+  border-radius: var(--radius-pill);
+  margin-bottom: 12px;
 }
 
 .booking-form-row {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
   gap: 16px;
+  margin-bottom: 20px;
 }
 
-/* ---------- Seção de salas ---------- */
-.rooms-section {
-  margin-bottom: 24px;
-}
-
-.rooms-section-header {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  margin-bottom: 12px;
-}
-
-.rooms-section-header h2 {
-  font-size: 1.15rem;
-  font-weight: 600;
-  margin: 0;
-  color: var(--color-text, #1f2937);
-}
-
-.rooms-counter {
+.booking-info-box {
+  background: #F8FAFC;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  padding: 14px 18px;
   font-size: 0.85rem;
-  color: var(--color-text-muted, #6b7280);
-}
-
-/* ---------- Grid de salas ---------- */
-.rooms-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-  gap: 16px;
-}
-
-/* ---------- Card de sala (clicável) ---------- */
-.room-card {
-  position: relative;
-  text-align: left;
-  background: #fff;
-  border: 2px solid var(--color-border, #e5e7eb);
-  border-radius: var(--radius-md, 8px);
-  padding: 16px;
-  cursor: pointer;
-  font-family: inherit;
-  transition: border-color 0.15s ease, box-shadow 0.15s ease,
-    transform 0.1s ease;
+  color: var(--color-text-secondary);
+  margin-bottom: 20px;
   display: flex;
-  flex-direction: column;
+  align-items: center;
   gap: 12px;
 }
 
-.room-card:hover {
-  border-color: var(--color-primary);
-  box-shadow: var(--shadow-sm, 0 1px 3px rgba(0, 0, 0, 0.08));
-}
-
-.room-card:focus-visible {
-  outline: 2px solid var(--color-primary);
-  outline-offset: 2px;
-}
-
-/* Estado selecionado */
-.room-card.is-selected {
-  border-color: var(--color-primary);
-  background: rgba(227, 6, 19, 0.04);
-  box-shadow: var(--shadow-sm, 0 1px 3px rgba(0, 0, 0, 0.08));
-}
-
-.room-card.is-selected .room-card-check {
-  opacity: 1;
-  transform: scale(1);
-}
-
-.room-card-header {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.room-card-name {
-  font-size: 1.05rem;
-  font-weight: 600;
-  margin: 0;
-  color: var(--color-text, #1f2937);
-}
-
-.room-card-capacity {
-  font-size: 0.85rem;
-  color: var(--color-text-muted, #6b7280);
-}
-
-.room-card-resources {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-}
-
-.room-resource-tag {
-  font-size: 0.75rem;
-  background: #eef2f7;
-  color: #334155;
-  padding: 3px 8px;
-  border-radius: 999px;
-  text-transform: capitalize;
-}
-
-.room-card-check {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  width: 22px;
-  height: 22px;
-  border-radius: 50%;
-  background: var(--color-primary);
-  color: #fff;
-  font-size: 0.8rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  opacity: 0;
-  transform: scale(0.6);
-  transition: opacity 0.15s ease, transform 0.15s ease;
-}
-
-/* ---------- Estado vazio ---------- */
-.rooms-empty {
-  text-align: center;
-  padding: 40px 20px;
-  background: #fff;
-  border: 1px dashed var(--color-border, #e5e7eb);
-  border-radius: var(--radius-md, 8px);
-  color: var(--color-text-muted, #6b7280);
-}
-
-.rooms-empty-icon {
-  font-size: 2rem;
-  margin-bottom: 8px;
-}
-
-.rooms-empty h3 {
-  margin: 0 0 6px;
-  color: var(--color-text, #1f2937);
-  font-size: 1.05rem;
-}
-
-.rooms-empty p {
-  margin: 0;
-  font-size: 0.9rem;
-}
-
-/* ---------- Bloco de confirmação ---------- */
-.booking-confirm {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  align-items: flex-start;
-}
-
-.booking-summary {
-  width: 100%;
-  background: #fff;
-  border: 1px solid var(--color-border, #e5e7eb);
-  border-radius: var(--radius-md, 8px);
-  padding: 16px;
-}
-
-.booking-summary h3 {
-  margin: 0 0 10px;
-  font-size: 1rem;
-  font-weight: 600;
-  color: var(--color-text, #1f2937);
-}
-
-.booking-summary-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  gap: 6px 16px;
-  font-size: 0.9rem;
-}
-
-.booking-summary-list li {
-  color: var(--color-text, #1f2937);
-}
-
-.booking-summary-list strong {
-  color: var(--color-text-muted, #6b7280);
-  font-weight: 500;
-  margin-right: 4px;
-}
-
-/* ---------- Alerta de sucesso ---------- */
-.alert-success {
-  margin-top: 16px;
-  padding: 12px 16px;
-  border-radius: var(--radius-md, 8px);
-  background: #ecfdf5;
-  border: 1px solid #a7f3d0;
-  color: #065f46;
-  font-size: 0.9rem;
+.booking-info-box svg {
+  color: var(--color-primary);
+  flex-shrink: 0;
 }

@@ -1,1 +1,34 @@
-<!DOCTYPE html><html lang="pt-BR"><%- include('../partials/head', { title }) %><body><main class="error-page"><h1>Ajuda de acesso</h1><p>Para recuperar sua senha ou resolver problemas de acesso, procure a administração da sua unidade. Um administrador pode redefinir a senha pelo cadastro de usuários.</p><a class="btn btn-primary" href="/login">Voltar ao login</a></main></body></html>
+<!DOCTYPE html>
+<html lang="pt-BR">
+<%- include('../partials/head', { title, pageCss: 'login.css' }) %>
+<body class="login-page">
+  <main class="login-container">
+    <section class="card login-card" style="text-align: center;">
+      <div class="login-brand__badge">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"></circle>
+          <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+          <line x1="12" y1="17" x2="12.01" y2="17"></line>
+        </svg>
+      </div>
+      <h1 class="login-brand__name">Ajuda e Suporte</h1>
+      <p class="login-brand__tagline" style="margin-bottom: 24px;">
+        Recuperação de acesso e informações acadêmicas
+      </p>
+
+      <div style="background: #F8FAFC; border: 1px solid var(--color-border); border-radius: var(--radius-md); padding: 20px; text-align: left; font-size: 0.9rem; line-height: 1.6; color: var(--color-text); margin-bottom: 24px;">
+        <p style="margin: 0 0 10px;">
+          Por políticas de segurança institucional, o SenacManager não envia redefinições públicas de senha por e-mail externo.
+        </p>
+        <p style="margin: 0;">
+          Para redefinir sua credencial ou atualizar seus dados cadastrais, procure a <strong>Coordenação de Cursos</strong> ou a <strong>Secretaria Escolar</strong> da sua unidade Senac. Um administrador autorizado poderá emitir uma nova chave de acesso.
+        </p>
+      </div>
+
+      <a class="btn btn-primary" href="/login" style="width: 100%;">
+        Voltar para a Tela de Login
+      </a>
+    </section>
+  </main>
+</body>
+</html>

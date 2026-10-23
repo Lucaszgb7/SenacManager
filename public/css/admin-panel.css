@@ -1,213 +1,49 @@
-/* =========================================================
-   SenacManager — Painel Administrativo
-   ========================================================= */
+/* ============================================================
+   SenacManager — admin-panel.css
+   Painel de administração completo para Salas, Grade e Usuários
+   ============================================================ */
 
-/* --- Abas --- */
-.tabs {
+.admin-toolbar {
   display: flex;
-  gap: 4px;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
-  margin-bottom: 20px;
-}
-.tab {
-  padding: 10px 18px;
-  background: transparent;
-  border: none;
-  border-bottom: 2px solid transparent;
-  cursor: pointer;
-  font-family: inherit;
-  font-size: 0.9rem;
-  font-weight: 600;
-  color: var(--color-muted, #6b7280);
-  transition: color 0.15s ease, border-color 0.15s ease;
-}
-.tab:hover { color: var(--color-primary); }
-.tab.is-active {
-  color: var(--color-primary);
-  border-bottom-color: var(--color-primary);
-}
-
-/* --- Painéis --- */
-.tab-panel { display: none; }
-.tab-panel.is-active { display: block; }
-
-/* --- Toolbar (busca + botão) --- */
-.panel-toolbar {
-  display: flex;
-  gap: 12px;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 16px;
+  margin-bottom: 20px;
+  gap: 16px;
   flex-wrap: wrap;
 }
-.input-search {
-  flex: 1 1 240px;
-  min-width: 200px;
-  padding: 10px 14px;
-  border: 1px solid rgba(0, 0, 0, 0.12);
-  border-radius: var(--radius-md, 8px);
-  font-family: inherit;
-  font-size: 0.9rem;
-  background: #ffffff;
-}
-.input-search:focus {
-  outline: none;
-  border-color: var(--color-primary);
-  box-shadow: 0 0 0 3px rgba(227, 6, 19, 0.14);
-}
 
-/* --- Tabela --- */
-.table-wrap {
-  background: #ffffff;
-  border-radius: var(--radius-md, 12px);
-  box-shadow: var(--shadow-sm, 0 1px 2px rgba(0, 0, 0, 0.05));
-  overflow-x: auto;
-}
-.data-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 0.88rem;
-}
-.data-table thead th {
-  text-align: left;
-  padding: 12px 16px;
-  background: rgba(0, 0, 0, 0.025);
-  font-weight: 600;
-  color: var(--color-text, #374151);
-  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
-  white-space: nowrap;
-}
-.data-table tbody td {
-  padding: 12px 16px;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-  color: var(--color-text, #1f2937);
-  vertical-align: middle;
-}
-.data-table tbody tr:last-child td { border-bottom: none; }
-.data-table tbody tr:hover { background: rgba(227, 6, 19, 0.035); }
-
-.col-actions {
-  text-align: right;
-  white-space: nowrap;
-}
-
-/* --- Ações em linha (texto) --- */
-.btn-link {
-  background: transparent;
-  border: none;
-  padding: 4px 8px;
-  cursor: pointer;
-  font-family: inherit;
-  font-size: 0.82rem;
-  font-weight: 600;
-  color: var(--color-primary);
-  border-radius: var(--radius-md, 6px);
-}
-.btn-link:hover { background: rgba(227, 6, 19, 0.08); }
-.btn-link--danger { color: #b91c1c; }
-.btn-link--danger:hover { background: rgba(185, 28, 28, 0.08); }
-
-/* --- Badges --- */
-.badge {
-  display: inline-flex;
-  align-items: center;
-  padding: 3px 10px;
-  border-radius: 999px;
-  font-size: 0.72rem;
-  font-weight: 600;
-  letter-spacing: 0.02em;
-}
-.badge--professor { background: rgba(227, 6, 19, 0.1); color: var(--color-primary-dark); }
-.badge--aluno     { background: rgba(16, 185, 129, 0.12); color: #047857; }
-.badge--admin     { background: rgba(139, 92, 246, 0.12); color: #6d28d9; }
-.badge--ativo     { background: rgba(16, 185, 129, 0.14); color: #047857; }
-.badge--inativo   { background: rgba(107, 114, 128, 0.14); color: #4b5563; }
-
-/* --- Modal --- */
-.modal {
-  position: fixed;
-  inset: 0;
-  z-index: 300;
+.admin-table-user-cell {
   display: flex;
   align-items: center;
-  justify-content: center;
-  padding: 16px;
-}
-.modal[hidden] { display: none; }
-
-.modal__overlay {
-  position: absolute;
-  inset: 0;
-  background: rgba(17, 24, 39, 0.5);
-  animation: modalFade 0.18s ease;
+  gap: 12px;
 }
 
-.modal__card {
-  position: relative;
-  width: 100%;
-  max-width: 480px;
-  background: #ffffff;
-  border-radius: var(--radius-md, 14px);
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
-  animation: modalPop 0.2s ease-out;
-  max-height: 90vh;
-  overflow-y: auto;
+.admin-table-user-cell .avatar {
+  width: 36px;
+  height: 36px;
+  font-size: 0.8rem;
+  flex-shrink: 0;
 }
 
-@keyframes modalFade {
-  from { opacity: 0; }
-  to   { opacity: 1; }
-}
-@keyframes modalPop {
-  from { opacity: 0; transform: translateY(10px) scale(0.98); }
-  to   { opacity: 1; transform: translateY(0) scale(1); }
-}
-
-.modal__header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 16px 20px;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
-}
-.modal__header h3 {
-  margin: 0;
-  font-size: 1rem;
-  font-weight: 700;
-  color: var(--color-text, #111827);
-}
-.modal__close {
-  background: transparent;
-  border: none;
-  font-size: 1.4rem;
-  line-height: 1;
-  cursor: pointer;
-  color: var(--color-muted, #6b7280);
-  padding: 4px 8px;
-  border-radius: var(--radius-md, 6px);
-}
-.modal__close:hover { background: rgba(0, 0, 0, 0.05); color: #111827; }
-
-.modal__body {
-  padding: 20px;
+.admin-table-user-info {
   display: flex;
   flex-direction: column;
-  gap: 14px;
-}
-.modal__footer {
-  display: flex;
-  justify-content: flex-end;
-  gap: 10px;
-  padding-top: 6px;
-  border-top: 1px solid rgba(0, 0, 0, 0.06);
-  margin-top: 6px;
+  line-height: 1.25;
 }
 
-/* --- Responsivo --- */
-@media (max-width: 640px) {
-  .data-table thead th,
-  .data-table tbody td {
-    padding: 10px 12px;
-    font-size: 0.82rem;
-  }
+.admin-table-user-name {
+  font-weight: 600;
+  color: var(--color-navy);
+}
+
+.admin-table-user-email {
+  font-size: 0.78rem;
+  color: var(--color-text-secondary);
+}
+
+.admin-actions-cell {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
 }

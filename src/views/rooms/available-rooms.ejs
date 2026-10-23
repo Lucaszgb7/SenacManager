@@ -1,21 +1,125 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-<%- include('../partials/head', { title: 'Salas disponíveis', pageCss: 'available-rooms.css' }) %>
+<%- include('../partials/head', { title: 'Salas Disponíveis', pageCss: 'available-rooms.css' }) %>
 <body>
-<%- include('../partials/header', { usuario }) %>
-<%- include('../partials/sidebar', { perfil: usuario.perfil }) %>
-<main class="app-main"><div class="app-main__inner">
-<h1 class="page-title">Salas disponíveis</h1>
+<%- include('../partials/header', { usuario, title: 'Salas Disponíveis' }) %>
+<%- include('../partials/sidebar', { perfil: usuario.perfil, usuario }) %>
 
-<p class="page-subtitle">Ocupação no momento da consulta. Atualize para consultar novamente.</p>
-<form class="toolbar" data-filter-form><label class="input-group">Buscar sala<input type="search" name="q"></label>
-<label class="input-group">Estado<select name="status"><option value="">Todos</option><option value="disponivel">Disponíveis</option><option value="ocupada">Ocupadas</option><option value="inativa">Inativas</option></select></label></form>
-<div class="rooms-grid">
-<% salas.forEach(s => { %><article class="room-card" data-filter-item data-search="<%= s.nome.toLowerCase() %>" data-status="<%= s.status %>">
-<h2 class="room-card-name"><%= s.nome %></h2><p><%= s.predio %> · <%= s.capacidade %> lugares</p><strong><%= {disponivel:'Disponível',ocupada:'Ocupada',inativa:'Inativa'}[s.status] %></strong>
-<% if (s.ocupacaoAtual) { %><p><%= s.ocupacaoAtual.professor %> · <%= s.ocupacaoAtual.disciplina %><br>Livre às <%= s.ocupacaoAtual.horarioFim %></p><% } %>
-<% if (usuario.perfil === 'professor' && s.ativa !== false) { %><a class="btn btn-primary" href="/rooms/booking?salaId=<%= s.id %>">Reservar</a><% } %>
-</article><% }) %></div><p data-filter-empty hidden>Nenhuma sala encontrada.</p>
-</div></main>
+<main class="app-main">
+  <div class="app-main__inner">
+    <header class="page-header">
+      <div class="page-header__left">
+        <h1 class="page-title">Salas Disponíveis</h1>
+        <p class="page-subtitle">Consulte o status e ocupação em tempo real das salas e laboratórios do campus.</p>
+      </div>
+
+      <% if (usuario.perfil === 'professor') { %>
+        <div class="page-header__right">
+          <a class="btn btn-primary" href="/rooms/booking">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="12" y1="5" x2="12" y2="19"></line>
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+            </svg>
+            Reservar por Horário
+          </a>
+        </div>
+      <% } %>
+    </header>
+
+    <!-- Toolbar de Busca e Filtro de Status -->
+    <section class="rooms-toolbar-card">
+      <form class="rooms-filter-form" data-filter-form>
+        <div class="input-group rooms-filter-search">
+          <label for="filter-query">Buscar por nome ou prédio</label>
+          <input type="search" id="filter-query" name="q" placeholder="Ex: Laboratório de Informática, Bloco A...">
+        </div>
+
+        <div class="input-group rooms-filter-select">
+          <label for="filter-status">Filtrar por Disponibilidade</label>
+          <select id="filter-status" name="status">
+            <option value="">Todas as salas</option>
+            <option value="disponivel">Disponíveis agora</option>
+            <option value="ocupada">Ocupadas</option>
+            <option value="inativa">Inativas / Manutenção</option>
+          </select>
+        </div>
+      </form>
+    </section>
+
+    <!-- Grid de Salas -->
+    <div class="rooms-grid">
+      <% salas.forEach(function(s) { 
+           var statusConfig = {
+             disponivel: { label: 'Disponível', badgeClass: 'badge--success' },
+             ocupada: { label: 'Em Aula / Ocupada', badgeClass: 'badge--warning' },
+             inativa: { label: 'Inativa', badgeClass: 'badge--danger' }
+           }[s.status] || { label: s.status, badgeClass: 'badge--neutral' };
+      %>
+        <article
+          class="room-card <%= s.status === 'inativa' ? 'room-card--inativa' : '' %>"
+          data-filter-item
+          data-search="<%= s.nome.toLowerCase() %> <%= (s.predio || '').toLowerCase() %>"
+          data-status="<%= s.status %>"
+        >
+          <div>
+            <div class="room-card__header">
+              <h2 class="room-card-name"><%= s.nome %></h2>
+              <span class="badge <%= statusConfig.badgeClass %>"><%= statusConfig.label %></span>
+            </div>
+
+            <div class="room-card__meta">
+              <span><strong>Local:</strong> <%= s.predio || 'Campus Central' %><%= s.andar ? ' · ' + s.andar : '' %></span>
+              <span class="room-card__capacity">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                  <circle cx="9" cy="7" r="4"></circle>
+                </svg>
+                <%= s.capacidade %> lugares
+              </span>
+            </div>
+
+            <% if (s.ocupacaoAtual) { %>
+              <div class="room-card__occupancy">
+                <div class="room-card__occupancy-title">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <polyline points="12 6 12 12 16 14"></polyline>
+                  </svg>
+                  <%= s.ocupacaoAtual.disciplina %>
+                </div>
+                <div><%= s.ocupacaoAtual.professor %></div>
+                <div class="room-card__occupancy-time">Previsão de liberação às <%= s.ocupacaoAtual.horarioFim %></div>
+              </div>
+            <% } %>
+          </div>
+
+          <div class="room-card__actions">
+            <% if (usuario.perfil === 'professor' && s.ativa !== false) { %>
+              <a class="btn btn-primary btn-sm" href="/rooms/booking?salaId=<%= s.id %>">
+                Reservar esta sala
+              </a>
+            <% } else if (s.ativa === false) { %>
+              <span style="font-size: 0.8rem; color: var(--color-danger); font-weight: 500;">Indisponível para reserva</span>
+            <% } else { %>
+              <span style="font-size: 0.8rem; color: var(--color-text-secondary);">Visualização pública</span>
+            <% } %>
+          </div>
+        </article>
+      <% }); %>
+    </div>
+
+    <!-- Feedback vazio do filtro -->
+    <div class="empty-state" data-filter-empty hidden style="margin-top: 32px;">
+      <svg class="empty-state__icon" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+        <circle cx="11" cy="11" r="8"></circle>
+        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+      </svg>
+      <div class="empty-state__title">Nenhuma sala encontrada</div>
+      <p class="empty-state__text">Tente alterar os termos de busca ou remover os filtros de disponibilidade selecionados.</p>
+    </div>
+  </div>
+</main>
+
 <%- include('../partials/footer') %>
-</body></html>
+</body>
+</html>

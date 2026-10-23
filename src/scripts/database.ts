@@ -1,5 +1,5 @@
 import 'dotenv/config';
-import bcrypt from 'bcrypt';
+import bcrypt from 'bcryptjs';
 import { initializeSchema } from '../database/schema';
 import { getPool, closePool } from '../database/connection';
 import { readData as readJson } from '../database/jsonStore';

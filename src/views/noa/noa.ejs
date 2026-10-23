@@ -2,19 +2,138 @@
 <html lang="pt-BR">
 <%- include('../partials/head', { title: 'NOA — Novas Oportunidades de Aprendizagem', pageCss: 'noa.css' }) %>
 <body>
-<%- include('../partials/header', { usuario }) %>
-<%- include('../partials/sidebar', { perfil: usuario.perfil }) %>
-<main class="app-main"><div class="app-main__inner">
-<h1 class="page-title">NOA — Novas Oportunidades de Aprendizagem</h1>
+<%- include('../partials/header', { usuario, title: 'Atividades NOA' }) %>
+<%- include('../partials/sidebar', { perfil: usuario.perfil, usuario }) %>
 
-<p class="page-subtitle">Atividades disponíveis no semestre atual.</p>
-<h2>Atividades disponíveis</h2>
-<% if (!atividades.length) { %><p>Nenhuma atividade aberta neste semestre.</p><% } %>
-<div class="noa-grid"><% atividades.forEach(a => { %><article class="card noa-card"><h3><a href="/classes/details?id=<%= a.id %>"><%= a.disciplina %></a></h3><p><%= a.professor.nome %> · <%= a.sala %></p><p><%= a.diaSemana %> · <%= a.horario %></p><p><%= a.vagasOcupadas %>/<%= a.vagasTotal %> vagas ocupadas</p>
-<button class="btn btn-primary" data-api-action="/noa/<%= a.id %>/inscrever" <%= a.inscrito || a.vagasOcupadas >= a.vagasTotal ? 'disabled' : '' %>><%= a.inscrito ? 'Já inscrito' : a.vagasOcupadas >= a.vagasTotal ? 'Esgotado' : 'Inscrever-se' %></button><p data-feedback role="status" hidden></p></article><% }) %></div>
-<h2>Minhas inscrições</h2>
-<% if (!minhasInscricoes.length) { %><p>Você ainda não possui inscrições.</p><% } %>
-<% minhasInscricoes.forEach(a => { %><article class="card"><h3><%= a.disciplina %></h3><p><%= a.semestre %> · <%= a.ativa === false ? 'Atividade cancelada' : a.horario %></p><button class="btn" data-api-action="/noa/<%= a.id %>/cancelar" data-confirm="Cancelar sua inscrição?">Cancelar inscrição</button><p data-feedback role="status" hidden></p></article><% }) %>
-</div></main>
+<main class="app-main">
+  <div class="app-main__inner">
+    <header class="page-header">
+      <div class="page-header__left">
+        <h1 class="page-title">Novas Oportunidades de Aprendizagem (NOA)</h1>
+        <p class="page-subtitle">Aulas de reforço, oficinas práticas e projetos complementares para enriquecer sua formação.</p>
+      </div>
+    </header>
+
+    <!-- Banner Informativo -->
+    <div class="noa-banner">
+      <div>
+        <h2 class="noa-banner__title">Desenvolva suas habilidades acadêmicas</h2>
+        <p class="noa-banner__text">
+          As atividades NOA são abertas a todos os estudantes regularmente matriculados. As vagas são limitadas por ordem de inscrição.
+        </p>
+      </div>
+      <span class="badge badge--noa" style="font-size: 0.85rem; padding: 6px 14px;">Semestre Vigente</span>
+    </div>
+
+    <!-- Seção 1: Atividades Abertas -->
+    <h2 class="noa-section-title">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="12" cy="12" r="10"></circle>
+        <polyline points="12 6 12 12 14 14"></polyline>
+      </svg>
+      Atividades com Inscrições Abertas
+    </h2>
+
+    <% if (!atividades.length) { %>
+      <div class="empty-state">
+        <div class="empty-state__title">Nenhuma atividade aberta no momento</div>
+        <p class="empty-state__text">Novas oficinas e workshops são disponibilizados no início e meio de cada semestre letivo.</p>
+      </div>
+    <% } else { %>
+      <div class="noa-grid">
+        <% atividades.forEach(function(a) { 
+             var pct = Math.min(100, Math.round(((a.vagasOcupadas || 0) / (a.vagasTotal || 1)) * 100));
+             var esgotado = a.vagasOcupadas >= a.vagasTotal;
+        %>
+          <article class="card noa-card">
+            <div>
+              <div class="noa-card__header">
+                <h3 class="noa-card__title">
+                  <a href="/classes/details?id=<%= a.id %>"><%= a.disciplina %></a>
+                </h3>
+                <span class="badge badge--noa">Oficina</span>
+              </div>
+
+              <div class="noa-card__meta">
+                <span><strong>Professor:</strong> <%= a.professor.nome %></span>
+                <span><strong>Local:</strong> <%= a.sala %></span>
+                <span><strong>Horário:</strong> <%= a.diaSemana %> · <%= a.horario %></span>
+              </div>
+
+              <div class="noa-spots">
+                <div class="noa-spots__header">
+                  <span>Ocupação de Vagas</span>
+                  <span><strong><%= a.vagasOcupadas %></strong> / <%= a.vagasTotal %></span>
+                </div>
+                <div class="noa-spots__bar">
+                  <div class="noa-spots__fill <%= esgotado ? 'noa-spots__fill--full' : '' %>" style="width: <%= pct %>%;"></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="noa-card__actions">
+              <button
+                class="btn <%= a.inscrito ? 'btn-secondary' : 'btn-primary' %>"
+                style="width: 100%;"
+                data-api-action="/noa/<%= a.id %>/inscrever"
+                <%= a.inscrito || esgotado ? 'disabled' : '' %>
+              >
+                <%= a.inscrito ? 'Já Inscrito' : esgotado ? 'Vagas Esgotadas' : 'Inscrever-se nesta Oficina' %>
+              </button>
+
+              <p data-feedback role="status" hidden style="margin-top: 8px;"></p>
+            </div>
+          </article>
+        <% }); %>
+      </div>
+    <% } %>
+
+    <!-- Seção 2: Minhas Inscrições -->
+    <h2 class="noa-section-title">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+        <polyline points="22 4 12 14.01 9 11.01"></polyline>
+      </svg>
+      Minhas Inscrições Confirmadas
+    </h2>
+
+    <% if (!minhasInscricoes.length) { %>
+      <div class="card" style="text-align: center; padding: 36px 20px;">
+        <p style="color: var(--color-text-secondary); margin: 0;">Você ainda não possui inscrições ativas em atividades NOA neste semestre.</p>
+      </div>
+    <% } else { %>
+      <div class="noa-grid">
+        <% minhasInscricoes.forEach(function(a) { %>
+          <article class="card">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; margin-bottom: 12px;">
+              <h3 style="margin: 0; font-size: 1.1rem; color: var(--color-navy);"><%= a.disciplina %></h3>
+              <span class="badge badge--success">Matriculado</span>
+            </div>
+
+            <div style="font-size: 0.85rem; color: var(--color-text-secondary); display: flex; flex-direction: column; gap: 4px; margin-bottom: 18px;">
+              <span><strong>Semestre:</strong> <%= a.semestre %></span>
+              <span><strong>Horário:</strong> <%= a.ativa === false ? 'Atividade cancelada' : a.horario %></span>
+            </div>
+
+            <div style="border-top: 1px solid var(--color-border); padding-top: 14px;">
+              <button
+                type="button"
+                class="btn btn-danger-outline btn-sm"
+                data-api-action="/noa/<%= a.id %>/cancelar"
+                data-confirm="Tem certeza de que deseja cancelar sua inscrição nesta atividade?"
+              >
+                Cancelar Inscrição
+              </button>
+              <p data-feedback role="status" hidden style="margin-top: 8px;"></p>
+            </div>
+          </article>
+        <% }); %>
+      </div>
+    <% } %>
+
+  </div>
+</main>
+
 <%- include('../partials/footer') %>
-</body></html>
+</body>
+</html>

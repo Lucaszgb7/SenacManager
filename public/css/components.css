@@ -1,26 +1,24 @@
 /* ============================================================
-   components.css
-   Classes reutilizáveis em todas as telas do SenacManager.
-   Depende das variáveis definidas em global.css (:root).
+   SenacManager — components.css
+   Componentes visuais reutilizáveis padronizados e modernos
    ============================================================ */
 
-/* ---------- Botões ---------- */
+/* ---------- Botões Modernos ---------- */
 .btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
-  padding: 12px 20px;
+  padding: 10px 18px;
   font-family: inherit;
-  font-size: 0.95rem;
+  font-size: 0.875rem;
   font-weight: 600;
-  line-height: 1;
+  line-height: 1.25;
   border: 1px solid transparent;
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-sm);
   cursor: pointer;
   text-decoration: none;
-  transition: background-color 0.2s ease, border-color 0.2s ease,
-    color 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
+  transition: all 0.15s ease-in-out;
   user-select: none;
   white-space: nowrap;
 }
@@ -30,140 +28,408 @@
   outline-offset: 2px;
 }
 
-/* Botão principal (ação primária) */
+/* Botão Primário (Azul Vibrante) */
 .btn-primary {
   background-color: var(--color-primary);
-  color: #ffffff;
+  color: #FFFFFF;
   border-color: var(--color-primary);
+  box-shadow: 0 1px 3px rgba(22, 138, 245, 0.25);
 }
+
 .btn-primary:hover:not(:disabled) {
-  background-color: var(--color-primary-dark, var(--color-primary));
-  border-color: var(--color-primary-dark, var(--color-primary));
-  box-shadow: var(--shadow-sm);
+  background-color: var(--color-primary-dark);
+  border-color: var(--color-primary-dark);
+  box-shadow: 0 4px 10px rgba(22, 138, 245, 0.35);
+  transform: translateY(-1px);
 }
+
 .btn-primary:active:not(:disabled) {
-  transform: translateY(1px);
-}
-
-/* Botão secundário (ação neutra) */
-.btn-secondary {
-  background-color: transparent;
-  color: var(--color-primary);
-  border-color: var(--color-primary);
-}
-.btn-secondary:hover:not(:disabled) {
-  background-color: var(--color-primary);
-  color: #ffffff;
-}
-
-/* Estado desabilitado */
-.btn:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
+  transform: translateY(0);
   box-shadow: none;
 }
 
-/* Estado de loading — mantém tamanho e exibe feedback sutil */
-.btn-loading {
-  position: relative;
-  pointer-events: none;
-  opacity: 0.85;
+/* Botão Secundário / Neutro */
+.btn-secondary {
+  background-color: #FFFFFF;
+  color: var(--color-text);
+  border-color: var(--color-border);
+  box-shadow: var(--shadow-xs);
 }
 
-/* ---------- Card ---------- */
+.btn-secondary:hover:not(:disabled) {
+  background-color: #F8FAFC;
+  border-color: #CBD5E1;
+  color: var(--color-navy);
+}
+
+/* Botão Danger Outline */
+.btn-danger-outline {
+  background-color: #FFFFFF;
+  color: var(--color-danger);
+  border-color: var(--color-danger-border);
+}
+
+.btn-danger-outline:hover:not(:disabled) {
+  background-color: var(--color-danger-bg);
+  border-color: var(--color-danger);
+  color: var(--color-danger-dark);
+}
+
+/* Botão Danger Sólido */
+.btn-danger {
+  background-color: var(--color-danger);
+  color: #FFFFFF;
+  border-color: var(--color-danger);
+}
+
+.btn-danger:hover:not(:disabled) {
+  background-color: var(--color-danger-dark);
+}
+
+/* Botão Link */
+.btn-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: transparent;
+  color: var(--color-primary);
+  border: none;
+  padding: 6px 10px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  border-radius: var(--radius-xs);
+  cursor: pointer;
+  text-decoration: none;
+  transition: all 0.15s ease;
+}
+
+.btn-link:hover {
+  background-color: var(--color-primary-light);
+  color: var(--color-primary-dark);
+}
+
+.btn-link--danger {
+  color: var(--color-danger);
+}
+
+.btn-link--danger:hover {
+  background-color: var(--color-danger-bg);
+  color: var(--color-danger-dark);
+}
+
+/* Botão Pequeno */
+.btn-sm {
+  padding: 6px 12px;
+  font-size: 0.8rem;
+  border-radius: var(--radius-xs);
+}
+
+.btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  box-shadow: none !important;
+  transform: none !important;
+}
+
+/* ---------- Cards Modernos ---------- */
 .card {
-  background-color: var(--color-surface, #ffffff);
+  background-color: var(--color-white);
   border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-md);
-  padding: 32px;
-  border: 1px solid var(--color-border, #e5e7eb);
+  border: 1px solid var(--color-border);
+  box-shadow: var(--shadow-sm);
+  padding: 24px;
+  transition: box-shadow 0.2s ease, border-color 0.2s ease;
 }
 
-/* ---------- Grupos de input ---------- */
+.card--interactive:hover {
+  border-color: #D3DCE6;
+  box-shadow: var(--shadow-md);
+}
+
+.card__title {
+  margin: 0 0 16px;
+  color: var(--color-text);
+  font-size: 1.05rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+/* ---------- Formulários & Inputs ---------- */
 .input-group {
   display: flex;
   flex-direction: column;
   gap: 6px;
-  margin-bottom: 20px;
-}
-
-.input-group label {
+  margin-bottom: 18px;
   font-size: 0.875rem;
-  font-weight: 500;
-  color: var(--color-text, #1f2937);
 }
 
-.input-group input {
+.input-group label,
+label.input-group {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--color-text);
+  letter-spacing: 0.01em;
+}
+
+.input-group input,
+.input-group select,
+.input-group textarea {
   width: 100%;
-  padding: 12px 14px;
+  padding: 10px 14px;
   font-family: inherit;
-  font-size: 0.95rem;
-  color: var(--color-text, #1f2937);
-  background-color: var(--color-surface, #ffffff);
-  border: 1px solid var(--color-border, #d1d5db);
-  border-radius: var(--radius-md);
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  font-size: 0.9rem;
+  color: var(--color-text);
+  background-color: #FFFFFF;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  transition: all 0.15s ease-in-out;
 }
 
-.input-group input::placeholder {
-  color: var(--color-text-muted, #9ca3af);
+.input-group input:hover,
+.input-group select:hover,
+.input-group textarea:hover {
+  border-color: #CBD5E1;
 }
 
-.input-group input:focus {
+.input-group input:focus,
+.input-group select:focus,
+.input-group textarea:focus {
   outline: none;
   border-color: var(--color-primary);
-  box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 0 0 3px rgba(22, 138, 245, 0.15);
+  background-color: #FFFFFF;
 }
 
-/* Estado de erro no input */
-.input-group input.error {
-  border-color: var(--color-error, #dc2626);
-}
-.input-group input.error:focus {
-  box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.12);
+.input-group input::placeholder,
+.input-group textarea::placeholder {
+  color: #94A3B8;
 }
 
-/* ---------- Mensagem de erro ---------- */
-.error-message {
-  display: none;
-  font-size: 0.8rem;
-  color: var(--color-error, #dc2626);
-  margin-top: 2px;
-}
-.error-message.visible {
-  display: block;
-}
-
-/* ---------- Checkbox ---------- */
 .checkbox-group {
-  display: flex;
+  display: inline-flex;
   align-items: center;
   gap: 8px;
   font-size: 0.875rem;
-  color: var(--color-text, #1f2937);
+  color: var(--color-text);
+  font-weight: 500;
   cursor: pointer;
   user-select: none;
+  margin-bottom: 16px;
 }
+
 .checkbox-group input[type="checkbox"] {
-  width: 16px;
-  height: 16px;
+  width: 17px;
+  height: 17px;
   accent-color: var(--color-primary);
+  border-radius: 4px;
   cursor: pointer;
 }
 
-/* ---------- Links ---------- */
-.link {
-  color: var(--color-primary);
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr));
+  gap: 16px 20px;
+  margin-bottom: 24px;
+}
+
+/* ---------- Tabelas Profissionais ---------- */
+.table-wrap {
+  width: 100%;
+  overflow-x: auto;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border);
+  background: #FFFFFF;
+  box-shadow: var(--shadow-xs);
+  margin-bottom: 20px;
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
   font-size: 0.875rem;
-  text-decoration: none;
+}
+
+.data-table thead {
+  background-color: #F8FAFC;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.data-table th {
+  padding: 12px 18px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-text-secondary);
+  white-space: nowrap;
+}
+
+.data-table td {
+  padding: 14px 18px;
+  border-bottom: 1px solid #F1F5F9;
+  color: var(--color-text);
+  vertical-align: middle;
+}
+
+.data-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.data-table tbody tr:hover {
+  background-color: #F8FAFC;
+}
+
+/* ---------- Badges & Tags ---------- */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  border-radius: var(--radius-pill);
+  font-size: 0.75rem;
+  font-weight: 600;
+  line-height: 1;
+  text-transform: capitalize;
+  white-space: nowrap;
+}
+
+.badge--success {
+  background-color: var(--color-success-bg);
+  color: var(--color-success-dark);
+  border: 1px solid var(--color-success-border);
+}
+
+.badge--danger,
+.badge--error {
+  background-color: var(--color-danger-bg);
+  color: var(--color-danger-dark);
+  border: 1px solid var(--color-danger-border);
+}
+
+.badge--warning {
+  background-color: var(--color-warning-bg);
+  color: var(--color-warning-dark);
+  border: 1px solid var(--color-warning-border);
+}
+
+.badge--info {
+  background-color: var(--color-info-bg);
+  color: var(--color-primary);
+  border: 1px solid #BFDBFE;
+}
+
+.badge--neutral {
+  background-color: #F1F5F9;
+  color: #475569;
+  border: 1px solid #E2E8F0;
+}
+
+.badge--noa {
+  background-color: #FEF3C7;
+  color: #92400E;
+  border: 1px solid #FDE68A;
+  font-weight: 700;
+}
+
+/* ---------- Abas / Tabs ---------- */
+.tabs {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 24px;
+  border-bottom: 2px solid var(--color-border);
+  padding-bottom: 2px;
+}
+
+.tab {
+  padding: 10px 18px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  background: transparent;
+  border: none;
+  border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+  cursor: pointer;
+  position: relative;
+  transition: all 0.15s ease;
+}
+
+.tab:hover {
+  color: var(--color-primary);
+}
+
+.tab.is-active {
+  color: var(--color-primary);
+  background-color: transparent;
+}
+
+.tab.is-active::after {
+  content: '';
+  position: absolute;
+  bottom: -4px;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background-color: var(--color-primary);
+  border-radius: 3px 3px 0 0;
+}
+
+/* ---------- Feedbacks & Alertas ---------- */
+[data-feedback] {
+  margin: 16px 0;
+  padding: 12px 16px;
+  border-radius: var(--radius-sm);
+  font-size: 0.875rem;
   font-weight: 500;
-  transition: color 0.2s ease, text-decoration 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
-.link:hover {
-  text-decoration: underline;
+
+.alert-success {
+  background-color: var(--color-success-bg);
+  color: var(--color-success-dark);
+  border: 1px solid var(--color-success-border);
 }
-.link:focus-visible {
-  outline: 2px solid var(--color-primary);
-  outline-offset: 2px;
-  border-radius: var(--radius-sm, 4px);
+
+.alert-error {
+  background-color: var(--color-danger-bg);
+  color: var(--color-danger-dark);
+  border: 1px solid var(--color-danger-border);
+}
+
+.alert-info {
+  background-color: var(--color-info-bg);
+  color: #1D4ED8;
+  border: 1px solid #BFDBFE;
+}
+
+/* ---------- Estados Vazios ---------- */
+.empty-state {
+  text-align: center;
+  padding: 48px 24px;
+  color: var(--color-text-secondary);
+}
+
+.empty-state__icon {
+  margin: 0 auto 16px;
+  color: #CBD5E1;
+}
+
+.empty-state__title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--color-text);
+  margin-bottom: 6px;
+}
+
+.empty-state__text {
+  font-size: 0.875rem;
+  max-width: 400px;
+  margin: 0 auto 20px;
 }

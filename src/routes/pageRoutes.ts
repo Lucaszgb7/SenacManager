@@ -9,7 +9,71 @@ router.get('/dashboard', async (req, res) => {
   const s = await state(), user = res.locals.usuario;
   const today = schoolNow().slice(0, 10);
   const aulas = s.aulas.filter(a => a.ativa !== false && (user.perfil === 'administrador' || a.professorId === user.id || (user.perfil === 'aluno' && (a.turma === user.turma || s.inscricoes.some(i => i.aulaId === a.id && i.alunoId === user.id))))).filter(a => vigente(a, today)).map(a => classView(a, s));
-  res.render('dashboard/dashboard', { aulas, metricas: { salas: s.salas.length, professores: s.usuarios.filter(u => u.perfil === 'professor' && u.ativo).length, alunos: s.usuarios.filter(u => u.perfil === 'aluno' && u.ativo).length, reservas: s.reservas.filter(r => r.status === 'confirmada' && r.data + 'T' + r.horarioFim > schoolNow()).length } });
+  
+  const metricas = {
+    salas: s.salas.length,
+    professores: s.usuarios.filter(u => u.perfil === 'professor' && u.ativo).length,
+    alunos: s.usuarios.filter(u => u.perfil === 'aluno' && u.ativo).length,
+    reservas: s.reservas.filter(r => r.status === 'confirmada' && r.data + 'T' + r.horarioFim > schoolNow()).length
+  };
+
+  const salasPorPredio: Record<string, number> = {};
+  s.salas.forEach(sala => {
+    const p = sala.predio || 'Bloco Principal';
+    salasPorPredio[p] = (salasPorPredio[p] || 0) + 1;
+  });
+
+  const aulasPorDia: Record<string, number> = {
+    'Segunda': 0, 'Terça': 0, 'Quarta': 0, 'Quinta': 0, 'Sexta': 0, 'Sábado': 0
+  };
+  const mapDia: Record<string, string> = {
+    'segunda': 'Segunda', 'terca': 'Terça', 'quarta': 'Quarta',
+    'quinta': 'Quinta', 'sexta': 'Sexta', 'sabado': 'Sábado'
+  };
+  s.aulas.filter(a => a.ativa !== false).forEach(a => {
+    const d = mapDia[a.diaSemana];
+    if (d && aulasPorDia[d] !== undefined) aulasPorDia[d]++;
+  });
+
+  const proximasReservas = s.reservas
+    .filter(r => r.status === 'confirmada' && (user.perfil === 'administrador' || r.professorId === user.id))
+    .slice(0, 5)
+    .map(r => {
+      const sala = s.salas.find(sal => sal.id === r.salaId);
+      const prof = s.usuarios.find(u => u.id === r.professorId);
+      return {
+        ...r,
+        salaNome: sala ? sala.nome : 'Sala',
+        predio: sala ? sala.predio : '',
+        professorNome: prof ? prof.nome : 'Professor'
+      };
+    });
+
+  const inscricoesNoa = user.perfil === 'aluno'
+    ? s.inscricoes
+        .filter(i => i.alunoId === user.id)
+        .map(i => {
+          const aula = s.aulas.find(a => a.id === i.aulaId);
+          return aula ? classView(aula, s) : null;
+        })
+        .filter(Boolean)
+    : [];
+
+  const totalSalasAtivas = s.salas.filter(sal => sal.ativa !== false).length;
+  const totalSalasInativas = s.salas.filter(sal => sal.ativa === false).length;
+  const totalAtividadesNoa = s.aulas.filter(a => a.isNoa && a.ativa !== false).length;
+
+  res.render('dashboard/dashboard', {
+    aulas,
+    metricas,
+    salasPorPredio,
+    aulasPorDia,
+    proximasReservas,
+    inscricoesNoa,
+    totalSalasAtivas,
+    totalSalasInativas,
+    totalAtividadesNoa
+  });
 });
 router.get('/search', async (req, res) => {
   const s = await state();

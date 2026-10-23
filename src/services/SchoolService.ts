@@ -1,4 +1,4 @@
-import bcrypt from 'bcrypt';
+import bcrypt from 'bcryptjs';
 import { randomUUID } from 'crypto';
 import { readData, writeData, transaction, RecordData, Collection } from './store';
 import { required, flag, strings, validated, HttpError, schoolNow, vigente, overlaps, semesterRange } from './validation';

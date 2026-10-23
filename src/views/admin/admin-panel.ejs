@@ -1,20 +1,159 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-<%- include('../partials/head', { title: 'Painel administrativo', pageCss: 'admin-panel.css' }) %>
+<%- include('../partials/head', { title: 'Painel Administrativo', pageCss: 'admin-panel.css' }) %>
 <body>
-<%- include('../partials/header', { usuario }) %>
-<%- include('../partials/sidebar', { perfil: usuario.perfil }) %>
-<main class="app-main"><div class="app-main__inner">
-<h1 class="page-title">Painel administrativo</h1>
+<%- include('../partials/header', { usuario, title: 'Painel Administrativo' }) %>
+<%- include('../partials/sidebar', { perfil: usuario.perfil, usuario }) %>
 
-<p class="page-subtitle">Gerencie os registros do sistema.</p>
-<div class="tabs" role="tablist"><button class="tab is-active" data-tab="salas" role="tab" aria-selected="true">Salas</button><button class="tab" data-tab="aulas-grade" role="tab" aria-selected="false">Horários</button><button class="tab" data-tab="usuarios" role="tab" aria-selected="false">Usuários</button></div>
-<% [['salas',salas],['aulas-grade',aulas],['usuarios',usuarios]].forEach(([kind,rows]) => { %>
-<section data-panel="<%= kind %>" <%= kind === 'salas' ? '' : 'hidden' %>>
-<p class="toolbar"><a class="btn btn-primary" href="/admin/<%= kind %>/edit">Novo cadastro</a></p>
-<div class="table-wrap"><table class="data-table"><thead><tr><th>Nome</th><th>Informações</th><th>Estado</th><th>Ações</th></tr></thead><tbody>
-<% rows.forEach(r => { %><tr><td><%= r.nome || r.disciplina %></td><td><%= kind === 'salas' ? r.predio + ' · ' + r.capacidade + ' lugares' : kind === 'usuarios' ? r.email + ' · ' + r.perfil : r.professor.nome + ' · ' + r.sala + ' · ' + r.diaSemana + ' · ' + r.horario + ' · ' + r.semestre %></td><td><%= (kind === 'usuarios' ? r.ativo : r.ativa) === false ? 'Inativo' : 'Ativo' %></td><td><a class="btn-link" href="/admin/<%= kind %>/edit?id=<%= r.id %>">Editar</a> <button class="btn-link btn-link--danger" data-api-action="/admin/<%= kind %>/<%= r.id %>" data-method="DELETE" data-confirm="Excluir este registro?">Excluir</button><p data-feedback role="status" hidden></p></td></tr><% }) %>
-</tbody></table></div><% if (!rows.length) { %><p>Nenhum registro cadastrado.</p><% } %></section><% }) %>
-</div></main>
+<main class="app-main">
+  <div class="app-main__inner">
+    <header class="page-header">
+      <div class="page-header__left">
+        <h1 class="page-title">Painel Administrativo</h1>
+        <p class="page-subtitle">Controle central de infraestrutura, grade horária e acessos de usuários.</p>
+      </div>
+    </header>
+
+    <!-- Abas de Navegação -->
+    <div class="tabs" role="tablist">
+      <button class="tab is-active" data-tab="salas" role="tab" aria-selected="true">
+        Salas de Aula (<%= salas.length %>)
+      </button>
+      <button class="tab" data-tab="aulas-grade" role="tab" aria-selected="false">
+        Grade Curricular (<%= aulas.length %>)
+      </button>
+      <button class="tab" data-tab="usuarios" role="tab" aria-selected="false">
+        Usuários do Sistema (<%= usuarios.length %>)
+      </button>
+    </div>
+
+    <!-- Painéis das Seções Administrativas -->
+    <% 
+      var secoes = [
+        ['salas', salas, 'Salas de Aula', 'Cadastre e configure capacidade, prédios e recursos de salas.'],
+        ['aulas-grade', aulas, 'Horários e Grade Escolar', 'Vincule disciplinas, professores, salas e dias da semana.'],
+        ['usuarios', usuarios, 'Contas e Usuários', 'Gerencie perfis de professores, alunos e administradores.']
+      ];
+    %>
+
+    <% secoes.forEach(function([kind, rows, tituloSecao, descSecao]) { %>
+      <section data-panel="<%= kind %>" <%= kind === 'salas' ? '' : 'hidden' %>>
+        <div class="admin-toolbar">
+          <div>
+            <h2 style="font-size: 1.15rem; color: var(--color-navy); margin: 0;"><%= tituloSecao %></h2>
+            <p style="font-size: 0.85rem; color: var(--color-text-secondary); margin: 3px 0 0;"><%= descSecao %></p>
+          </div>
+
+          <a class="btn btn-primary" href="/admin/<%= kind %>/edit">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="12" y1="5" x2="12" y2="19"></line>
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+            </svg>
+            Novo Cadastro
+          </a>
+        </div>
+
+        <% if (!rows.length) { %>
+          <div class="empty-state">
+            <div class="empty-state__title">Nenhum registro cadastrado nesta categoria</div>
+            <p class="empty-state__text">Clique no botão "Novo Cadastro" acima para adicionar o primeiro item.</p>
+          </div>
+        <% } else { %>
+          <div class="table-wrap">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th><%= kind === 'usuarios' ? 'Usuário / Nome' : kind === 'salas' ? 'Sala' : 'Disciplina' %></th>
+                  <th>Informações Detalhadas</th>
+                  <th>Estado</th>
+                  <th style="text-align: right;">Ações</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% rows.forEach(function(r) { 
+                     var isAtivo = (kind === 'usuarios' ? r.ativo : r.ativa) !== false;
+                %>
+                  <tr>
+                    <td>
+                      <% if (kind === 'usuarios') { %>
+                        <div class="admin-table-user-cell">
+                          <div class="avatar avatar--sm">
+                            <%= (r.nome || 'U').split(' ').filter(Boolean).slice(0, 2).map(function(n){ return n[0].toUpperCase(); }).join('') %>
+                          </div>
+                          <div class="admin-table-user-info">
+                            <span class="admin-table-user-name"><%= r.nome %></span>
+                            <span class="admin-table-user-email"><%= r.email %></span>
+                          </div>
+                        </div>
+                      <% } else { %>
+                        <strong style="color: var(--color-navy);"><%= r.nome || r.disciplina %></strong>
+                      <% } %>
+                    </td>
+
+                    <td>
+                      <% if (kind === 'salas') { %>
+                        <span><%= r.predio || 'Campus Central' %><%= r.andar ? ' · ' + r.andar : '' %> · <strong><%= r.capacidade %> lugares</strong></span>
+                      <% } else if (kind === 'usuarios') { %>
+                        <span class="badge <%= r.perfil === 'administrador' ? 'badge--info' : r.perfil === 'professor' ? 'badge--neutral' : 'badge--success' %>">
+                          <%= r.perfil %>
+                        </span>
+                        <% if (r.curso) { %> · <%= r.curso %> (<%= r.turma %>)<% } %>
+                      <% } else { %>
+                        <span>
+                          <strong>Prof. <%= r.professor.nome %></strong> · <%= r.sala %> · <%= r.diaSemana %> · <%= r.horario %>
+                          <span class="badge badge--neutral" style="font-size: 0.7rem; padding: 2px 6px;"><%= r.semestre %></span>
+                          <% if (r.isNoa) { %>
+                            <span class="badge badge--noa" style="font-size: 0.7rem;">NOA</span>
+                          <% } %>
+                        </span>
+                      <% } %>
+                    </td>
+
+                    <td>
+                      <span class="badge <%= isAtivo ? 'badge--success' : 'badge--danger' %>">
+                        <%= isAtivo ? 'Ativo' : 'Inativo' %>
+                      </span>
+                    </td>
+
+                    <td style="text-align: right;">
+                      <div class="admin-actions-cell" style="justify-content: flex-end;">
+                        <a class="btn-link" href="/admin/<%= kind %>/edit?id=<%= r.id %>" title="Editar registro">
+                          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                          </svg>
+                          Editar
+                        </a>
+
+                        <button
+                          type="button"
+                          class="btn-link btn-link--danger"
+                          data-api-action="/admin/<%= kind %>/<%= r.id %>"
+                          data-method="DELETE"
+                          data-confirm="Tem certeza de que deseja excluir este registro?"
+                          title="Excluir registro"
+                        >
+                          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="3 6 5 6 21 6"></polyline>
+                            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                          </svg>
+                          Excluir
+                        </button>
+
+                        <p data-feedback role="status" hidden style="margin: 0;"></p>
+                      </div>
+                    </td>
+                  </tr>
+                <% }); %>
+              </tbody>
+            </table>
+          </div>
+        <% } %>
+      </section>
+    <% }); %>
+  </div>
+</main>
+
 <%- include('../partials/footer') %>
-</body></html>
+</body>
+</html>

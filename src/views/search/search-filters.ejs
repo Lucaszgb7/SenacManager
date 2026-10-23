@@ -1,16 +1,96 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-<%- include('../partials/head', { title: 'Pesquisar aulas', pageCss: 'search-filters.css' }) %>
+<%- include('../partials/head', { title: 'Pesquisar Aulas', pageCss: 'search-filters.css' }) %>
 <body>
-<%- include('../partials/header', { usuario }) %>
-<%- include('../partials/sidebar', { perfil: usuario.perfil }) %>
-<main class="app-main"><div class="app-main__inner">
-<h1 class="page-title">Pesquisar aulas</h1>
+<%- include('../partials/header', { usuario, title: 'Pesquisar Aulas' }) %>
+<%- include('../partials/sidebar', { perfil: usuario.perfil, usuario }) %>
 
-<form action="/search" method="get" class="card toolbar"><label class="input-group">Disciplina, professor, sala, turma, dia ou semestre<input type="search" name="q" value="<%= busca %>"></label><button class="btn btn-primary" type="submit">Pesquisar</button></form>
-<p><%= aulas.length %> aula(s) encontrada(s).</p>
-<div class="card-grid"><% aulas.forEach(a => { %><a class="card" href="/classes/details?id=<%= a.id %>"><h2><%= a.disciplina %></h2><p><%= a.professor.nome %> · <%= a.sala %></p><p><%= a.diaSemana %> · <%= a.horario %> · <%= a.semestre %></p><p><%= a.ativa === false ? 'Cancelada' : 'Ativa' %></p></a><% }) %></div>
-<% if (!aulas.length) { %><p>Nenhuma aula encontrada. Tente outro termo.</p><% } %>
-</div></main>
+<main class="app-main">
+  <div class="app-main__inner">
+    <header class="page-header">
+      <div class="page-header__left">
+        <h1 class="page-title">Pesquisar Grade de Aulas</h1>
+        <p class="page-subtitle">Consulte o cronograma de disciplinas por professor, sala, dia ou turma.</p>
+      </div>
+    </header>
+
+    <!-- Formulário de Busca -->
+    <section class="search-bar-card">
+      <form action="/search" method="get" class="search-form-row">
+        <div class="input-group">
+          <label for="search-input">Termo de Pesquisa</label>
+          <input
+            id="search-input"
+            type="search"
+            name="q"
+            value="<%= busca %>"
+            placeholder="Digite nome da disciplina, professor, sala, turma ou dia..."
+          >
+        </div>
+
+        <button class="btn btn-primary" type="submit" style="padding: 11px 24px;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+          Pesquisar
+        </button>
+      </form>
+    </section>
+
+    <!-- Cabeçalho de Resultados -->
+    <div class="search-results-header">
+      <span style="font-size: 0.9rem; color: var(--color-text-secondary);">
+        <strong><%= aulas.length %></strong> aula(s) encontrada(s)
+        <% if (busca) { %> para "<strong><%= busca %></strong>"<% } %>
+      </span>
+
+      <% if (busca) { %>
+        <a href="/search" class="btn-link" style="font-size: 0.8rem;">Limpar busca</a>
+      <% } %>
+    </div>
+
+    <!-- Grid de Resultados -->
+    <% if (!aulas.length) { %>
+      <div class="empty-state">
+        <svg class="empty-state__icon" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+          <circle cx="11" cy="11" r="8"></circle>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        </svg>
+        <div class="empty-state__title">Nenhuma aula encontrada</div>
+        <p class="empty-state__text">Tente utilizar outros termos como o nome do professor, sigla da sala ou dia da semana.</p>
+        <a href="/search" class="btn btn-secondary btn-sm">Ver todas as aulas</a>
+      </div>
+    <% } else { %>
+      <div class="search-results-grid">
+        <% aulas.forEach(function(a) { %>
+          <a class="search-class-card" href="/classes/details?id=<%= a.id %>">
+            <div>
+              <h2 class="search-class-card__title"><%= a.disciplina %></h2>
+              <div class="search-class-card__meta">
+                <span><strong>Professor:</strong> <%= a.professor.nome %></span>
+                <span><strong>Sala:</strong> <%= a.sala %></span>
+                <span><strong>Horário:</strong> <%= a.diaSemana %> · <%= a.horario %></span>
+                <% if (a.turma) { %>
+                  <span><strong>Turma:</strong> <%= a.turma %> · <%= a.semestre %></span>
+                <% } %>
+              </div>
+            </div>
+
+            <div class="search-class-card__footer">
+              <span class="badge <%= a.ativa === false ? 'badge--danger' : 'badge--success' %>">
+                <%= a.ativa === false ? 'Cancelada' : 'Ativa' %>
+              </span>
+              <span class="btn-link" style="padding: 0;">Detalhes &rarr;</span>
+            </div>
+          </a>
+        <% }); %>
+      </div>
+    <% } %>
+
+  </div>
+</main>
+
 <%- include('../partials/footer') %>
-</body></html>
+</body>
+</html>

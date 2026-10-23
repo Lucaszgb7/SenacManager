@@ -1,1 +1,18 @@
-<!DOCTYPE html><html lang="pt-BR"><%- include('../partials/head', { title: 'Erro' }) %><body><main class="error-page"><h1><%= status %></h1><p><%= message %></p><a class="btn btn-primary" href="/dashboard">Voltar</a></main></body></html>
+<!DOCTYPE html>
+<html lang="pt-BR">
+<%- include('../partials/head', { title: 'Erro ' + status }) %>
+<body style="background: var(--color-bg); display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 24px;">
+  <main class="card error-page">
+    <div style="width: 64px; height: 64px; border-radius: 50%; background: #FEE2E2; color: #DC2626; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px;">
+      <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="10"></circle>
+        <line x1="12" y1="8" x2="12" y2="12"></line>
+        <line x1="12" y1="16" x2="12.01" y2="16"></line>
+      </svg>
+    </div>
+    <h1 style="font-size: 3rem; margin: 0 0 8px; color: var(--color-navy);"><%= status %></h1>
+    <p style="font-size: 1.05rem; color: var(--color-text-secondary); margin: 0 0 24px;"><%= message %></p>
+    <a class="btn btn-primary" href="/dashboard" style="display: inline-flex;">Voltar ao Dashboard</a>
+  </main>
+</body>
+</html>

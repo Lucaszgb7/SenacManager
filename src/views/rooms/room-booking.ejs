@@ -1,29 +1,135 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-<%- include('../partials/head', { title: 'Reservar sala', pageCss: 'room-booking.css' }) %>
+<%- include('../partials/head', { title: 'Reservar Sala', pageCss: 'room-booking.css' }) %>
 <body>
-<%- include('../partials/header', { usuario }) %>
-<%- include('../partials/sidebar', { perfil: usuario.perfil }) %>
-<main class="app-main"><div class="app-main__inner">
-<h1 class="page-title">Reservar sala</h1>
+<%- include('../partials/header', { usuario, title: 'Reservar Sala' }) %>
+<%- include('../partials/sidebar', { perfil: usuario.perfil, usuario }) %>
 
-<p class="page-subtitle">Consulte o intervalo e confirme a sala para sua aula.</p>
-<form method="get" action="/rooms/booking" class="card booking-form">
-<div class="booking-form-row">
-<label class="input-group">Data<input type="date" name="data" min="<%= hoje %>" value="<%= filtros.data || '' %>" required></label>
-<label class="input-group">Início<input type="time" name="horarioInicio" value="<%= filtros.horarioInicio || '' %>" required></label>
-<label class="input-group">Término<input type="time" name="horarioFim" value="<%= filtros.horarioFim || '' %>" required></label>
-</div><button class="btn" type="submit">Consultar disponibilidade</button></form>
-<form action="/rooms/booking" method="post" data-api-form data-redirect="/bookings/my" class="card">
-<div class="form-grid">
-<label class="input-group">Sala<select name="salaId" required><option value="">Selecione</option><% salas.forEach(s => { %><option value="<%= s.id %>" <%= s.indisponivel ? 'disabled' : '' %> <%= filtros.salaId === s.id ? 'selected' : '' %>><%= s.nome %> · <%= s.capacidade %> lugares<%= s.indisponivel ? ' (ocupada no intervalo)' : '' %></option><% }) %></select></label>
-<label class="input-group">Data<input type="date" name="data" min="<%= hoje %>" value="<%= filtros.data || '' %>" required></label>
-<label class="input-group">Início<input type="time" name="horarioInicio" value="<%= filtros.horarioInicio || '' %>" required></label>
-<label class="input-group">Término<input type="time" name="horarioFim" value="<%= filtros.horarioFim || '' %>" required></label>
-<label class="input-group">Disciplina<input name="disciplina" minlength="2" required></label>
-<label class="input-group">Turma<input name="turma" required></label>
-</div><p data-feedback role="status" hidden></p><button class="btn btn-primary" type="submit">Confirmar reserva</button>
-</form>
-</div></main>
+<main class="app-main">
+  <div class="app-main__inner">
+    <header class="page-header">
+      <div class="page-header__left">
+        <h1 class="page-title">Reservar Sala</h1>
+        <p class="page-subtitle">Verifique os horários disponíveis e confirme a alocação de espaço para suas aulas.</p>
+      </div>
+
+      <div class="page-header__right">
+        <a href="/bookings/my" class="btn btn-secondary">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+            <polyline points="14 2 14 8 20 8"></polyline>
+          </svg>
+          Minhas Reservas
+        </a>
+      </div>
+    </header>
+
+    <!-- ETAPA 1: Consulta de Disponibilidade por Intervalo -->
+    <section class="booking-step-card">
+      <span class="booking-step-badge">Etapa 1 · Verificação de Conflitos</span>
+      <h2 style="font-size: 1.1rem; color: var(--color-navy); margin-bottom: 16px;">Definir Intervalo de Horário</h2>
+
+      <form method="get" action="/rooms/booking" class="booking-form" style="margin: 0; padding: 0; box-shadow: none; border: none;">
+        <div class="booking-form-row">
+          <div class="input-group">
+            <label for="check-data">Data da Aula</label>
+            <input type="date" id="check-data" name="data" min="<%= hoje %>" value="<%= filtros.data || '' %>" required>
+          </div>
+
+          <div class="input-group">
+            <label for="check-inicio">Horário de Início</label>
+            <input type="time" id="check-inicio" name="horarioInicio" value="<%= filtros.horarioInicio || '' %>" required>
+          </div>
+
+          <div class="input-group">
+            <label for="check-fim">Horário de Término</label>
+            <input type="time" id="check-fim" name="horarioFim" value="<%= filtros.horarioFim || '' %>" required>
+          </div>
+        </div>
+
+        <button class="btn btn-secondary" type="submit">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+          Consultar Disponibilidade das Salas
+        </button>
+      </form>
+    </section>
+
+    <!-- ETAPA 2: Seleção e Confirmação da Reserva -->
+    <section class="booking-step-card">
+      <span class="booking-step-badge">Etapa 2 · Detalhes da Reserva</span>
+      <h2 style="font-size: 1.1rem; color: var(--color-navy); margin-bottom: 16px;">Dados da Aula e Confirmação</h2>
+
+      <div class="booking-info-box">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"></circle>
+          <line x1="12" y1="16" x2="12" y2="12"></line>
+          <line x1="12" y1="8" x2="12.01" y2="8"></line>
+        </svg>
+        <div>
+          O sistema previne conflitos com reservas confirmadas e horários da grade curricular vigente. Intervalos adjacentes (sem sobreposição) são permitidos.
+        </div>
+      </div>
+
+      <form action="/rooms/booking" method="post" data-api-form data-redirect="/bookings/my">
+        <div class="form-grid">
+          <div class="input-group" style="grid-column: 1 / -1;">
+            <label for="book-sala">Selecione a Sala</label>
+            <select id="book-sala" name="salaId" required>
+              <option value="">Selecione uma sala</option>
+              <% salas.forEach(function(s) { %>
+                <option
+                  value="<%= s.id %>"
+                  <%= s.indisponivel ? 'disabled' : '' %>
+                  <%= filtros.salaId === s.id ? 'selected' : '' %>
+                >
+                  <%= s.nome %> · <%= s.predio || 'Bloco Geral' %> (<%= s.capacidade %> lugares)<%= s.indisponivel ? ' — [OCUPADA NO INTERVALO]' : '' %>
+                </option>
+              <% }); %>
+            </select>
+          </div>
+
+          <div class="input-group">
+            <label for="book-data">Data</label>
+            <input type="date" id="book-data" name="data" min="<%= hoje %>" value="<%= filtros.data || '' %>" required>
+          </div>
+
+          <div class="input-group">
+            <label for="book-inicio">Horário de Início</label>
+            <input type="time" id="book-inicio" name="horarioInicio" value="<%= filtros.horarioInicio || '' %>" required>
+          </div>
+
+          <div class="input-group">
+            <label for="book-fim">Horário de Término</label>
+            <input type="time" id="book-fim" name="horarioFim" value="<%= filtros.horarioFim || '' %>" required>
+          </div>
+
+          <div class="input-group">
+            <label for="book-disciplina">Disciplina / Conteúdo</label>
+            <input id="book-disciplina" name="disciplina" placeholder="Ex: Programação Web" minlength="2" required>
+          </div>
+
+          <div class="input-group">
+            <label for="book-turma">Turma / Grupo</label>
+            <input id="book-turma" name="turma" placeholder="Ex: ADS-3A" required>
+          </div>
+        </div>
+
+        <p data-feedback role="status" hidden></p>
+
+        <button class="btn btn-primary" type="submit" style="padding: 12px 24px; font-size: 0.95rem;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="20 6 9 17 4 12"></polyline>
+          </svg>
+          Confirmar e Salvar Reserva
+        </button>
+      </form>
+    </section>
+  </div>
+</main>
+
 <%- include('../partials/footer') %>
-</body></html>
+</body>
+</html>

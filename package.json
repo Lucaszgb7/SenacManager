@@ -2,10 +2,11 @@
   "name": "senac-manager",
   "version": "1.0.0",
   "scripts": {
-    "dev": "ts-node-dev --respawn src/server.ts",
+    "dev": "tsx watch src/server.ts",
     "build": "node scripts/build.cjs",
     "start": "node dist/server.js",
     "test": "jest",
+    "lint": "tsc --noEmit",
     "typecheck": "tsc --noEmit",
     "admin:create": "node dist/scripts/create-admin.js",
     "test:browser": "npm run build && node scripts/browser-test.cjs",
@@ -14,7 +15,7 @@
     "db:reset": "node scripts/database.cjs reset"
   },
   "dependencies": {
-    "bcrypt": "^6.0.0",
+    "bcryptjs": "^3.0.3",
     "dotenv": "^16.6.1",
     "ejs": "^6.0.1",
     "express": "^5.2.1",
@@ -24,7 +25,7 @@
   },
   "devDependencies": {
     "@playwright/test": "^1.63.0",
-    "@types/bcrypt": "^6.0.0",
+    "@types/bcryptjs": "^3.0.0",
     "@types/express": "^5.0.6",
     "@types/express-session": "^1.19.0",
     "@types/jest": "^30.0.0",
@@ -33,6 +34,7 @@
     "jest": "^30.5.2",
     "ts-jest": "^29.4.13",
     "ts-node-dev": "^2.0.0",
+    "tsx": "^4.23.15",
     "typescript": "^5.9.3"
   },
   "engines": {

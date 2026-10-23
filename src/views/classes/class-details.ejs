@@ -1,20 +1,107 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-<%- include('../partials/head', { title: 'Detalhes da aula', pageCss: 'class-details.css' }) %>
+<%- include('../partials/head', { title: 'Detalhes da Aula', pageCss: 'class-details.css' }) %>
 <body>
-<%- include('../partials/header', { usuario }) %>
-<%- include('../partials/sidebar', { perfil: usuario.perfil }) %>
-<main class="app-main"><div class="app-main__inner">
-<h1 class="page-title">Detalhes da aula</h1>
+<%- include('../partials/header', { usuario, title: 'Detalhes da Aula' }) %>
+<%- include('../partials/sidebar', { perfil: usuario.perfil, usuario }) %>
 
-<p><a href="/search" class="back-link">Voltar à pesquisa</a></p><article class="card">
-<h2><%= aula.disciplina %></h2><p><%= aula.isNoa ? 'Atividade NOA' : 'Aula regular' %> · <%= aula.ativa === false ? 'Cancelada' : 'Ativa' %></p>
-<dl class="details-list"><dt>Professor</dt><dd><%= aula.professor.nome %></dd><dt>Sala</dt><dd><%= aula.sala %> · <%= aula.predio %></dd><dt>Horário</dt><dd><%= aula.diaSemana %> · <%= aula.horario %></dd><dt>Turma</dt><dd><%= aula.turma %></dd><dt>Semestre</dt><dd><%= aula.semestre %></dd></dl><p><%= aula.descricao %></p>
-<% if (usuario.perfil === 'administrador' || (usuario.perfil === 'professor' && aula.professorId === usuario.id)) { %>
-<div class="toolbar"><a class="btn btn-primary" href="/classes/<%= aula.id %>/edit">Editar</a>
-<% if (aula.ativa !== false) { %><button class="btn" data-api-action="/classes/<%= aula.id %>/cancelar" data-confirm="Cancelar esta aula?">Cancelar aula</button><% } %>
-<% if (usuario.perfil === 'administrador') { %><button class="btn btn-danger-outline" data-api-action="/admin/aulas-grade/<%= aula.id %>" data-method="DELETE" data-confirm="Excluir esta aula definitivamente?" data-redirect="/search">Excluir</button><% } %></div><% } %>
-<p data-feedback role="status" hidden></p></article>
-</div></main>
+<main class="app-main">
+  <div class="app-main__inner">
+    <header class="page-header">
+      <div class="page-header__left">
+        <h1 class="page-title">Detalhes da Aula</h1>
+        <p class="page-subtitle">Informações da grade horária, professor responsável e localização.</p>
+      </div>
+
+      <div class="page-header__right">
+        <a href="/search" class="btn btn-secondary">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="19" y1="12" x2="5" y2="12"></line>
+            <polyline points="12 19 5 12 12 5"></polyline>
+          </svg>
+          Voltar à Pesquisa
+        </a>
+      </div>
+    </header>
+
+    <article class="card" style="max-width: 860px;">
+      <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; margin-bottom: 20px; flex-wrap: wrap;">
+        <div>
+          <h2 style="margin: 0 0 6px; font-size: 1.5rem; color: var(--color-navy);"><%= aula.disciplina %></h2>
+          <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+            <span class="badge <%= aula.isNoa ? 'badge--noa' : 'badge--neutral' %>">
+              <%= aula.isNoa ? 'Atividade NOA' : 'Aula Regular' %>
+            </span>
+            <span class="badge <%= aula.ativa === false ? 'badge--danger' : 'badge--success' %>">
+              <%= aula.ativa === false ? 'Cancelada' : 'Ativa no Semestre' %>
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <dl class="details-list">
+        <dt>Professor</dt>
+        <dd><strong><%= aula.professor.nome %></strong></dd>
+
+        <dt>Sala e Local</dt>
+        <dd><%= aula.sala %> · <%= aula.predio || 'Campus Central' %></dd>
+
+        <dt>Dia e Horário</dt>
+        <dd><%= aula.diaSemana %> · <strong><%= aula.horario %></strong></dd>
+
+        <dt>Turma</dt>
+        <dd><span class="badge badge--neutral"><%= aula.turma %></span></dd>
+
+        <dt>Semestre</dt>
+        <dd><%= aula.semestre %></dd>
+
+        <% if (aula.descricao) { %>
+          <dt>Ementa / Observações</dt>
+          <dd style="line-height: 1.6; color: var(--color-text);"><%= aula.descricao %></dd>
+        <% } %>
+      </dl>
+
+      <% if (usuario.perfil === 'administrador' || (usuario.perfil === 'professor' && aula.professorId === usuario.id)) { %>
+        <div class="toolbar" style="border-top: 1px solid var(--color-border); padding-top: 20px; margin-top: 24px;">
+          <a class="btn btn-primary" href="/classes/<%= aula.id %>/edit">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+              <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+            </svg>
+            Editar Informações
+          </a>
+
+          <% if (aula.ativa !== false) { %>
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-api-action="/classes/<%= aula.id %>/cancelar"
+              data-confirm="Tem certeza de que deseja cancelar esta aula?"
+            >
+              Cancelar Aula
+            </button>
+          <% } %>
+
+          <% if (usuario.perfil === 'administrador') { %>
+            <button
+              type="button"
+              class="btn btn-danger-outline"
+              data-api-action="/admin/aulas-grade/<%= aula.id %>"
+              data-method="DELETE"
+              data-confirm="Excluir esta aula definitivamente da grade?"
+              data-redirect="/search"
+            >
+              Excluir Aula
+            </button>
+          <% } %>
+        </div>
+      <% } %>
+
+      <p data-feedback role="status" hidden style="margin-top: 14px;"></p>
+    </article>
+  </div>
+</main>
+
 <%- include('../partials/footer') %>
-</body></html>
+</body>
+</html>

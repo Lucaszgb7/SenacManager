@@ -2,23 +2,338 @@
 <html lang="pt-BR">
 <%- include('../partials/head', { title: 'Dashboard', pageCss: 'dashboard-extra.css' }) %>
 <body>
-<%- include('../partials/header', { usuario }) %>
-<%- include('../partials/sidebar', { perfil: usuario.perfil }) %>
-<main class="app-main"><div class="app-main__inner">
-<h1 class="page-title">Dashboard</h1>
+<%- include('../partials/header', { usuario, title: 'Dashboard' }) %>
+<%- include('../partials/sidebar', { perfil: usuario.perfil, usuario }) %>
 
-<p class="page-subtitle">Olá, <%= usuario.nome %></p>
-<% if (usuario.perfil === 'administrador') { %>
-<div class="metric-grid">
-<% Object.entries(metricas).forEach(([label, value]) => { %>
-<div class="metric-card"><strong class="metric-card__value"><%= value %></strong><span class="metric-card__label"><%= label %></span></div>
-<% }) %></div><p><a class="btn btn-primary" href="/admin">Painel administrativo</a></p>
-<% } %>
-<% if (usuario.perfil === 'professor') { %><p class="toolbar"><a class="btn btn-primary" href="/rooms/booking">Reservar sala</a> <a class="btn" href="/bookings/my">Minhas reservas</a></p><% } %>
-<section class="card"><h2 class="card__title">Aulas de hoje</h2>
-<% if (!aulas.length) { %><p>Nenhuma aula prevista para hoje.</p><% } %>
-<ul class="list-clean"><% aulas.forEach(a => { %><li class="list-clean__item"><a href="/classes/details?id=<%= a.id %>"><strong><%= a.disciplina %></strong> — <%= a.horario %> · <%= a.sala %> · <%= a.professor.nome %></a></li><% }) %></ul>
-</section>
-</div></main>
+<main class="app-main">
+  <div class="app-main__inner">
+    <!-- Cabeçalho da Página -->
+    <header class="page-header">
+      <div class="page-header__left">
+        <h1 class="page-title">Painel de Controle</h1>
+        <p class="page-subtitle">Olá, <strong><%= usuario.nome %></strong>! Visão consolidada das atividades acadêmicas e alocação de salas.</p>
+      </div>
+
+      <!-- Barra de Ações Rápidas -->
+      <div class="page-header__right">
+        <% if (usuario.perfil === 'professor') { %>
+          <a class="btn btn-primary" href="/rooms/booking">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="12" y1="5" x2="12" y2="19"></line>
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+            </svg>
+            Nova Reserva
+          </a>
+          <a class="btn btn-secondary" href="/bookings/my">Minhas Reservas</a>
+        <% } else if (usuario.perfil === 'administrador') { %>
+          <a class="btn btn-primary" href="/admin">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="3" width="7" height="7"></rect>
+              <rect x="14" y="3" width="7" height="7"></rect>
+              <rect x="14" y="14" width="7" height="7"></rect>
+              <rect x="3" y="14" width="7" height="7"></rect>
+            </svg>
+            Painel Geral
+          </a>
+          <a class="btn btn-secondary" href="/rooms/available">Ver Salas</a>
+        <% } else { %>
+          <a class="btn btn-primary" href="/noa">Explorar Atividades NOA</a>
+          <a class="btn btn-secondary" href="/search">Consultar Aulas</a>
+        <% } %>
+      </div>
+    </header>
+
+    <!-- Cards de Indicadores / Métricas Globais -->
+    <section class="metric-grid" aria-label="Indicadores principais">
+      <!-- Card 1: Salas -->
+      <article class="metric-card">
+        <div class="metric-card__content">
+          <span class="metric-card__value"><%= metricas.salas %></span>
+          <span class="metric-card__label">Salas no Campus</span>
+          <span class="metric-card__hint">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            <%= typeof totalSalasAtivas !== 'undefined' ? totalSalasAtivas : metricas.salas %> ativas no sistema
+          </span>
+        </div>
+        <div class="metric-card__icon metric-card__icon--blue">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+            <polyline points="9 22 9 12 15 12 15 22"></polyline>
+          </svg>
+        </div>
+      </article>
+
+      <!-- Card 2: Professores -->
+      <article class="metric-card">
+        <div class="metric-card__content">
+          <span class="metric-card__value"><%= metricas.professores %></span>
+          <span class="metric-card__label">Professores</span>
+          <span class="metric-card__hint">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            Corpo docente ativo
+          </span>
+        </div>
+        <div class="metric-card__icon metric-card__icon--emerald">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+            <circle cx="9" cy="7" r="4"></circle>
+            <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+            <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+          </svg>
+        </div>
+      </article>
+
+      <!-- Card 3: Alunos -->
+      <article class="metric-card">
+        <div class="metric-card__content">
+          <span class="metric-card__value"><%= metricas.alunos %></span>
+          <span class="metric-card__label">Alunos</span>
+          <span class="metric-card__hint">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            Matrículas cadastradas
+          </span>
+        </div>
+        <div class="metric-card__icon metric-card__icon--purple">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M22 10v6M2 10l10-5 10 5-10 5z"></path>
+            <path d="M6 12v5c3 3 9 3 12 0v-5"></path>
+          </svg>
+        </div>
+      </article>
+
+      <!-- Card 4: Reservas Ativas -->
+      <article class="metric-card">
+        <div class="metric-card__content">
+          <span class="metric-card__value"><%= metricas.reservas %></span>
+          <span class="metric-card__label">Reservas Ativas</span>
+          <span class="metric-card__hint">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            Horários agendados
+          </span>
+        </div>
+        <div class="metric-card__icon metric-card__icon--amber">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+            <line x1="16" y1="2" x2="16" y2="6"></line>
+            <line x1="8" y1="2" x2="8" y2="6"></line>
+            <line x1="3" y1="10" x2="21" y2="10"></line>
+          </svg>
+        </div>
+      </article>
+    </section>
+
+    <!-- Gráficos e Distribuição de Dados Reais -->
+    <section class="analytics-grid">
+      <!-- Gráfico 1: Aulas por Dia da Semana -->
+      <article class="chart-card">
+        <div class="chart-card__header">
+          <h2 class="chart-card__title">Aulas por Dia da Semana</h2>
+          <span class="chart-card__tag">Grade Curricular Vigente</span>
+        </div>
+        
+        <% 
+          var diasNomes = ['Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'];
+          var diasDados = typeof aulasPorDia !== 'undefined' ? aulasPorDia : {};
+          var maxAulas = 1;
+          diasNomes.forEach(function(d) {
+            if ((diasDados[d] || 0) > maxAulas) maxAulas = diasDados[d];
+          });
+        %>
+        <div class="bar-chart" aria-label="Gráfico de aulas por dia da semana">
+          <% diasNomes.forEach(function(dia) { 
+               var qtd = diasDados[dia] || 0;
+               var pct = Math.max(8, Math.round((qtd / maxAulas) * 100));
+          %>
+            <div class="bar-chart__col">
+              <div class="bar-chart__bar-wrap">
+                <div class="bar-chart__bar" style="height: <%= pct %>%;" title="<%= dia %>: <%= qtd %> aula(s)">
+                  <span class="bar-chart__value"><%= qtd %></span>
+                </div>
+              </div>
+              <span class="bar-chart__label"><%= dia.slice(0, 3) %></span>
+            </div>
+          <% }); %>
+        </div>
+      </article>
+
+      <!-- Gráfico 2: Distribuição de Salas por Prédio/Bloco -->
+      <article class="chart-card">
+        <div class="chart-card__header">
+          <h2 class="chart-card__title">Distribuição de Salas por Bloco</h2>
+          <span class="chart-card__tag">Infraestrutura</span>
+        </div>
+
+        <div class="progress-list">
+          <% 
+            var predios = typeof salasPorPredio !== 'undefined' ? salasPorPredio : {};
+            var totalSalasCount = metricas.salas || 1;
+            var predioKeys = Object.keys(predios);
+          %>
+          <% if (!predioKeys.length) { %>
+            <p style="color: var(--color-text-secondary); font-size: 0.875rem;">Nenhum prédio cadastrado.</p>
+          <% } %>
+          <% predioKeys.forEach(function(pNome) { 
+               var qtd = predios[pNome];
+               var pct = Math.round((qtd / totalSalasCount) * 100);
+          %>
+            <div class="progress-item">
+              <div class="progress-item__header">
+                <span class="progress-item__title"><%= pNome %></span>
+                <span class="progress-item__count"><%= qtd %> sala(s) · <%= pct %>%</span>
+              </div>
+              <div class="progress-item__bar">
+                <div class="progress-item__fill" style="width: <%= pct %>%;"></div>
+              </div>
+            </div>
+          <% }); %>
+        </div>
+      </article>
+    </section>
+
+    <!-- Seção de Aulas de Hoje e Próximas Reservas -->
+    <section class="dashboard-sections dashboard-sections--2col">
+      <!-- Coluna: Aulas de Hoje -->
+      <article class="card">
+        <div class="card__title">
+          <span>Aulas de Hoje</span>
+          <span class="badge badge--info"><%= aulas.length %> prevista(s)</span>
+        </div>
+
+        <% if (!aulas.length) { %>
+          <div class="empty-state" style="padding: 32px 16px;">
+            <svg class="empty-state__icon" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="12" y1="8" x2="12" y2="12"></line>
+              <line x1="12" y1="16" x2="12.01" y2="16"></line>
+            </svg>
+            <div class="empty-state__title">Nenhuma aula agendada para hoje</div>
+            <p class="empty-state__text">Consulte a grade completa na seção de pesquisa ou verifique outros dias.</p>
+            <a href="/search" class="btn btn-secondary btn-sm">Pesquisar Grade</a>
+          </div>
+        <% } else { %>
+          <div style="display: flex; flex-direction: column; gap: 8px;">
+            <% aulas.forEach(function(a) { %>
+              <div class="class-item-row">
+                <div class="class-item-row__left">
+                  <div class="class-item-row__time-pill"><%= a.horario %></div>
+                  <div class="class-item-row__details">
+                    <a href="/classes/details?id=<%= a.id %>" class="class-item-row__title" title="Ver detalhes da aula">
+                      <%= a.disciplina %>
+                    </a>
+                    <div class="class-item-row__meta">
+                      <span><strong>Sala:</strong> <%= a.sala %></span>
+                      <span>·</span>
+                      <span><strong>Prof.:</strong> <%= a.professor.nome %></span>
+                      <% if (a.turma) { %>
+                        <span>·</span>
+                        <span class="badge badge--neutral" style="font-size: 0.7rem; padding: 2px 6px;">Turma <%= a.turma %></span>
+                      <% } %>
+                    </div>
+                  </div>
+                </div>
+                <div>
+                  <a href="/classes/details?id=<%= a.id %>" class="btn-link">Ver aula &rarr;</a>
+                </div>
+              </div>
+            <% }); %>
+          </div>
+        <% } %>
+      </article>
+
+      <!-- Coluna: Próximas Reservas / NOA -->
+      <article class="card">
+        <% if (usuario.perfil === 'aluno') { %>
+          <div class="card__title">
+            <span>Minhas Inscrições em Atividades NOA</span>
+            <a href="/noa" class="btn-link" style="font-size: 0.8rem;">Ver todas</a>
+          </div>
+
+          <% var minhasAtividades = typeof inscricoesNoa !== 'undefined' ? inscricoesNoa : []; %>
+          <% if (!minhasAtividades.length) { %>
+            <div class="empty-state" style="padding: 32px 16px;">
+              <svg class="empty-state__icon" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+              </svg>
+              <div class="empty-state__title">Nenhuma inscrição NOA ativa</div>
+              <p class="empty-state__text">Aproveite as oficinas e reforços disponíveis no semestre.</p>
+              <a href="/noa" class="btn btn-primary btn-sm">Ver Oficinas NOA</a>
+            </div>
+          <% } else { %>
+            <div style="display: flex; flex-direction: column; gap: 8px;">
+              <% minhasAtividades.forEach(function(atv) { %>
+                <div class="class-item-row">
+                  <div class="class-item-row__left">
+                    <div class="class-item-row__time-pill"><%= atv.horario %></div>
+                    <div class="class-item-row__details">
+                      <div class="class-item-row__title"><%= atv.disciplina %></div>
+                      <div class="class-item-row__meta">
+                        <span><strong>Sala:</strong> <%= atv.sala %></span>
+                        <span>·</span>
+                        <span><%= atv.diaSemana %></span>
+                      </div>
+                    </div>
+                  </div>
+                  <div>
+                    <span class="badge badge--noa">Inscrito</span>
+                  </div>
+                </div>
+              <% }); %>
+            </div>
+          <% } %>
+
+        <% } else { %>
+          <div class="card__title">
+            <span>Próximas Reservas de Salas</span>
+            <a href="/bookings/my" class="btn-link" style="font-size: 0.8rem;">Ver todas</a>
+          </div>
+
+          <% var reservasRecentes = typeof proximasReservas !== 'undefined' ? proximasReservas : []; %>
+          <% if (!reservasRecentes.length) { %>
+            <div class="empty-state" style="padding: 32px 16px;">
+              <svg class="empty-state__icon" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                <line x1="16" y1="2" x2="16" y2="6"></line>
+                <line x1="8" y1="2" x2="8" y2="6"></line>
+              </svg>
+              <div class="empty-state__title">Sem reservas futuras agendadas</div>
+              <p class="empty-state__text">Reserve salas para aulas práticas, reuniões e eventos acadêmicos.</p>
+              <% if (usuario.perfil === 'professor') { %>
+                <a href="/rooms/booking" class="btn btn-primary btn-sm">Reservar Sala</a>
+              <% } %>
+            </div>
+          <% } else { %>
+            <div style="display: flex; flex-direction: column; gap: 8px;">
+              <% reservasRecentes.forEach(function(resItem) { %>
+                <div class="class-item-row">
+                  <div class="class-item-row__left">
+                    <div class="class-item-row__time-pill"><%= resItem.horarioInicio %> — <%= resItem.horarioFim %></div>
+                    <div class="class-item-row__details">
+                      <div class="class-item-row__title"><%= resItem.disciplina %> (<%= resItem.turma %>)</div>
+                      <div class="class-item-row__meta">
+                        <span><strong><%= resItem.salaNome %></strong></span>
+                        <span>·</span>
+                        <span><%= resItem.data %></span>
+                        <% if (usuario.perfil === 'administrador') { %>
+                          <span>·</span>
+                          <span>Prof. <%= resItem.professorNome %></span>
+                        <% } %>
+                      </div>
+                    </div>
+                  </div>
+                  <div>
+                    <span class="badge badge--success">Confirmada</span>
+                  </div>
+                </div>
+              <% }); %>
+            </div>
+          <% } %>
+        <% } %>
+      </article>
+    </section>
+
+  </div>
+</main>
+
 <%- include('../partials/footer') %>
-</body></html>
+</body>
+</html>

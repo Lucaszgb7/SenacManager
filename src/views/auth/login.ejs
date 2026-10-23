@@ -8,9 +8,15 @@
 
       <!-- Cabeçalho / Identidade -->
       <header class="login-brand">
-        <h1 class="login-brand__name">SenacManager</h1>
+        <div class="login-brand__badge">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
+            <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+          </svg>
+        </div>
+        <h1 class="login-brand__name">Senac<span>Manager</span></h1>
         <p class="login-brand__tagline">
-          Organize aulas, salas e horários em um só lugar
+          Portal Integrado de Gestão Acadêmica e Alocação de Salas
         </p>
       </header>
 
@@ -31,12 +37,12 @@
       >
         <!-- Campo: e-mail -->
         <div class="input-group">
-          <label for="email">E-mail</label>
+          <label for="email">E-mail Institucional</label>
           <input
             type="email"
             id="email"
             name="email"
-            placeholder="seu.email@senac.com"
+            placeholder="seu.email@senac.br"
             autocomplete="email"
             required
           />
@@ -45,7 +51,7 @@
 
         <!-- Campo: senha (com toggle de visibilidade) -->
         <div class="input-group">
-          <label for="password">Senha</label>
+          <label for="password">Senha de Acesso</label>
           <div class="password-wrapper">
             <input
               type="password"
@@ -62,7 +68,7 @@
               aria-label="Mostrar senha"
               aria-pressed="false"
             >
-              <!-- Ícone: olho aberto (SVG inline) -->
+              <!-- Ícone: olho aberto -->
               <svg
                 id="icon-eye"
                 xmlns="http://www.w3.org/2000/svg"
@@ -78,8 +84,7 @@
                 <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
                 <circle cx="12" cy="12" r="3"></circle>
               </svg>
-
-              <!-- Ícone: olho fechado (SVG inline) -->
+              <!-- Ícone: olho fechado -->
               <svg
                 id="icon-eye-off"
                 xmlns="http://www.w3.org/2000/svg"
@@ -103,12 +108,12 @@
 
         <!-- Linha: lembrar-me + esqueci minha senha -->
         <div class="login-form__row">
-          <label class="checkbox-group" for="remember">
+          <label class="checkbox-group" for="remember" style="margin: 0;">
             <input type="checkbox" id="remember" name="remember" value="1" />
-            Lembrar-me
+            Lembrar minha sessão
           </label>
 
-          <a href="/auth/forgot-password" class="link">Esqueci minha senha</a>
+          <a href="/auth/forgot-password" class="link">Esqueceu a senha?</a>
         </div>
 
         <!-- Botão de envio -->
@@ -117,15 +122,32 @@
           id="submit-btn"
           class="btn btn-primary login-form__submit"
         >
-          Entrar
+          Acessar o Sistema
         </button>
       </form>
+
+      <!-- Painel de Contas de Teste / Demonstração -->
+      <div class="demo-accounts">
+        <div class="demo-accounts__title">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="16" x2="12" y2="12"></line>
+            <line x1="12" y1="8" x2="12.01" y2="8"></line>
+          </svg>
+          Contas cadastradas para teste:
+        </div>
+        <ul>
+          <li><strong>Professor:</strong> carlos.silva@senac.br (Senha: 123456)</li>
+          <li><strong>Administrador:</strong> roberto.ferreira@senac.br (Senha: 123456)</li>
+          <li><strong>Aluno:</strong> joao.almeida@aluno.senac.br (Senha: 123456)</li>
+        </ul>
+      </div>
 
       <!-- Rodapé do card -->
       <footer class="login-footer">
         <p>
-          Ainda não tem conta?
-          <a href="/contato" class="link">Fale com a administração</a>
+          Precisa de auxílio com seu acesso?
+          <a href="/contato" class="link">Suporte Acadêmico</a>
         </p>
       </footer>
 

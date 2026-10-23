@@ -2,7 +2,7 @@ const fs = require('node:fs/promises');
 const os = require('node:os');
 const path = require('node:path');
 const assert = require('node:assert/strict');
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs');
 const { chromium } = require('@playwright/test');
 
 (async () => {
@@ -21,7 +21,11 @@ const { chromium } = require('@playwright/test');
     const app = require('../dist/app').default;
     await new Promise(resolve => { server = app.listen(0, '127.0.0.1', resolve); });
     const base = 'http://127.0.0.1:' + server.address().port;
-    browser = await chromium.launch({ channel: 'msedge', headless: true });
+    try {
+      browser = await chromium.launch({ channel: 'msedge', headless: true });
+    } catch {
+      browser = await chromium.launch({ headless: true });
+    }
     const page = await browser.newPage();
     const errors = [];
     page.on('pageerror', error => errors.push(error.message));

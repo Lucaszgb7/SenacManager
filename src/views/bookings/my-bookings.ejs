@@ -1,20 +1,107 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-<%- include('../partials/head', { title: 'Minhas reservas', pageCss: 'my-bookings.css' }) %>
+<%- include('../partials/head', { title: 'Minhas Reservas', pageCss: 'my-bookings.css' }) %>
 <body>
-<%- include('../partials/header', { usuario }) %>
-<%- include('../partials/sidebar', { perfil: usuario.perfil }) %>
-<main class="app-main"><div class="app-main__inner">
-<h1 class="page-title">Minhas reservas</h1>
+<%- include('../partials/header', { usuario, title: 'Minhas Reservas' }) %>
+<%- include('../partials/sidebar', { perfil: usuario.perfil, usuario }) %>
 
-<p class="toolbar"><a href="/rooms/booking" class="btn btn-primary">Nova reserva</a></p>
-<div class="tabs" role="tablist"><button type="button" class="tab is-active" data-tab="proximas" role="tab" aria-selected="true">Próximas (<%= reservasFuturas.length %>)</button><button type="button" class="tab" data-tab="historico" role="tab" aria-selected="false">Histórico (<%= reservasPassadas.length %>)</button></div>
-<% [['proximas', reservasFuturas], ['historico', reservasPassadas]].forEach(([tab, rows]) => { %>
-<section data-panel="<%= tab %>" <%= tab === 'historico' ? 'hidden' : '' %>>
-<% if (!rows.length) { %><p>Nenhuma reserva nesta lista.</p><% } %>
-<% rows.forEach(r => { %><article class="card booking-card"><h2><%= r.sala %></h2><p><%= r.data %> · <%= r.horario %></p><p><%= r.disciplina %> · <%= r.turma %></p><p><%= r.status === 'confirmada' ? 'Confirmada' : 'Cancelada' %></p>
-<% if (tab === 'proximas') { %><button type="button" class="btn btn-danger-outline" data-api-action="/bookings/<%= r.id %>/cancelar" data-confirm="Cancelar esta reserva?">Cancelar reserva</button><% } %><p data-feedback role="status" hidden></p></article><% }) %>
-</section><% }) %>
-</div></main>
+<main class="app-main">
+  <div class="app-main__inner">
+    <header class="page-header">
+      <div class="page-header__left">
+        <h1 class="page-title">Minhas Reservas</h1>
+        <p class="page-subtitle">Acompanhe suas reservas ativas e consulte o histórico de agendamentos no campus.</p>
+      </div>
+
+      <div class="page-header__right">
+        <a href="/rooms/booking" class="btn btn-primary">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="12" y1="5" x2="12" y2="19"></line>
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+          </svg>
+          Nova Reserva de Sala
+        </a>
+      </div>
+    </header>
+
+    <!-- Abas de Navegação -->
+    <div class="tabs" role="tablist">
+      <button type="button" class="tab is-active" data-tab="proximas" role="tab" aria-selected="true">
+        Próximas (<%= reservasFuturas.length %>)
+      </button>
+      <button type="button" class="tab" data-tab="historico" role="tab" aria-selected="false">
+        Histórico (<%= reservasPassadas.length %>)
+      </button>
+    </div>
+
+    <!-- Painéis de Conteúdo -->
+    <% [['proximas', reservasFuturas], ['historico', reservasPassadas]].forEach(function([tab, rows]) { %>
+      <section data-panel="<%= tab %>" <%= tab === 'historico' ? 'hidden' : '' %>>
+        <% if (!rows.length) { %>
+          <div class="empty-state">
+            <svg class="empty-state__icon" width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+              <polyline points="14 2 14 8 20 8"></polyline>
+            </svg>
+            <div class="empty-state__title">Nenhuma reserva encontrada nesta lista</div>
+            <p class="empty-state__text"><%= tab === 'proximas' ? 'Você não possui reservas agendadas para datas futuras.' : 'Nenhum histórico anterior registrado.' %></p>
+            <% if (tab === 'proximas') { %>
+              <a href="/rooms/booking" class="btn btn-primary btn-sm">Agendar Reserva Agora</a>
+            <% } %>
+          </div>
+        <% } else { %>
+          <div class="bookings-grid">
+            <% rows.forEach(function(r) { 
+                 var partesData = (r.data || '').split('-');
+                 var dia = partesData[2] || '--';
+                 var mes = partesData[1] ? ['JAN','FEV','MAR','ABR','MAI','JUN','JUL','AGO','SET','OUT','NOV','DEZ'][parseInt(partesData[1], 10) - 1] : 'MES';
+            %>
+              <article class="booking-item-card <%= r.status !== 'confirmada' ? 'booking-item-card--cancelada' : '' %>">
+                <div class="booking-item-card__left">
+                  <div class="booking-date-badge">
+                    <span class="booking-date-badge__day"><%= dia %></span>
+                    <span class="booking-date-badge__month"><%= mes %></span>
+                  </div>
+
+                  <div class="booking-item-card__content">
+                    <h2 class="booking-item-card__title"><%= r.sala %></h2>
+                    <div class="booking-item-card__meta">
+                      <span><strong>Horário:</strong> <%= r.horario %></span>
+                      <span>·</span>
+                      <span><strong>Disciplina:</strong> <%= r.disciplina %></span>
+                      <span>·</span>
+                      <span class="badge badge--neutral" style="font-size: 0.72rem; padding: 2px 8px;">Turma <%= r.turma %></span>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="booking-item-card__right">
+                  <span class="badge <%= r.status === 'confirmada' ? 'badge--success' : 'badge--danger' %>">
+                    <%= r.status === 'confirmada' ? 'Confirmada' : 'Cancelada' %>
+                  </span>
+
+                  <% if (tab === 'proximas' && r.status === 'confirmada') { %>
+                    <button
+                      type="button"
+                      class="btn btn-danger-outline btn-sm"
+                      data-api-action="/bookings/<%= r.id %>/cancelar"
+                      data-confirm="Tem certeza de que deseja cancelar esta reserva de sala?"
+                    >
+                      Cancelar reserva
+                    </button>
+                  <% } %>
+
+                  <p data-feedback role="status" hidden style="margin: 0;"></p>
+                </div>
+              </article>
+            <% }); %>
+          </div>
+        <% } %>
+      </section>
+    <% }); %>
+  </div>
+</main>
+
 <%- include('../partials/footer') %>
-</body></html>
+</body>
+</html>

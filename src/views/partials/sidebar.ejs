@@ -1,6 +1,5 @@
-
 <%
-  // perfil: 'professor' | 'aluno' | 'admin'
+  // perfil: 'professor' | 'aluno' | 'administrador'
   // paginaAtual (opcional): string identificadora da página ativa
   var _perfil = typeof perfil !== 'undefined' ? perfil : 'aluno';
   var _pagina = typeof paginaAtual !== 'undefined' ? paginaAtual : '';
@@ -8,62 +7,113 @@
   var menus = {
     professor: [
       { id: 'dashboard',  label: 'Dashboard',         href: '/dashboard',
-        icon: '<path d="M3 12l9-8 9 8" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M5 10v10h14V10" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>' },
+        icon: '<rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/>' },
       { id: 'rooms-available', label: 'Salas Disponíveis', href: '/rooms/available',
-        icon: '<rect x="3" y="4" width="18" height="16" rx="2" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M3 10h18" stroke="currentColor" stroke-width="1.8"/>' },
+        icon: '<path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>' },
       { id: 'rooms-booking', label: 'Reservar Sala',  href: '/rooms/booking',
-        icon: '<rect x="3" y="5" width="18" height="16" rx="2" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M8 3v4M16 3v4M3 11h18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M12 14v4M10 16h4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>' },
+        icon: '<rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="12" y1="14" x2="12" y2="18"/><line x1="10" y1="16" x2="14" y2="16"/>' },
       { id: 'bookings-my', label: 'Minhas Reservas',  href: '/bookings/my',
-        icon: '<path d="M5 4h11l3 3v13H5z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M8 10h8M8 14h8M8 18h5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>' },
-      { id: 'search', label: 'Pesquisar',             href: '/search',
-        icon: '<circle cx="11" cy="11" r="6" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M20 20l-4-4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>' },
+        icon: '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/>' },
+      { id: 'search', label: 'Pesquisar Aulas',       href: '/search',
+        icon: '<circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>' },
       { id: 'profile', label: 'Meu Perfil',           href: '/profile',
-        icon: '<circle cx="12" cy="8" r="4" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M4 21c1.5-4 5-6 8-6s6.5 2 8 6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>' }
+        icon: '<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>' }
     ],
     aluno: [
       { id: 'dashboard', label: 'Dashboard', href: '/dashboard',
-        icon: '<path d="M3 12l9-8 9 8" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M5 10v10h14V10" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>' },
-      { id: 'noa', label: 'NOA', href: '/noa',
-        icon: '<circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 7v5l3 2" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>' },
-      { id: 'search', label: 'Pesquisar', href: '/search',
-        icon: '<circle cx="11" cy="11" r="6" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M20 20l-4-4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>' },
+        icon: '<rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/>' },
+      { id: 'noa', label: 'Atividades NOA', href: '/noa',
+        icon: '<path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>' },
+      { id: 'search', label: 'Pesquisar Aulas', href: '/search',
+        icon: '<circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>' },
       { id: 'profile', label: 'Meu Perfil', href: '/profile',
-        icon: '<circle cx="12" cy="8" r="4" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M4 21c1.5-4 5-6 8-6s6.5 2 8 6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>' }
+        icon: '<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>' }
     ],
     administrador: [
       { id: 'dashboard', label: 'Dashboard', href: '/dashboard',
-        icon: '<path d="M3 12l9-8 9 8" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M5 10v10h14V10" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>' },
-      { id: 'admin', label: 'Painel Administrativo', href: '/admin',
-        icon: '<rect x="3" y="4" width="7" height="7" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.8"/><rect x="14" y="4" width="7" height="7" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.8"/><rect x="3" y="14" width="7" height="7" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.8"/><rect x="14" y="14" width="7" height="7" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.8"/>' },
+        icon: '<rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/>' },
+      { id: 'admin', label: 'Painel Geral', href: '/admin',
+        icon: '<path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>' },
       { id: 'rooms-available', label: 'Salas Disponíveis', href: '/rooms/available',
-        icon: '<rect x="3" y="4" width="18" height="16" rx="2" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M3 10h18" stroke="currentColor" stroke-width="1.8"/>' },
-      { id: 'search', label: 'Pesquisar', href: '/search',
-        icon: '<circle cx="11" cy="11" r="6" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M20 20l-4-4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>' },
+        icon: '<path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>' },
+      { id: 'search', label: 'Pesquisar Aulas', href: '/search',
+        icon: '<circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>' },
       { id: 'profile', label: 'Meu Perfil', href: '/profile',
-        icon: '<circle cx="12" cy="8" r="4" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M4 21c1.5-4 5-6 8-6s6.5 2 8 6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>' }
+        icon: '<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>' }
     ]
   };
 
   var links = menus[_perfil] || menus.aluno;
 %>
-<aside class="app-sidebar" id="appSidebar" aria-label="Menu lateral">
-  <a href="/dashboard" class="app-sidebar__brand">Senac<span>Manager</span></a>
-  <nav class="app-sidebar__nav">
-    <ul class="app-sidebar__list">
-      <% links.forEach(function(link) { %>
-        <li class="app-sidebar__item">
-          <a
-            href="<%= link.href %>"
-            class="app-sidebar__link <%= _pagina === link.id ? 'is-active' : '' %>"
-          >
-            <svg class="app-sidebar__icon" width="20" height="20" viewBox="0 0 24 24" aria-hidden="true">
-              <%- link.icon %>
-            </svg>
-            <span><%= link.label %></span>
-          </a>
-        </li>
-      <% }); %>
-    </ul>
-  </nav>
+<aside class="app-sidebar" id="appSidebar" aria-label="Menu lateral principal">
+  <div class="app-sidebar__top">
+    <!-- Identidade Visual SenacManager -->
+    <a href="/dashboard" class="app-sidebar__brand">
+      <div class="app-sidebar__brand-icon">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
+          <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+        </svg>
+      </div>
+      <div class="app-sidebar__brand-text">
+        <div class="app-sidebar__brand-title">Senac<span>Manager</span></div>
+        <div class="app-sidebar__brand-sub">Gestão Acadêmica</div>
+      </div>
+    </a>
+
+    <!-- Seção de Navegação -->
+    <nav class="app-sidebar__nav">
+      <div class="app-sidebar__section-title">Menu Principal</div>
+      <ul class="app-sidebar__list">
+        <% links.forEach(function(link) { %>
+          <li class="app-sidebar__item">
+            <a
+              href="<%= link.href %>"
+              class="app-sidebar__link <%= _pagina === link.id ? 'is-active' : '' %>"
+            >
+              <svg class="app-sidebar__icon" width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <%- link.icon %>
+              </svg>
+              <span><%= link.label %></span>
+            </a>
+          </li>
+        <% }); %>
+      </ul>
+    </nav>
+  </div>
+
+  <!-- Rodapé da Sidebar com Card de Usuário e Logout -->
+  <div class="app-sidebar__footer">
+    <div class="app-sidebar__user-box">
+      <div class="app-sidebar__user-profile">
+        <% if (typeof usuario !== 'undefined' && usuario && usuario.fotoUrl) { %>
+          <img src="<%= usuario.fotoUrl %>" alt="Avatar" class="avatar avatar--sm" style="width: 32px; height: 32px; object-fit: cover;">
+        <% } else { %>
+          <div class="avatar avatar--sm" style="width: 32px; height: 32px; font-size: 0.75rem;">
+            <%= (typeof usuario !== 'undefined' && usuario && usuario.nome ? usuario.nome : 'U')
+                  .split(' ')
+                  .filter(Boolean)
+                  .slice(0, 2)
+                  .map(function(n){ return n[0].toUpperCase(); })
+                  .join('') %>
+          </div>
+        <% } %>
+        <div class="app-sidebar__user-text">
+          <div class="app-sidebar__user-name"><%= typeof usuario !== 'undefined' && usuario && usuario.nome ? usuario.nome : 'Usuário' %></div>
+          <div class="app-sidebar__user-role"><%= _perfil %></div>
+        </div>
+      </div>
+      
+      <form action="/auth/logout" method="post" style="margin: 0;">
+        <button type="submit" class="app-sidebar__logout-btn" title="Sair da conta" aria-label="Sair">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+            <polyline points="16 17 21 12 16 7"/>
+            <line x1="21" y1="12" x2="9" y2="12"/>
+          </svg>
+        </button>
+      </form>
+    </div>
+  </div>
 </aside>
 <div class="app-sidebar__backdrop" id="sidebarBackdrop" hidden></div>

@@ -1,38 +1,95 @@
-* {
+/* ============================================================
+   SenacManager — global.css
+   Paleta institucional moderna (Azul-Marinho + Azul Vibrante)
+   Inspirado no design administrativo moderno de alta performance.
+   ============================================================ */
+
+*, *::before, *::after {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
 
 :root {
-  --color-primary: #E30613;
-  --color-primary-dark: #B8050F;
-  --color-secondary: #1A1A1A;
+  /* Paleta Institucional SenacManager */
+  --color-navy: #062647;
+  --color-navy-dark: #041B33;
+  --color-navy-light: #0A3663;
+  
+  --color-primary: #168AF5;
+  --color-primary-dark: #1274CE;
+  --color-primary-light: #EAF4FF;
+  --color-primary-subtle: rgba(22, 138, 245, 0.08);
 
-  --color-bg: #F5F6FA;
+  --color-secondary: #062647;
+
+  /* Superfícies e Fundos */
+  --color-bg: #F4F6F9;
+  --color-surface: #FFFFFF;
   --color-white: #FFFFFF;
 
-  --color-text: #1F2937;
-  --color-text-light: #6B7280;
-  --color-muted: var(--color-text-light);
-  --color-text-muted: var(--color-text-light);
-  --color-surface: var(--color-white);
-  --color-border: #E5E7EB;
+  /* Tipografia e Textos */
+  --color-text: #303844;
+  --color-text-secondary: #8993A1;
+  --color-text-muted: #8993A1;
+  --color-text-light: #8993A1;
+  --color-muted: #8993A1;
 
-  --color-error: #DC2626;
+  /* Bordas */
+  --color-border: #E5EAF0;
+  --color-border-subtle: #F0F4F8;
+
+  /* Estados de Feedback */
+  --color-success: #10B981;
+  --color-success-dark: #059669;
+  --color-success-bg: #ECFDF5;
+  --color-success-border: #A7F3D0;
+
+  --color-warning: #F59E0B;
+  --color-warning-dark: #D97706;
+  --color-warning-bg: #FFFBEB;
+  --color-warning-border: #FDE68A;
+
+  --color-danger: #EF4444;
+  --color-danger-dark: #DC2626;
+  --color-danger-bg: #FEF2F2;
+  --color-danger-border: #FECACA;
+
+  --color-error: #EF4444;
   --color-error-bg: #FEF2F2;
 
-  --color-success: #16A34A;
+  --color-info: #3B82F6;
+  --color-info-bg: #EFF6FF;
 
+  /* Arredondamentos */
+  --radius-xs: 4px;
   --radius-sm: 6px;
   --radius-md: 10px;
-  --radius-lg: 16px;
+  --radius-lg: 14px;
+  --radius-xl: 20px;
+  --radius-pill: 9999px;
 
-  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.06);
-  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
-  --shadow-lg: 0 10px 30px rgba(0, 0, 0, 0.1);
+  /* Sombras Sutis e Profissionais */
+  --shadow-xs: 0 1px 2px rgba(6, 38, 71, 0.04);
+  --shadow-sm: 0 1px 3px rgba(6, 38, 71, 0.05), 0 1px 2px rgba(6, 38, 71, 0.03);
+  --shadow-md: 0 4px 14px rgba(6, 38, 71, 0.06);
+  --shadow-lg: 0 10px 25px rgba(6, 38, 71, 0.08);
 
-  --font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  /* Layout */
+  --layout-header-h: 70px;
+  --layout-sidebar-w: 260px;
+  --layout-sidebar-w-mobile: 280px;
+  --layout-content-max: 1440px;
+  --layout-gap: 24px;
+
+  /* Fonte */
+  --font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+}
+
+html {
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 body {
@@ -40,19 +97,30 @@ body {
   color: var(--color-text);
   background-color: var(--color-bg);
   line-height: 1.5;
+  min-height: 100vh;
 }
 
 a {
   text-decoration: none;
   color: inherit;
+  transition: color 0.15s ease, opacity 0.15s ease;
 }
 
 button {
   font-family: inherit;
   cursor: pointer;
   border: none;
+  background: transparent;
 }
 
-input {
+input, select, textarea {
   font-family: inherit;
+  font-size: inherit;
+  color: inherit;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+  display: block;
 }

@@ -1,161 +1,359 @@
-/* =========================================================
-   SenacManager — Estilos auxiliares para os dashboards
-   ========================================================= */
+/* ============================================================
+   SenacManager — dashboard-extra.css
+   Estilos específicos para cards de métricas, gráficos reais
+   e visualizações escolares do Dashboard.
+   ============================================================ */
 
-/* --- Card genérico (reforço, caso components.css não cubra) --- */
-.card {
-  background: #ffffff;
-  border-radius: var(--radius-md, 12px);
-  padding: 20px;
-  box-shadow: var(--shadow-sm, 0 1px 2px rgba(0, 0, 0, 0.05));
-}
-.card__title {
-  font-size: 1rem;
-  font-weight: 600;
-  margin: 0 0 16px;
-  color: var(--color-text, #111827);
-}
-.card--highlight {
-  border-left: 4px solid var(--color-primary);
-}
-
-/* --- Lista limpa (usada em "próximas aulas" / cronograma) --- */
-.list-clean {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-.list-clean__item {
-  display: flex;
-  gap: 14px;
-  padding: 10px 0;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-  align-items: flex-start;
-}
-.list-clean__item:last-child { border-bottom: none; }
-
-.list-clean__time {
-  flex-shrink: 0;
-  min-width: 110px;
-  font-size: 0.82rem;
-  color: var(--color-primary);
-  font-weight: 600;
-}
-.list-clean__primary {
-  font-size: 0.95rem;
-  font-weight: 600;
-  color: var(--color-text, #111827);
-}
-.list-clean__secondary {
-  font-size: 0.82rem;
-  color: var(--color-muted, #6b7280);
-  margin-top: 2px;
-}
-
-/* --- Bloco "próxima aula" (aluno) --- */
-.next-class__discipline {
-  font-size: 1.15rem;
-  font-weight: 700;
-  color: var(--color-text, #111827);
-  margin-bottom: 10px;
-}
-.next-class__meta {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  font-size: 0.88rem;
-  color: var(--color-muted, #4b5563);
-}
-
-/* --- Badge NOA --- */
-.badge {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 999px;
-  font-weight: 600;
-  font-size: 0.7rem;
-  letter-spacing: 0.03em;
-  padding: 3px 10px;
-  text-transform: uppercase;
-}
-.badge--noa {
-  background: #fef3c7;
-  color: #92400e;
-  border: 1px solid #fcd34d;
-}
-.badge--noa.badge--sm {
-  margin-left: 8px;
-  font-size: 0.62rem;
-  padding: 2px 8px;
-  vertical-align: middle;
-}
-
-/* --- Grid de métricas (admin) --- */
+/* ---------- Grid de Métricas / KPIs ---------- */
 .metric-grid {
   display: grid;
-  grid-template-columns: 1fr;
-  gap: 16px;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 20px;
+  margin-bottom: 28px;
 }
-@media (min-width: 640px)  { .metric-grid { grid-template-columns: repeat(2, 1fr); } }
-@media (min-width: 1024px) { .metric-grid { grid-template-columns: repeat(4, 1fr); } }
 
 .metric-card {
-  background: #ffffff;
-  border-radius: var(--radius-md, 12px);
-  padding: 20px;
-  box-shadow: var(--shadow-sm, 0 1px 2px rgba(0, 0, 0, 0.05));
-  border-top: 3px solid var(--color-primary);
+  background: #FFFFFF;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--color-border);
+  box-shadow: var(--shadow-sm);
+  padding: 22px 20px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  transition: all 0.2s ease;
+  position: relative;
+  overflow: hidden;
 }
+
+.metric-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+  border-color: #D3DCE6;
+}
+
+.metric-card__content {
+  display: flex;
+  flex-direction: column;
+}
+
 .metric-card__value {
   font-size: 2rem;
   font-weight: 700;
-  color: var(--color-text, #111827);
+  color: var(--color-navy);
   line-height: 1.1;
-}
-.metric-card__label {
-  font-size: 0.9rem;
-  font-weight: 600;
-  color: var(--color-text, #374151);
-  margin-top: 6px;
-}
-.metric-card__hint {
-  font-size: 0.78rem;
-  color: var(--color-muted, #6b7280);
-  margin-top: 2px;
+  letter-spacing: -0.03em;
 }
 
-/* --- Grid de atalhos (admin) --- */
-.shortcut-grid {
+.metric-card__label {
+  font-size: 0.84rem;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  margin-top: 6px;
+  letter-spacing: 0.01em;
+}
+
+.metric-card__hint {
+  font-size: 0.75rem;
+  color: var(--color-primary);
+  margin-top: 4px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.metric-card__icon {
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.metric-card__icon--blue {
+  background-color: #EAF4FF;
+  color: #168AF5;
+}
+
+.metric-card__icon--emerald {
+  background-color: #ECFDF5;
+  color: #10B981;
+}
+
+.metric-card__icon--amber {
+  background-color: #FFFBEB;
+  color: #F59E0B;
+}
+
+.metric-card__icon--purple {
+  background-color: #F3E8FF;
+  color: #9333EA;
+}
+
+/* ---------- Grid de Gráficos e Analytics ---------- */
+.analytics-grid {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 14px;
-  margin-top: 12px;
+  gap: 24px;
+  margin-bottom: 28px;
 }
-@media (min-width: 640px) { .shortcut-grid { grid-template-columns: repeat(3, 1fr); } }
 
-.shortcut-card {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 18px 20px;
-  background: #ffffff;
-  border-radius: var(--radius-md, 12px);
-  box-shadow: var(--shadow-sm, 0 1px 2px rgba(0, 0, 0, 0.05));
-  text-decoration: none;
-  color: var(--color-text, #111827);
-  font-weight: 600;
-  border: 1px solid transparent;
-  transition: border-color 0.15s ease, transform 0.15s ease;
+@media (min-width: 1024px) {
+  .analytics-grid {
+    grid-template-columns: 3fr 2fr;
+  }
 }
-.shortcut-card:hover {
+
+.chart-card {
+  background: #FFFFFF;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--color-border);
+  box-shadow: var(--shadow-sm);
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+}
+
+.chart-card__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.chart-card__title {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--color-navy);
+  margin: 0;
+}
+
+.chart-card__tag {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  background: #F1F5F9;
+  padding: 4px 10px;
+  border-radius: var(--radius-pill);
+}
+
+/* Gráfico de Barras em CSS Puro / SVG para Dias da Semana */
+.bar-chart {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px;
+  height: 200px;
+  padding: 16px 8px 0;
+  border-bottom: 2px solid #E5EAF0;
+  position: relative;
+}
+
+.bar-chart__col {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 100%;
+  justify-content: flex-end;
+  position: relative;
+}
+
+.bar-chart__bar-wrap {
+  width: 100%;
+  max-width: 44px;
+  height: 100%;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.bar-chart__bar {
+  width: 100%;
+  background: linear-gradient(180deg, #168AF5 0%, #062647 100%);
+  border-radius: 6px 6px 0 0;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  cursor: pointer;
+  min-height: 4px;
+}
+
+.bar-chart__bar:hover {
+  filter: brightness(1.15);
+  transform: scaleY(1.02);
+}
+
+.bar-chart__value {
+  position: absolute;
+  top: -24px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--color-navy);
+}
+
+.bar-chart__label {
+  margin-top: 10px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  text-align: center;
+}
+
+/* Distribuição de Salas por Prédio (Barras de Progresso) */
+.progress-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.progress-item {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.progress-item__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.progress-item__title {
+  color: var(--color-navy);
+}
+
+.progress-item__count {
+  color: var(--color-text-secondary);
+}
+
+.progress-item__bar {
+  width: 100%;
+  height: 8px;
+  background-color: #F1F5F9;
+  border-radius: var(--radius-pill);
+  overflow: hidden;
+}
+
+.progress-item__fill {
+  height: 100%;
+  background: linear-gradient(90deg, #168AF5, #38BDF8);
+  border-radius: var(--radius-pill);
+  transition: width 0.4s ease-out;
+}
+
+/* ---------- Lista de Aulas e Reservas no Dashboard ---------- */
+.dashboard-sections {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 24px;
+}
+
+@media (min-width: 1024px) {
+  .dashboard-sections--2col {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.class-item-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px;
+  background-color: #FFFFFF;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  margin-bottom: 12px;
+  transition: all 0.15s ease;
+  gap: 16px;
+}
+
+.class-item-row:hover {
+  border-color: #CBD5E1;
+  background-color: #F8FAFC;
+  transform: translateX(2px);
+}
+
+.class-item-row__left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  min-width: 0;
+}
+
+.class-item-row__time-pill {
+  padding: 6px 12px;
+  border-radius: var(--radius-sm);
+  background-color: var(--color-primary-light);
+  color: var(--color-primary-dark);
+  font-size: 0.8rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.class-item-row__details {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.class-item-row__title {
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: var(--color-navy);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.class-item-row__meta {
+  font-size: 0.78rem;
+  color: var(--color-text-secondary);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 3px;
+  flex-wrap: wrap;
+}
+
+/* Atalhos Rápidos */
+.quick-actions-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.quick-action-card {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 18px;
+  background: #FFFFFF;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  color: var(--color-navy);
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-decoration: none;
+  box-shadow: var(--shadow-xs);
+  transition: all 0.15s ease;
+}
+
+.quick-action-card:hover {
   border-color: var(--color-primary);
+  color: var(--color-primary);
+  background-color: var(--color-primary-light);
   transform: translateY(-1px);
 }
-.shortcut-card__arrow {
+
+.quick-action-card svg {
   color: var(--color-primary);
-  font-size: 1.1rem;
 }
