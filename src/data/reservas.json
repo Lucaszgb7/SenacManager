@@ -50,5 +50,17 @@
     "horarioFim": "17:00",
     "turma": "TURMA DEMONSTRACAO",
     "disciplina": "Atividade de demonstracao"
+  },
+  {
+    "id": "291eb40d-e8a3-47c3-b108-7e2d0ca5cf92",
+    "salaId": "b2c3d4e5-0002-4000-8000-000000000002",
+    "professorId": "a1b2c3d4-0001-4000-8000-000000000001",
+    "disciplina": "Aula TI",
+    "turma": "2 B",
+    "data": "2026-10-24",
+    "horarioInicio": "10:00",
+    "horarioFim": "11:30",
+    "status": "confirmada",
+    "criadoEm": "2026-10-23T13:25:51.181Z"
   }
 ]

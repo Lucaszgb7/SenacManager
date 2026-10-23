@@ -41,7 +41,7 @@
     "horarioInicio": "19:00",
     "horarioFim": "22:00",
     "turma": "TURMA DEMONSTRACAO",
-    "ativa": true
+    "ativa": false
   },
   {
     "id": "d4e5f6a7-0004-4000-8000-000000000004",
