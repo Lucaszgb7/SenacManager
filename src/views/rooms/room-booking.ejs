@@ -24,6 +24,26 @@
       </div>
     </header>
 
+    <!-- Mensagens de retorno após tentar reservar (passo 5) -->
+    <% if (typeof sucesso !== 'undefined' && sucesso) { %>
+      <div class="alerta alerta-sucesso" role="status">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="20 6 9 17 4 12"></polyline>
+        </svg>
+        <span><%= sucesso %></span>
+      </div>
+    <% } %>
+    <% if (typeof erro !== 'undefined' && erro) { %>
+      <div class="alerta alerta-erro" role="alert">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"></circle>
+          <line x1="12" y1="8" x2="12" y2="12"></line>
+          <line x1="12" y1="16" x2="12.01" y2="16"></line>
+        </svg>
+        <span><%= erro %></span>
+      </div>
+    <% } %>
+
     <!-- ETAPA 1: Consulta de Disponibilidade por Intervalo -->
     <section class="booking-step-card">
       <span class="booking-step-badge">Etapa 1 · Verificação de Conflitos</span>
@@ -73,19 +93,59 @@
         </div>
       </div>
 
-      <form action="/rooms/booking" method="post" data-api-form data-redirect="/bookings/my">
+      <!-- Grade visual de salas com destaque da selecionada e marcação de ocupadas (passo 4) -->
+      <% if (typeof salas !== 'undefined' && salas.length) { %>
+        <div class="salas-grid" role="radiogroup" aria-label="Selecionar sala">
+          <% salas.forEach(function(s) { %>
+            <%
+              // indisponivel: calculado pelo controller para o intervalo consultado
+              const indisponivel = !!s.indisponivel || s.disponivel === false;
+              const selecionada  = filtros && filtros.salaId === s.id;
+            %>
+            <label class="sala-card
+                          <%= indisponivel ? 'sala-ocupada' : 'sala-disponivel' %>
+                          <%= selecionada ? 'sala-selecionada' : '' %>"
+                   data-sala-id="<%= s.id %>">
+              <input type="radio"
+                     name="salaId"
+                     value="<%= s.id %>"
+                     form="booking-form"
+                     <%= indisponivel ? 'disabled' : '' %>
+                     <%= selecionada ? 'checked' : '' %>>
+              <div class="sala-card__head">
+                <strong><%= s.nome %></strong>
+                <span class="sala-card__predio"><%= s.predio || 'Bloco Geral' %></span>
+              </div>
+              <div class="sala-card__meta">
+                <span><%= s.capacidade %> lugares</span>
+                <% if (indisponivel) { %>
+                  <span class="badge-ocupada">Ocupada no intervalo</span>
+                <% } else { %>
+                  <span class="badge-disponivel">Disponível</span>
+                <% } %>
+              </div>
+            </label>
+          <% }); %>
+        </div>
+      <% } %>
+
+      <form id="booking-form" action="/rooms/booking" method="post">
         <div class="form-grid">
           <div class="input-group" style="grid-column: 1 / -1;">
-            <label for="book-sala">Selecione a Sala</label>
+            <label for="book-sala">Ou escolha pela lista</label>
             <select id="book-sala" name="salaId" required>
               <option value="">Selecione uma sala</option>
-              <% salas.forEach(function(s) { %>
+              <% (salas || []).forEach(function(s) { %>
+                <%
+                  const indisponivel = !!s.indisponivel || s.disponivel === false;
+                  const selecionada  = filtros && filtros.salaId === s.id;
+                %>
                 <option
                   value="<%= s.id %>"
-                  <%= s.indisponivel ? 'disabled' : '' %>
-                  <%= filtros.salaId === s.id ? 'selected' : '' %>
+                  <%= indisponivel ? 'disabled' : '' %>
+                  <%= selecionada ? 'selected' : '' %>
                 >
-                  <%= s.nome %> · <%= s.predio || 'Bloco Geral' %> (<%= s.capacidade %> lugares)<%= s.indisponivel ? ' — [OCUPADA NO INTERVALO]' : '' %>
+                  <%= s.nome %> · <%= s.predio || 'Bloco Geral' %> (<%= s.capacidade %> lugares)<%= indisponivel ? ' — [OCUPADA NO INTERVALO]' : '' %>
                 </option>
               <% }); %>
             </select>

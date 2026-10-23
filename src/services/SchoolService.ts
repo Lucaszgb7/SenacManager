@@ -1,7 +1,7 @@
 import bcrypt from 'bcryptjs';
 import { randomUUID } from 'crypto';
 import { readData, writeData, transaction, RecordData, Collection } from './store';
-import { required, flag, strings, validated, HttpError, schoolNow, vigente, overlaps, semesterRange } from './validation';
+import { required, flag, strings, validated, HttpError, schoolNow, vigente, overlaps, semesterRange, validarFormatoHorario, validarHorarioReserva, validarDataReserva } from './validation';
 import { Professor } from '../models/Professor';
 import { Aluno } from '../models/Aluno';
 import { Administrador } from '../models/Administrador';
@@ -141,17 +141,95 @@ export async function buscarAulaPorId(id: string): Promise<RecordData> {
   throw new HttpError(404, 'Aula não encontrada.');
 }
 
+/**
+ * Cria uma reserva avulsa de sala por um professor.
+ * Valida: professor ativo, sala ativa, formato de horário, data/hora futura,
+ * conflito com reservas confirmadas e aulas da grade.
+ * As mensagens de conflito distinguem "sala ocupada" de "professor ocupado".
+ */
 export async function createBooking(id: string, data: RecordData) {
   return transaction(async () => {
     const s = await state();
+
+    // 1) Professor precisa existir, estar ativo e ter perfil de professor.
     const professor = mustFind(s.usuarios, id, 'Professor');
-    if (professor.perfil !== 'professor' || !professor.ativo) throw new HttpError(403, 'Apenas professores ativos podem reservar.');
+    if (professor.perfil !== 'professor' || !professor.ativo) {
+      throw new HttpError(403, 'Apenas professores ativos podem reservar.');
+    }
+
+    // 2) Sala precisa existir e estar ativa.
     const sala = mustFind(s.salas, required(data.salaId, 'Sala'), 'Sala');
     if (sala.ativa === false) throw new HttpError(409, 'Sala inativa.');
-    const reserva = validated(() => new Reserva(sala.id, id, required(data.disciplina, 'Disciplina', 2), required(data.turma, 'Turma'), required(data.data, 'Data'), required(data.horarioInicio, 'Início'), required(data.horarioFim, 'Término'))).toJSON();
-    if (reserva.data + 'T' + reserva.horarioInicio <= schoolNow()) throw new HttpError(400, 'Escolha um horário futuro.');
-    if (s.reservas.some(r => r.status === 'confirmada' && r.data === reserva.data && (r.salaId === sala.id || r.professorId === id) && overlaps(r, reserva)) ||
-        s.aulas.some(a => (a.salaId === sala.id || a.professorId === id) && vigente(a, reserva.data) && overlaps(a, reserva))) throw new HttpError(409, 'Já existe uma aula ou reserva neste horário para a sala ou professor.');
+
+    // 3) Valida formato dos horários antes de instanciar a Reserva,
+    //    para devolver mensagem clara em vez de erro do construtor.
+    const inicio = required(data.horarioInicio, 'Início');
+    const fim = required(data.horarioFim, 'Término');
+    if (!validarFormatoHorario(inicio) || !validarFormatoHorario(fim)) {
+      throw new HttpError(400, 'Horário inválido. Use o formato HH:MM.');
+    }
+    if (!validarHorarioReserva(inicio, fim)) {
+      throw new HttpError(400, 'O horário de término deve ser posterior ao de início.');
+    }
+
+    // 4) Data precisa ser válida e não pode estar no passado.
+    const dataStr = required(data.data, 'Data');
+    if (!validarDataReserva(dataStr)) {
+      throw new HttpError(400, 'Escolha uma data a partir de hoje.');
+    }
+
+    // 5) Constrói a reserva (mantém as validações do model Reserva).
+    const reserva = validated(() => new Reserva(
+      sala.id,
+      id,
+      required(data.disciplina, 'Disciplina', 2),
+      required(data.turma, 'Turma'),
+      dataStr,
+      inicio,
+      fim
+    )).toJSON();
+
+    // 6) Regra original preservada: horário de início não pode ser no passado.
+    if (reserva.data + 'T' + reserva.horarioInicio <= schoolNow()) {
+      throw new HttpError(400, 'Escolha um horário futuro.');
+    }
+
+    // 7) Detecta conflitos separando as causas para dar mensagem clara.
+    //    - Mesma sala, mesma data, intervalo sobreposto, reserva confirmada.
+    const conflitoSalaReserva = s.reservas.some(r =>
+      r.status === 'confirmada' &&
+      r.data === reserva.data &&
+      r.salaId === sala.id &&
+      overlaps(r, reserva)
+    );
+    //    - Mesma sala, data dentro do semestre da aula, intervalo sobreposto.
+    const conflitoSalaAula = s.aulas.some(a =>
+      a.salaId === sala.id &&
+      vigente(a, reserva.data) &&
+      overlaps(a, reserva)
+    );
+    if (conflitoSalaReserva || conflitoSalaAula) {
+      throw new HttpError(409, 'Esta sala já está ocupada no horário selecionado. Escolha outro horário ou outra sala.');
+    }
+
+    //    - Professor com reserva confirmada sobreposta.
+    const conflitoProfessorReserva = s.reservas.some(r =>
+      r.status === 'confirmada' &&
+      r.data === reserva.data &&
+      r.professorId === id &&
+      overlaps(r, reserva)
+    );
+    //    - Professor com aula na grade sobreposta.
+    const conflitoProfessorAula = s.aulas.some(a =>
+      a.professorId === id &&
+      vigente(a, reserva.data) &&
+      overlaps(a, reserva)
+    );
+    if (conflitoProfessorReserva || conflitoProfessorAula) {
+      throw new HttpError(409, 'Você já possui uma aula ou reserva neste horário. Escolha outro horário.');
+    }
+
+    // 8) Persiste a reserva no store existente.
     await writeData('reservas', [...s.reservas, reserva]);
     return reserva;
   });
@@ -273,6 +351,30 @@ export async function atualizarStatusUsuario(
     return safeUser(next);
   });
 }
+
+/**
+ * Lista as salas ativas marcando cada uma como disponível ou não
+ * para a data/horário informados. Sem data/horário, todas voltam disponíveis.
+ * Usado pela tela de reserva para exibir os cards de sala com status.
+ */
+export async function listarSalasComDisponibilidade(data?: string, horarioInicio?: string, horarioFim?: string) {
+  const s = await state();
+  const filtrar = !!(data && horarioInicio && horarioFim);
+  return s.salas
+    .filter(sala => sala.ativa !== false)
+    .map(sala => {
+      if (!filtrar) return { ...sala, disponivel: true };
+      const faixa = { data, horarioInicio, horarioFim };
+      const ocupadaPorReserva = s.reservas.some(r =>
+        r.status === 'confirmada' && r.data === data && r.salaId === sala.id && overlaps(r, faixa)
+      );
+      const ocupadaPorAula = s.aulas.some(a =>
+        a.ativa !== false && a.salaId === sala.id && vigente(a, data) && overlaps(a, faixa)
+      );
+      return { ...sala, disponivel: !(ocupadaPorReserva || ocupadaPorAula) };
+    });
+}
+
 // ---------- Aliases (opcionais) ----------
 export const listarSalas      = async () => (await state()).salas;
 export const listarAulasGrade = async () => (await state()).aulas;
