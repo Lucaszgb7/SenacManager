@@ -1,13 +1,14 @@
-import 'express-session';
-import { Perfil } from '../models/Usuario';
 
-declare module 'express-session' {
+import "express-session";
+
+declare module "express-session" {
   interface SessionData {
     usuario?: {
-      id: string;
-      nome: string;
-      email: string;
-      perfil: Perfil;
+      id: number;
+      nome?: string;
+      email?: string;
+      tipo?: string;
+      [key: string]: unknown;
     };
   }
 }
