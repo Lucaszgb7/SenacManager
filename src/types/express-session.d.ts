@@ -1,14 +1,12 @@
-
 import "express-session";
 
 declare module "express-session" {
   interface SessionData {
     usuario?: {
-      id: number;
+      id: string;
       nome?: string;
       email?: string;
-      tipo?: string;
-      [key: string]: unknown;
+      perfil: string;
     };
   }
 }
