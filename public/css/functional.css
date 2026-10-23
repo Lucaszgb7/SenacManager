@@ -108,3 +108,8 @@ button:disabled {
   opacity: 0.55;
   cursor: not-allowed;
 }
+
+form[data-api-form][aria-busy="true"] [type="submit"],
+button[data-api-action][aria-busy="true"] {
+  cursor: progress;
+}

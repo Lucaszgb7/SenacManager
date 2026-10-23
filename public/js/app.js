@@ -2,8 +2,42 @@
   'use strict';
   function feedback(scope, message, error = false) {
     let el = scope.querySelector('[data-feedback]');
-    if (!el) { el = document.createElement('p'); el.dataset.feedback = ''; el.setAttribute('role', 'status'); scope.appendChild(el); }
-    el.hidden = false; el.textContent = message; el.className = error ? 'alert-error' : 'alert-success';
+    if (!el) { el = document.createElement('p'); el.dataset.feedback = ''; scope.appendChild(el); }
+    el.hidden = false;
+    el.textContent = message;
+    el.className = error ? 'alert-error' : 'alert-success';
+    el.setAttribute('role', error ? 'alert' : 'status');
+    el.setAttribute('aria-atomic', 'true');
+  }
+  function setAttributeState(element, name, state) {
+    if (!element) return;
+    if (state.present) element.setAttribute(name, state.value);
+    else element.removeAttribute(name);
+  }
+  function beginLoading(button, scope, label) {
+    const buttonState = button && {
+      html: button.innerHTML,
+      disabled: button.disabled,
+      busy: { present: button.hasAttribute('aria-busy'), value: button.getAttribute('aria-busy') },
+    };
+    const scopeBusy = scope && { present: scope.hasAttribute('aria-busy'), value: scope.getAttribute('aria-busy') };
+
+    if (button) {
+      button.disabled = true;
+      button.setAttribute('aria-busy', 'true');
+      button.textContent = label;
+    }
+    if (scope) scope.setAttribute('aria-busy', 'true');
+
+    // Sempre restaura rótulo e atributos originais, inclusive após falha de rede.
+    return () => {
+      if (button && buttonState) {
+        button.innerHTML = buttonState.html;
+        button.disabled = buttonState.disabled;
+        setAttributeState(button, 'aria-busy', buttonState.busy);
+      }
+      if (scope && scopeBusy) setAttributeState(scope, 'aria-busy', scopeBusy);
+    };
   }
   async function send(url, method, body) {
     const multipart = body instanceof FormData;
@@ -12,12 +46,15 @@
     if (!response.ok || result.success === false) throw new Error(result.message || 'Não foi possível concluir a operação.');
     return result;
   }
+  const formsInFlight = new WeakSet();
   document.querySelectorAll('[data-api-form]').forEach(form => {
     form.addEventListener('submit', async event => {
       event.preventDefault();
+      // O bloqueio por formulário protege também submits disparados por teclado ou script.
+      if (formsInFlight.has(form)) return;
       if (!form.reportValidity()) return;
-      const button = form.querySelector('[type=submit]');
-      if (button.disabled) return;
+      const button = event.submitter || form.querySelector('[type=submit]');
+      if (button?.disabled) return;
       let data = {};
       for (const input of form.elements) {
         if (!input.name || input.disabled) continue;
@@ -29,7 +66,8 @@
         if (file && file.size > 2 * 1024 * 1024) { feedback(form, 'A imagem deve ter no máximo 2 MB.', true); return; }
         data = new FormData(form);
       }
-      button.disabled = true;
+      formsInFlight.add(form);
+      const restore = beginLoading(button, form, button?.dataset.loadingLabel || 'Salvando...');
       try {
         const result = await send(form.action, form.dataset.method || 'POST', data);
         feedback(form, result.message || 'Salvo com sucesso.');
@@ -37,19 +75,28 @@
         const redirect = form.dataset.redirect || result.redirect;
         if (redirect) window.location.assign(redirect);
       } catch (error) { feedback(form, error.message, true); }
-      finally { button.disabled = false; }
+      finally {
+        restore();
+        formsInFlight.delete(form);
+      }
     });
   });
+  const actionsInFlight = new WeakSet();
   document.querySelectorAll('[data-api-action]').forEach(button => {
     button.addEventListener('click', async () => {
-      if (button.disabled || (button.dataset.confirm && !window.confirm(button.dataset.confirm))) return;
-      button.disabled = true;
+      if (button.disabled || actionsInFlight.has(button) || (button.dataset.confirm && !window.confirm(button.dataset.confirm))) return;
       const scope = button.closest('article, td, section') || button.parentElement;
+      actionsInFlight.add(button);
+      const restore = beginLoading(button, scope, button.dataset.loadingLabel || 'Processando...');
       try {
         await send(button.dataset.apiAction, button.dataset.method || 'POST', {});
         if (button.dataset.redirect) window.location.assign(button.dataset.redirect);
         else window.location.reload();
-      } catch (error) { feedback(scope, error.message, true); button.disabled = false; }
+      } catch (error) { feedback(scope, error.message, true); }
+      finally {
+        restore();
+        actionsInFlight.delete(button);
+      }
     });
   });
   const tabs = document.querySelectorAll('[data-tab]');

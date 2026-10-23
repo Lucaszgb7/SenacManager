@@ -131,6 +131,27 @@
   transform: none !important;
 }
 
+.btn[aria-busy="true"] {
+  gap: 10px;
+  opacity: 0.82;
+  cursor: progress;
+}
+
+button[aria-busy="true"]::before {
+  content: '';
+  width: 0.9em;
+  height: 0.9em;
+  flex: 0 0 auto;
+  border: 2px solid currentColor;
+  border-right-color: transparent;
+  border-radius: 50%;
+  animation: senac-feedback-spin 0.8s linear infinite;
+}
+
+@keyframes senac-feedback-spin {
+  to { transform: rotate(360deg); }
+}
+
 /* ---------- Cards Modernos ---------- */
 .card {
   background-color: var(--color-white);
@@ -382,13 +403,18 @@ label.input-group {
 /* ---------- Feedbacks & Alertas ---------- */
 [data-feedback] {
   margin: 16px 0;
+  box-sizing: border-box;
+  max-width: 100%;
+  min-width: 0;
   padding: 12px 16px;
   border-radius: var(--radius-sm);
   font-size: 0.875rem;
   font-weight: 500;
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: 8px;
+  overflow-wrap: anywhere;
 }
 
 .alert-success {
@@ -401,6 +427,13 @@ label.input-group {
   background-color: var(--color-danger-bg);
   color: var(--color-danger-dark);
   border: 1px solid var(--color-danger-border);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  button[aria-busy="true"]::before {
+    animation: none;
+    opacity: 0.7;
+  }
 }
 
 .alert-info {
