@@ -1,10 +1,12 @@
-import { Usuario, Perfil } from './Usuario';
+
+import { Usuario } from './Usuario';
 
 /**
  * Representa um professor do SenacManager.
- * Possui como informação extra a lista de disciplinas que leciona.
+ * Possui uma lista de disciplinas que leciona.
  */
 export class Professor extends Usuario {
+  // Armazena as disciplinas associadas ao professor.
   private _disciplinas: string[];
 
   constructor(
@@ -15,50 +17,95 @@ export class Professor extends Usuario {
     id?: string,
     criadoEm?: Date
   ) {
-    // Perfil fixo: 'professor'
+    // Define o perfil fixo do professor.
     super(nome, email, senhaHash, 'professor', id, criadoEm);
+
+    // Inicializa a lista e utiliza o setter para validar os dados.
     this._disciplinas = [];
     this.disciplinas = disciplinas;
   }
 
-  get disciplinas(): string[] {
-    // Retorna cópia defensiva para evitar mutação externa direta
+  // ---------------------------------------------------------------------
+  // Getter e setter de disciplinas
+  // ---------------------------------------------------------------------
+
+  /**
+   * Retorna uma cópia da lista de disciplinas.
+   * Evita que alterações externas modifiquem a lista diretamente.
+   */
+  public get disciplinas(): string[] {
     return [...this._disciplinas];
   }
 
   /**
-   * Valida se todas as disciplinas são strings não vazias.
-   * Evita duplicatas (case-insensitive).
+   * Define as disciplinas do professor.
+   * Valida os valores, remove espaços desnecessários
+   * e evita duplicatas sem diferenciar maiúsculas de minúsculas.
    */
-  set disciplinas(valor: string[]) {
+  public set disciplinas(valor: string[]) {
     if (!Array.isArray(valor)) {
       throw new Error('Disciplinas deve ser um array de strings.');
     }
+
     const normalizadas: string[] = [];
-    for (const d of valor) {
-      if (typeof d !== 'string' || d.trim().length < 2) {
-        throw new Error('Cada disciplina deve ter pelo menos 2 caracteres.');
+    const vistas = new Set<string>();
+
+    for (const disciplina of valor) {
+      // Garante que cada disciplina seja uma string válida.
+      if (
+        typeof disciplina !== 'string' ||
+        disciplina.trim().length < 2
+      ) {
+        throw new Error(
+          'Cada disciplina deve ter pelo menos 2 caracteres.'
+        );
       }
-      const limpa = d.trim();
-      if (!normalizadas.some((x) => x.toLowerCase() === limpa.toLowerCase())) {
+
+      // Remove espaços no início e no final do nome.
+      const limpa = disciplina.trim();
+      const chave = limpa.toLowerCase();
+
+      // Adiciona somente disciplinas que ainda não existem na lista.
+      if (!vistas.has(chave)) {
+        vistas.add(chave);
         normalizadas.push(limpa);
       }
     }
+
     this._disciplinas = normalizadas;
   }
 
-  toJSON(): Record<string, any> {
+  // ---------------------------------------------------------------------
+  // Serialização
+  // ---------------------------------------------------------------------
+
+  /**
+   * Converte o professor em um objeto simples,
+   * incluindo os dados herdados e suas disciplinas.
+   */
+  public toJSON(): Record<string, unknown> {
     return {
       ...super.toJSON(),
-      disciplinas: this._disciplinas,
+      disciplinas: [...this._disciplinas],
     };
   }
 
   /**
-   * Reconstrói um Professor a partir de um objeto plano.
+   * Reconstrói um professor a partir de um objeto JSON.
+   * Restaura os dados básicos, as disciplinas e os campos complementares.
    */
-  static fromJSON(data: any): Professor {
-    const usuario = new Professor(
+  public static fromJSON(data: any): Professor {
+    if (!data || typeof data !== 'object') {
+      throw new Error('Dados inválidos para reconstruir Professor.');
+    }
+
+    // Confere se o perfil corresponde à classe Professor.
+    if (data.perfil !== 'professor') {
+      throw new Error('O perfil informado não corresponde a Professor.');
+    }
+
+    // Reconstrói o professor e valida a lista de disciplinas.
+    const professor = new Professor(
       data.nome,
       data.email,
       data.senhaHash,
@@ -66,9 +113,12 @@ export class Professor extends Usuario {
       data.id,
       data.criadoEm ? new Date(data.criadoEm) : undefined
     );
-    usuario.telefone = data.telefone ?? null;
-    usuario.fotoUrl = data.fotoUrl ?? null;
-    usuario.ativo = data.ativo !== false;
-    return usuario;
+
+    // Restaura os campos complementares do usuário.
+    professor.telefone = data.telefone ?? null;
+    professor.fotoUrl = data.fotoUrl ?? null;
+    professor.ativo = data.ativo !== false;
+
+    return professor;
   }
 }
