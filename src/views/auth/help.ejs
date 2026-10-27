@@ -1,34 +1,109 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<%- include('../partials/head', { title, pageCss: 'login.css' }) %>
-<body class="login-page">
-  <main class="login-container">
-    <section class="card login-card" style="text-align: center;">
-      <div class="login-brand__badge">
-        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-          <circle cx="12" cy="12" r="10"></circle>
-          <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
-          <line x1="12" y1="17" x2="12.01" y2="17"></line>
-        </svg>
-      </div>
-      <h1 class="login-brand__name">Ajuda e Suporte</h1>
-      <p class="login-brand__tagline" style="margin-bottom: 24px;">
-        Recuperação de acesso e informações acadêmicas
-      </p>
 
-      <div style="background: #F8FAFC; border: 1px solid var(--color-border); border-radius: var(--radius-md); padding: 20px; text-align: left; font-size: 0.9rem; line-height: 1.6; color: var(--color-text); margin-bottom: 24px;">
-        <p style="margin: 0 0 10px;">
-          Por políticas de segurança institucional, o SenacManager não envia redefinições públicas de senha por e-mail externo.
-        </p>
-        <p style="margin: 0;">
-          Para redefinir sua credencial ou atualizar seus dados cadastrais, procure a <strong>Coordenação de Cursos</strong> ou a <strong>Secretaria Escolar</strong> da sua unidade Senac. Um administrador autorizado poderá emitir uma nova chave de acesso.
-        </p>
-      </div>
+<%- include('../partials/head', { title: 'Central de Ajuda', pageCss: 'help.css' }) %>
 
-      <a class="btn btn-primary" href="/login" style="width: 100%;">
-        Voltar para a Tela de Login
-      </a>
+<main class="help-page">
+  <!-- Cabeçalho da central de ajuda -->
+  <header class="help-header">
+    <a href="/login" class="help-brand">SenacManager</a>
+    <h1>Central de Ajuda</h1>
+    <p>Orientações para alunos, professores e administradores.</p>
+    <a href="/login" class="help-button">Ir para o login</a>
+  </header>
+
+  <!-- Conteúdo principal do guia -->
+  <div class="help-content">
+
+    <section class="help-card">
+      <h2>1. Como fazer login</h2>
+      <ol>
+        <li>Acesse a página de login do SenacManager.</li>
+        <li>Informe seu e-mail cadastrado.</li>
+        <li>Digite sua senha.</li>
+        <li>Clique em <strong>Entrar</strong>.</li>
+      </ol>
+      <p>Se os dados não forem aceitos, confira o e-mail e a senha informados.</p>
     </section>
-  </main>
-</body>
-</html>
+
+    <section class="help-card">
+      <h2>2. Como consultar aulas</h2>
+      <ol>
+        <li>Acesse o sistema com sua conta.</li>
+        <li>Procure a opção de aulas ou grade de horários, caso esteja disponível no seu perfil.</li>
+        <li>Consulte as informações de disciplina, professor, sala e horário que forem exibidas.</li>
+      </ol>
+      <p>A disponibilidade da consulta depende das telas e funcionalidades habilitadas no sistema.</p>
+    </section>
+
+    <section class="help-card">
+      <h2>3. Como reservar salas</h2>
+      <p>Esta orientação é destinada aos professores.</p>
+      <ol>
+        <li>Entre no sistema com uma conta de professor.</li>
+        <li>Acesse a opção de reserva de salas, quando disponível.</li>
+        <li>Confira as salas e os horários disponíveis.</li>
+        <li>Preencha os dados solicitados e confirme a reserva, se o formulário estiver habilitado.</li>
+        <li>Consulte suas reservas para verificar os registros disponíveis.</li>
+      </ol>
+      <p>O acesso à reserva é restrito ao perfil de professor nas rotas correspondentes.</p>
+    </section>
+
+    <section class="help-card">
+      <h2>4. Como visualizar atividades NOA</h2>
+      <p>Esta seção é destinada aos alunos.</p>
+      <ol>
+        <li>Entre no sistema com sua conta.</li>
+        <li>Acesse a área de atividades NOA, se estiver disponível no seu perfil.</li>
+        <li>Confira o nome da atividade, o horário, o professor, a sala e as vagas exibidas.</li>
+        <li>Consulte a área de inscrições para verificar os registros apresentados.</li>
+      </ol>
+      <p>A exibição de atividades não garante que a inscrição esteja integrada ou seja salva no sistema.</p>
+    </section>
+
+    <section class="help-card">
+      <h2>5. Como editar o perfil</h2>
+      <ol>
+        <li>Acesse o sistema e abra a opção de perfil, quando disponível.</li>
+        <li>Confira as informações apresentadas.</li>
+        <li>Se os campos de edição estiverem habilitados, altere os dados desejados.</li>
+        <li>Utilize a opção de salvar somente se ela estiver funcional.</li>
+      </ol>
+      <p>Algumas telas de perfil podem apresentar dados demonstrativos. Confirme se as alterações são realmente salvas antes de sair da página.</p>
+    </section>
+
+    <section class="help-card">
+      <h2>6. Perguntas frequentes</h2>
+
+      <details class="help-faq">
+        <summary>Não consigo entrar. O que devo fazer?</summary>
+        <p>Confira seu e-mail e sua senha. Se o problema continuar, utilize somente as opções de recuperação disponíveis na tela de login.</p>
+      </details>
+
+      <details class="help-faq">
+        <summary>Por que não consigo reservar uma sala?</summary>
+        <p>A reserva é destinada a professores e depende de uma sessão válida e da disponibilidade da funcionalidade.</p>
+      </details>
+
+      <details class="help-faq">
+        <summary>Por que não aparece uma atividade NOA?</summary>
+        <p>Verifique se a área está disponível no seu perfil e se existem atividades cadastradas para exibição.</p>
+      </details>
+
+      <details class="help-faq">
+        <summary>Minhas alterações no perfil não foram salvas. E agora?</summary>
+        <p>A tela pode não estar integrada a uma operação de gravação. Não presuma que os dados foram alterados sem confirmar o resultado.</p>
+      </details>
+
+      <details class="help-faq">
+        <summary>Todos os usuários têm as mesmas permissões?</summary>
+        <p>Não. O acesso a determinadas operações depende do perfil e das regras de autorização do sistema.</p>
+      </details>
+    </section>
+
+  </div>
+
+  <!-- Rodapé da página de ajuda -->
+  <footer class="help-footer">
+    <p>SenacManager — Guia de utilização</p>
+    <a href="/login">Voltar para o login</a>
+  </footer>
+</main>

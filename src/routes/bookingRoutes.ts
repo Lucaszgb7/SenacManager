@@ -15,7 +15,7 @@ bookingRoutes.get(
   "/bookings/my",
   autenticado,
   permitirPerfis("professor"),
-  BookingController.minhasReservas.bind(BookingController)
+  BookingController.minhasReservas
 );
 
 /**
@@ -26,7 +26,7 @@ bookingRoutes.post(
   "/bookings/:id/cancelar",
   autenticado,
   permitirPerfis("professor"),
-  BookingController.cancelar.bind(BookingController)
+  BookingController.cancelar
 );
 
 export default bookingRoutes;

@@ -1,17 +1,47 @@
 import { Request, Response } from 'express';
-import { authenticate, saveUser } from '../services/SchoolService';
-import { HttpError } from '../services/validation';
+import bcrypt from 'bcrypt';
+
+import { UsuarioRepository } from '../repositories/UsuarioRepository';
+import { Professor } from '../models/Professor';
+import { Aluno } from '../models/Aluno';
+import { Administrador } from '../models/Administrador';
 
 export class AuthController {
-  login = async (req: Request, res: Response): Promise<void> => {
+  async login(req: Request, res: Response): Promise<void> {
     try {
-      const { email, password, remember } = req.body as {
+      const { email, password } = req.body as {
         email?: string;
         password?: string;
-        remember?: string;
       };
 
-      const usuario = await authenticate(email, password);
+      if (!email || !password) {
+        res.status(400).render('auth/login', {
+          error: 'E-mail ou senha inválidos',
+        });
+        return;
+      }
+
+      const usuarioRepository = new UsuarioRepository();
+      const usuario = await usuarioRepository.buscarPorEmail(email);
+
+      if (!usuario) {
+        res.status(401).render('auth/login', {
+          error: 'E-mail ou senha inválidos',
+        });
+        return;
+      }
+
+      const senhaValida = await bcrypt.compare(
+        password,
+        usuario.senhaHash
+      );
+
+      if (!senhaValida) {
+        res.status(401).render('auth/login', {
+          error: 'E-mail ou senha inválidos',
+        });
+        return;
+      }
 
       req.session.usuario = {
         id: usuario.id,
@@ -20,30 +50,147 @@ export class AuthController {
         perfil: usuario.perfil,
       };
 
-      if (remember) {
-        // "Lembrar-me": mantém a sessão ativa por 30 dias
-        req.session.cookie.maxAge = 1000 * 60 * 60 * 24 * 30;
+      res.redirect('/dashboard');
+    } catch (err) {
+      console.error('[AuthController.login] Erro:', err);
+
+      res.status(500).render('auth/login', {
+        error: 'Erro interno. Tente novamente mais tarde.',
+      });
+    }
+  }
+
+  async logout(req: Request, res: Response): Promise<void> {
+    req.session.destroy((err) => {
+      if (err) {
+        console.error(
+          '[AuthController.logout] Erro ao destruir sessão:',
+          err
+        );
+
+        res.status(500).json({
+          success: false,
+          message: 'Erro ao sair.',
+        });
+
+        return;
       }
 
-      res.redirect('/dashboard');
-    } catch (error) {
-      if (!(error instanceof HttpError)) throw error;
-      res.status(error.status).render('auth/login', { error: error.message });
+      res.clearCookie('senac.sid');
+      res.redirect('/login');
+    });
+  }
+
+  async registrar(req: Request, res: Response): Promise<void> {
+    try {
+      const {
+        nome,
+        email,
+        senha,
+        perfil,
+        disciplinas,
+        curso,
+        turma,
+      } = req.body as {
+        nome?: string;
+        email?: string;
+        senha?: string;
+        perfil?: 'professor' | 'aluno' | 'administrador';
+        disciplinas?: string[];
+        curso?: string;
+        turma?: string;
+      };
+
+      if (!nome || !email || !senha || !perfil) {
+        res.status(400).json({
+          success: false,
+          message: 'Campos obrigatórios: nome, email, senha e perfil.',
+        });
+        return;
+      }
+
+      const usuarioRepository = new UsuarioRepository();
+
+      const existente = await usuarioRepository.buscarPorEmail(email);
+
+      if (existente) {
+        res.status(409).json({
+          success: false,
+          message: 'Já existe um usuário com este e-mail.',
+        });
+        return;
+      }
+
+      const senhaHash = await bcrypt.hash(senha, 10);
+
+      let usuarioCriado;
+
+      switch (perfil) {
+        case 'professor':
+          usuarioCriado = new Professor(
+            nome,
+            email,
+            senhaHash,
+            disciplinas ?? []
+          );
+          break;
+
+        case 'aluno':
+          if (!curso || !turma) {
+            res.status(400).json({
+              success: false,
+              message: 'Curso e turma são obrigatórios para aluno.',
+            });
+            return;
+          }
+
+          usuarioCriado = new Aluno(
+            nome,
+            email,
+            senhaHash,
+            curso,
+            turma
+          );
+          break;
+
+        case 'administrador':
+          usuarioCriado = new Administrador(
+            nome,
+            email,
+            senhaHash
+          );
+          break;
+
+        default:
+          res.status(400).json({
+            success: false,
+            message:
+              'Perfil inválido. Use: professor, aluno ou administrador.',
+          });
+          return;
+      }
+
+      const salvo = await usuarioRepository.criar(usuarioCriado);
+
+      res.status(201).json({
+        success: true,
+        message: 'Usuário criado com sucesso.',
+        usuario: {
+          id: salvo.id,
+          nome: salvo.nome,
+          email: salvo.email,
+          perfil: salvo.perfil,
+        },
+      });
+    } catch (err) {
+      console.error('[AuthController.registrar] Erro:', err);
+
+      res.status(500).json({
+        success: false,
+        message: 'Erro interno ao criar usuário.',
+      });
     }
-  };
-
-  logout = async (req: Request, res: Response): Promise<void> => {
-    await new Promise<void>((resolve, reject) =>
-      req.session.destroy(error => (error ? reject(error) : resolve()))
-    );
-    res.clearCookie('senac.sid');
-    res.redirect('/login');
-  };
-
-  registrar = async (req: Request, res: Response): Promise<void> => {
-    const usuario = await saveUser(req.body || {}, undefined, req.session.usuario!.id);
-    res.status(201).json({ success: true, usuario });
-  };
+  }
 }
 
 export default new AuthController();
