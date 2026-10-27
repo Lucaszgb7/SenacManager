@@ -1,67 +1,228 @@
-/* ============================================================
-   SenacManager — profile.css
-   Estilos específicos para tela de perfil do usuário
-   ============================================================ */
-
-.profile-card-header {
-  background: #FFFFFF;
-  border-radius: var(--radius-lg);
-  border: 1px solid var(--color-border);
-  box-shadow: var(--shadow-sm);
-  padding: 28px;
-  display: flex;
-  align-items: center;
-  gap: 24px;
-  margin-bottom: 24px;
-  flex-wrap: wrap;
+/* =====================
+   Layout geral do perfil
+   ===================== */
+.profile-page {
+  padding: 2rem 1rem;
 }
 
-.profile-avatar-container {
-  position: relative;
-  flex-shrink: 0;
+.profile-header h1 {
+  font-size: 1.75rem;
+  color: var(--color-primary, #004a8d);
+  margin-bottom: 0.25rem;
 }
 
-.profile-avatar-img {
-  width: 90px;
-  height: 90px;
-  border-radius: 50%;
-  object-fit: cover;
-  border: 4px solid #FFFFFF;
-  box-shadow: var(--shadow-md);
+.profile-subtitle {
+  color: #666;
+  margin-bottom: 1.5rem;
 }
 
-.profile-info {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.profile-info__name {
-  margin: 0;
-  font-size: 1.4rem;
-  font-weight: 700;
-  color: var(--color-navy);
-}
-
-.profile-info__email {
-  margin: 0;
-  font-size: 0.9rem;
-  color: var(--color-text-secondary);
-}
-
-.profile-info__badge {
-  align-self: flex-start;
-  margin-top: 6px;
-}
-
-.profile-sections-grid {
+.profile-grid {
   display: grid;
-  grid-template-columns: 1fr;
-  gap: 24px;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5rem;
 }
 
-@media (min-width: 900px) {
-  .profile-sections-grid {
-    grid-template-columns: 3fr 2fr;
+/* Cartões no mesmo estilo dos cards do dashboard */
+.profile-card {
+  background: #fff;
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  border: 1px solid #e5e7eb;
+}
+
+.profile-card h2 {
+  font-size: 1.1rem;
+  margin-bottom: 1rem;
+  color: #1f2937;
+}
+
+/* =====================
+   Avatar
+   ===================== */
+.profile-avatar-card {
+  text-align: center;
+}
+
+.profile-avatar {
+  width: 140px;
+  height: 140px;
+  object-fit: cover;
+  border-radius: 50%;
+  border: 4px solid #e5e7eb;
+  margin: 0 auto 1rem;
+  display: block;
+}
+
+/* =====================
+   Formulários
+   ===================== */
+.profile-form .form-group {
+  margin-bottom: 1rem;
+}
+
+.profile-form label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 0.35rem;
+  color: #374151;
+}
+
+.profile-form input[type="text"],
+.profile-form input[type="email"],
+.profile-form input[type="password"] {
+  width: 100%;
+  padding: 0.6rem 0.75rem;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.profile-form input:focus {
+  outline: none;
+  border-color: #004a8d;
+  box-shadow: 0 0 0 3px rgba(0, 74, 141, 0.15);
+}
+
+/* Campo inválido */
+.profile-form input.is-invalid {
+  border-color: #dc2626;
+  box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.15);
+}
+
+/* =====================
+   Botões
+   ===================== */
+.btn {
+  display: inline-block;
+  padding: 0.6rem 1.1rem;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+  transition: transform 0.1s, background 0.15s;
+}
+
+.btn-primary {
+  background: #004a8d;
+  color: #fff;
+}
+
+.btn-primary:hover {
+  background: #003a6e;
+}
+
+.btn-secondary {
+  background: #f3f4f6;
+  color: #374151;
+  border: 1px solid #d1d5db;
+  margin-right: 0.5rem;
+}
+
+.btn-secondary:hover {
+  background: #e5e7eb;
+}
+
+/* =====================
+   Alertas de feedback
+   ===================== */
+.alert {
+  position: relative;
+  padding: 0.9rem 2.5rem 0.9rem 1rem;
+  border-radius: 8px;
+  margin-bottom: 1.25rem;
+  font-size: 0.95rem;
+}
+
+.alert-success {
+  background: #ecfdf5;
+  color: #065f46;
+  border: 1px solid #a7f3d0;
+}
+
+.alert-error {
+  background: #fef2f2;
+  color: #991b1b;
+  border: 1px solid #fecaca;
+}
+
+.alert-close {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.75rem;
+  background: transparent;
+  border: none;
+  font-size: 1.2rem;
+  cursor: pointer;
+  color: inherit;
+  line-height: 1;
+}
+
+/* =====================
+   Toggle de senha e força
+   ===================== */
+.input-with-toggle {
+  position: relative;
+}
+
+.toggle-password {
+  position: absolute;
+  right: 0.5rem;
+  top: 50%;
+  transform: translateY(-50%);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 1rem;
+  opacity: 0.6;
+}
+
+.toggle-password:hover {
+  opacity: 1;
+}
+
+.password-strength {
+  margin-top: 0.35rem;
+}
+
+.password-strength .bar {
+  display: block;
+  height: 4px;
+  border-radius: 2px;
+  background: #e5e7eb;
+  overflow: hidden;
+  position: relative;
+}
+
+.password-strength .bar::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  width: var(--strength, 0%);
+  background: var(--strength-color, #dc2626);
+  transition: width 0.2s, background 0.2s;
+}
+
+.hint {
+  display: block;
+  margin-top: 0.3rem;
+  color: #6b7280;
+  font-size: 0.82rem;
+}
+
+/* =====================
+   Responsivo
+   ===================== */
+@media (max-width: 600px) {
+  .profile-card {
+    padding: 1.25rem;
+  }
+  .btn {
+    width: 100%;
+  }
+  .btn-secondary {
+    margin-right: 0;
+    margin-bottom: 0.5rem;
   }
 }
