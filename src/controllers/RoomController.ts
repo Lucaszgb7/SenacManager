@@ -1,212 +1,278 @@
-// src/controllers/RoomController.ts
-import { Request, Response } from "express";
 
+import { Request, Response } from "express";
 import { SalaRepository } from "../repositories/SalaRepository";
 import { ReservaRepository } from "../repositories/ReservaRepository";
 import { Reserva } from "../models/Reserva";
 
-/**
- * Controller responsável pelas telas e ações relacionadas a salas.
- */
+const salaRepository = new SalaRepository();
+const reservaRepository = new ReservaRepository();
+
 export class RoomController {
-  /**
-   * GET /rooms/available
-   * Lista todas as salas com seu status atual (disponível/ocupada),
-   * calculado em tempo real a partir das reservas confirmadas.
-   */
-  async listarDisponiveis(req: Request, res: Response): Promise<void> {
+  listarDisponiveis = async (
+    req: Request,
+    res: Response
+  ): Promise<void> => {
     try {
-      const salas = await SalaRepository.listarTodas();
+      const salas = await salaRepository.listarTodas();
       const agora = new Date();
 
-      // Para cada sala, checamos se existe reserva ativa NESTE instante.
-      // Fazemos em paralelo para não serializar as consultas ao banco.
       const salasComStatus = await Promise.all(
         salas.map(async (sala) => {
-          const reservaAtiva = await ReservaRepository.buscarReservaAtiva(
-            sala.id,
+          const reservaAtual = await reservaRepository.buscarReservaAtiva(
+            String(sala.id),
             agora
           );
+
           return {
-            ...sala,
-            // Regra de negócio: sala ocupada se houver reserva confirmada
-            // cobrindo o horário atual.
-            status: reservaAtiva ? "ocupada" : "disponivel",
-            reservaAtual: reservaAtiva ?? null,
+            ...sala.toJSON(),
+            status:
+              sala.ativa === false
+                ? "inativa"
+                : reservaAtual
+                  ? "ocupada"
+                  : "disponivel",
+            ocupacaoAtual: reservaAtual,
+            reservaAtual,
           };
         })
       );
 
-      return res.render("rooms/available-rooms", {
+      res.render("rooms/available-rooms", {
         salas: salasComStatus,
         atualizadoEm: agora,
-        usuario: req.session.usuario, // útil para o header da view
+        usuario: req.session.usuario,
       });
     } catch (err) {
-      console.error("[RoomController.listarDisponiveis] Erro:", err);
-      return res.status(500).render("errors/500", {
+      console.error("[RoomController.listarDisponiveis]", err);
+
+      res.status(500).render("errors/500", {
         message: "Erro ao carregar a lista de salas.",
       });
     }
-  }
+  };
 
-  /**
-   * GET /rooms/booking
-   * Renderiza o formulário de reserva junto com a lista de salas.
-   */
-  async telaReserva(req: Request, res: Response): Promise<void> {
+  telaReserva = async (
+    req: Request,
+    res: Response
+  ): Promise<void> => {
     try {
-      const salas = await SalaRepository.listarTodas();
+      const salas = await salaRepository.listarTodas();
 
-      return res.render("rooms/room-booking", {
+      res.render("rooms/room-booking", {
         salas,
         usuario: req.session.usuario,
-        // Se vieram via querystring (ex.: ?salaId=3), pré-seleciona no form.
-        salaSelecionada: req.query.salaId ?? null,
-        erro: null, // sem erro na primeira renderização
+        salaSelecionada: String(req.query.salaId ?? ""),
+        hoje: new Date().toISOString().slice(0, 10),
+        filtros: {
+          data: String(req.query.data ?? ""),
+        },
+        erro: null,
       });
     } catch (err) {
-      console.error("[RoomController.telaReserva] Erro:", err);
-      return res.status(500).render("errors/500", {
+      console.error("[RoomController.telaReserva]", err);
+
+      res.status(500).render("errors/500", {
         message: "Erro ao carregar a tela de reserva.",
       });
     }
-  }
+  };
 
-  /**
-   * POST /rooms/booking
-   * Recebe o formulário, valida conflito e cria a reserva.
-   */
-  async confirmarReserva(req: Request, res: Response): Promise<void> {
+  confirmarReserva = async (
+    req: Request,
+    res: Response
+  ): Promise<void> => {
     try {
-      const { salaId, data, horarioInicio, horarioFim, disciplina, turma } =
-        req.body as {
-          salaId?: string;
-          data?: string;
-          horarioInicio?: string;
-          horarioFim?: string;
-          disciplina?: string;
-          turma?: string;
-        };
+      const {
+        salaId,
+        data,
+        horarioInicio,
+        horarioFim,
+        disciplina,
+        turma,
+      } = req.body as {
+        salaId?: string;
+        data?: string;
+        horarioInicio?: string;
+        horarioFim?: string;
+        disciplina?: string;
+        turma?: string;
+      };
 
-      // SEGURANÇA: o professorId vem SEMPRE da sessão, nunca do body.
-      // Isso impede que um professor crie reservas em nome de outro.
       const usuario = req.session.usuario;
+
       if (!usuario) {
-        return res.status(401).json({
+        res.status(401).json({
           success: false,
           message: "Não autenticado.",
         });
+        return;
       }
-      const professorId = usuario.id;
 
-      // Validação de entrada — mensagens específicas ajudam o usuário.
       if (
         !salaId ||
         !data ||
         !horarioInicio ||
         !horarioFim ||
-        !disciplina ||
-        !turma
+        !disciplina?.trim() ||
+        !turma?.trim()
       ) {
-        return this._renderErroReserva(
+        await this._renderErroReserva(
+          req,
           res,
           400,
           "Preencha todos os campos do formulário."
         );
+        return;
       }
 
-      // Monta os objetos Date a partir dos campos do formulário.
-      // Formato esperado: data="2025-06-10", horarioInicio="14:00".
-      const inicio = this._combinarDataHora(data, horarioInicio);
-      const fim = this._combinarDataHora(data, horarioFim);
+      const salaIdNormalizado = String(salaId).trim();
 
-      // Validação de coerência temporal.
-      if (isNaN(inicio.getTime()) || isNaN(fim.getTime())) {
-        return this._renderErroReserva(
+      if (!salaIdNormalizado) {
+        await this._renderErroReserva(
+          req,
+          res,
+          400,
+          "Sala inválida."
+        );
+        return;
+      }
+
+      const salas = await salaRepository.listarTodas();
+      const salaExiste = salas.some(
+        (sala) => String(sala.id) === salaIdNormalizado
+      );
+
+      if (!salaExiste) {
+        await this._renderErroReserva(
+          req,
+          res,
+          404,
+          "Sala não encontrada."
+        );
+        return;
+      }
+
+      const formatoDataValido = /^\d{4}-\d{2}-\d{2}$/.test(data);
+      const formatoHoraValido = (hora: string) =>
+        /^([01]\d|2[0-3]):[0-5]\d$/.test(hora);
+
+      if (
+        !formatoDataValido ||
+        !formatoHoraValido(horarioInicio) ||
+        !formatoHoraValido(horarioFim)
+      ) {
+        await this._renderErroReserva(
+          req,
           res,
           400,
           "Data ou horário inválidos."
         );
+        return;
       }
+
+      const inicio = this._combinarDataHora(data, horarioInicio);
+      const fim = this._combinarDataHora(data, horarioFim);
+
+      if (
+        Number.isNaN(inicio.getTime()) ||
+        Number.isNaN(fim.getTime())
+      ) {
+        await this._renderErroReserva(
+          req,
+          res,
+          400,
+          "Data ou horário inválidos."
+        );
+        return;
+      }
+
       if (fim <= inicio) {
-        return this._renderErroReserva(
+        await this._renderErroReserva(
+          req,
           res,
           400,
           "O horário de término deve ser posterior ao de início."
         );
+        return;
       }
 
-      // SEGURANÇA / REGRA DE NEGÓCIO: checa conflito na própria sala.
-      const conflito = await ReservaRepository.existeConflito(
-        Number(salaId),
-        inicio,
-        fim
+      const conflito = await reservaRepository.existeConflito(
+        salaIdNormalizado,
+        data,
+        horarioInicio,
+        horarioFim
       );
+
       if (conflito) {
-        return this._renderErroReserva(
+        await this._renderErroReserva(
+          req,
           res,
           409,
           "Já existe uma reserva para esta sala neste horário. Escolha outro horário ou sala."
         );
+        return;
       }
 
-      // Cria a reserva. Status inicial "confirmada".
-      const novaReserva = new Reserva({
-        salaId: Number(salaId),
-        professorId,
-        data: inicio,
-        horarioInicio: inicio,
-        horarioFim: fim,
-        disciplina,
-        turma,
-        status: "confirmada",
-      });
-
-      await ReservaRepository.criar(novaReserva);
-
-      // Sucesso → volta para a lista de reservas do professor.
-      return res.redirect("/bookings/my");
-    } catch (err) {
-      console.error("[RoomController.confirmarReserva] Erro:", err);
-      return this._renderErroReserva(
-        res,
-        500,
-        "Erro ao processar a reserva. Tente novamente."
+      const novaReserva = new Reserva(
+        salaIdNormalizado,
+        String(usuario.id),
+        disciplina.trim(),
+        turma.trim(),
+        data,
+        horarioInicio,
+        horarioFim,
+        "confirmada"
       );
+
+      await reservaRepository.criar(novaReserva);
+
+      res.redirect("/bookings/my");
+    } catch (err) {
+      console.error("[RoomController.confirmarReserva]", err);
+
+      if (!res.headersSent) {
+        await this._renderErroReserva(
+          req,
+          res,
+          500,
+          "Erro ao processar a reserva. Tente novamente."
+        );
+      }
     }
-  }
+  };
 
-  // -----------------------------------------------------------------
-  // Helpers privados
-  // -----------------------------------------------------------------
-
-  /**
-   * Combina "YYYY-MM-DD" + "HH:mm" em um Date no timezone local do servidor.
-   * (Se o projeto usar UTC ou timezone explícito, ajuste aqui.)
-   */
   private _combinarDataHora(data: string, hora: string): Date {
     return new Date(`${data}T${hora}:00`);
   }
 
-  /**
-   * Re-renderiza a tela de reserva com a mensagem de erro,
-   * preservando os dados já digitados para não frustrar o usuário.
-   */
   private async _renderErroReserva(
+    req: Request,
     res: Response,
     status: number,
     mensagem: string
   ): Promise<void> {
     try {
-      const salas = await SalaRepository.listarTodas();
-      return res.status(status).render("rooms/room-booking", {
+      const salas = await salaRepository.listarTodas();
+
+      res.status(status).render("rooms/room-booking", {
         salas,
+        usuario: req.session.usuario,
+        salaSelecionada: String(req.body?.salaId ?? req.query.salaId ?? ""),
+        hoje: new Date().toISOString().slice(0, 10),
+        filtros: {
+          data: String(req.body?.data ?? req.query.data ?? ""),
+        },
         erro: mensagem,
       });
     } catch (err) {
-      console.error("[RoomController._renderErroReserva] Falha ao re-renderizar:", err);
-      return res.status(status).json({ success: false, message: mensagem });
+      console.error("[RoomController._renderErroReserva]", err);
+
+      if (!res.headersSent) {
+        res.status(status).json({
+          success: false,
+          message: mensagem,
+        });
+      }
     }
   }
 }

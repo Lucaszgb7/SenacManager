@@ -1,75 +1,67 @@
-// src/middlewares/errorMiddleware.ts
 import { Request, Response, NextFunction } from "express";
+import { HttpError } from "../services/validation";
 
-/**
- * Middleware global de tratamento de erros
- * -----------------------------------------------------------------
- * IMPORTANTE: no Express, um middleware só é reconhecido como
- * tratador de erros se declarar EXATAMENTE 4 parâmetros
- * (err, req, res, next) — mesmo que `next` não seja usado.
- *
- * FLUXO:
- *   1. Qualquer erro lançado (ou repassado via next(err)) em
- *      controllers/middlewares anteriores cai aqui.
- *   2. Logamos o erro completo no servidor (console) para diagnóstico.
- *   3. Respondemos ao cliente com status 500 e mensagem GENÉRICA —
- *      nunca expor stack trace, queries SQL ou nomes de tabelas.
- *
- * SEGURANÇA:
- *   - Em produção, detalhes internos viram informação valiosa para
- *     atacantes (fingerprinting, enumeração de schema, etc.).
- *   - Diferenciar o log (detalhado, interno) da resposta (genérica,
- *     pública) é a prática recomendada.
- */
 export function errorMiddleware(
   err: Error,
   req: Request,
   res: Response,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   _next: NextFunction
 ): void {
-  // 1) Log interno detalhado. Aqui sim queremos ver tudo.
-  console.error("[ErrorMiddleware] Requisição falhou:");
-  console.error(`  Rota: ${req.method} ${req.originalUrl}`);
-  console.error(`  Mensagem: ${err.message}`);
-  console.error(`  Stack: ${err.stack}`);
+  console.error(
+    `[ErrorMiddleware] ${req.method} ${req.originalUrl}:`,
+    err.message
+  );
 
-  // 2) Se os headers já foram enviados, não há como responder de novo.
-  //    Delegamos ao handler padrão do Express para encerrar a conexão.
-  if (res.headersSent) {
-    return;
-  }
+  if (res.headersSent) return;
 
-  // 3) Detecta se o cliente espera JSON (API/fetch) ou HTML (navegador).
-  const acceptHeader = req.headers["accept"] ?? "";
+  const status =
+    err instanceof HttpError
+      ? err.status
+      : typeof (err as Error & { status?: number }).status === "number"
+        ? (err as Error & { status: number }).status
+        : 500;
+
+  const codigo = status >= 400 && status <= 599 ? status : 500;
+  const mensagem =
+    codigo < 500
+      ? err.message
+      : "Erro interno do servidor. Tente novamente mais tarde.";
+
+  const accept = req.headers.accept ?? "";
   const contentType = req.headers["content-type"] ?? "";
-  const isApiRequest =
-    acceptHeader.includes("application/json") ||
+  const esperaJson =
+    accept.includes("application/json") ||
     contentType.includes("application/json");
 
-  // 4) Resposta genérica — sem detalhes internos.
-  if (isApiRequest) {
-    res.status(500).json({
+  if (esperaJson) {
+    res.status(codigo).json({
       success: false,
-      message: "Erro interno do servidor. Tente novamente mais tarde.",
+      message: mensagem,
     });
     return;
   }
 
-  res
-    .status(500)
-    .send(
-      `<!DOCTYPE html>
+  res.status(codigo).send(
+    `<!DOCTYPE html>
 <html lang="pt-br">
-  <head>
-    <meta charset="UTF-8" />
-    <title>Erro interno — SenacManager</title>
-  </head>
-  <body style="font-family: sans-serif; text-align: center; padding: 60px;">
-    <h1>500 — Erro interno</h1>
-    <p>Algo deu errado. Tente novamente mais tarde.</p>
-    <a href="/dashboard">Voltar para o dashboard</a>
-  </body>
+<head>
+<meta charset="UTF-8">
+<title>Erro ${codigo} — SenacManager</title>
+</head>
+<body style="font-family:sans-serif;text-align:center;padding:60px">
+<h1>${codigo} — ${codigo === 500 ? "Erro interno" : "Não foi possível concluir a solicitação"}</h1>
+<p>${mensagem.replace(/[&<>"']/g, (char) => {
+      const entidades: Record<string, string> = {
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#39;",
+      };
+      return entidades[char] ?? char;
+    })}</p>
+<a href="/dashboard">Voltar para o dashboard</a>
+</body>
 </html>`
-    );
+  );
 }
