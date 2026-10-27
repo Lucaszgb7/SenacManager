@@ -75,12 +75,102 @@ router.get('/dashboard', async (req, res) => {
     totalAtividadesNoa
   });
 });
+
+// ------------------------------------------------------------
+// GET /search — pesquisa de aulas com filtros combináveis
+// Mantém busca por texto (q) e adiciona filtros por disciplina,
+// professor, turma e dia da semana. Preserva os filtros na query
+// string para repopular o formulário após a pesquisa.
+// ------------------------------------------------------------
 router.get('/search', async (req, res) => {
   const s = await state();
-  const busca = typeof req.query.q === 'string' ? req.query.q.trim().toLocaleLowerCase('pt-BR') : '';
-  const aulas = s.aulas.map(a => classView(a, s)).filter(a => [a.disciplina, a.professor.nome, a.sala, a.turma, a.diaSemana, a.semestre].join(' ').toLocaleLowerCase('pt-BR').includes(busca));
-  res.render('search/search-filters', { aulas, busca });
+  const user = res.locals.usuario;
+
+  // Normaliza todos os filtros vindos da query string
+  const q          = typeof req.query.q          === 'string' ? req.query.q.trim() : '';
+  const disciplina = typeof req.query.disciplina === 'string' ? req.query.disciplina.trim() : '';
+  const professor  = typeof req.query.professor  === 'string' ? req.query.professor.trim() : '';
+  const turma      = typeof req.query.turma      === 'string' ? req.query.turma.trim() : '';
+  const diaSemana  = typeof req.query.diaSemana  === 'string' ? req.query.diaSemana.trim() : '';
+
+  const lower = (v: string) => v.toLocaleLowerCase('pt-BR');
+
+  // Aplica a mesma visibilidade do /dashboard para não expor aulas
+  // que o usuário não pode ver (admin vê tudo; professor só as suas;
+  // aluno só da própria turma ou em que está inscrito).
+  const aulasVisiveis = s.aulas
+    .filter(a => a.ativa !== false)
+    .filter(a =>
+      user.perfil === 'administrador' ||
+      a.professorId === user.id ||
+      (user.perfil === 'aluno' && (
+        a.turma === user.turma ||
+        s.inscricoes.some(i => i.aulaId === a.id && i.alunoId === user.id)
+      ))
+    );
+
+  // Aplica os filtros de forma combinada (AND entre filtros preenchidos).
+  // Cada filtro só atua quando o usuário informou um valor.
+  const aulas = aulasVisiveis
+    .map(a => classView(a, s))
+    .filter(a => {
+      // Busca livre: continua funcionando como antes (procura em vários campos)
+      if (q) {
+        const blob = [a.disciplina, a.professor.nome, a.sala, a.turma, a.diaSemana, a.semestre]
+          .join(' ')
+          .toLocaleLowerCase('pt-BR');
+        if (!blob.includes(lower(q))) return false;
+      }
+      // Filtro por disciplina (match parcial, case-insensitive)
+      if (disciplina && !lower(a.disciplina).includes(lower(disciplina))) return false;
+      // Filtro por professor (match parcial, case-insensitive)
+      if (professor && !lower(a.professor.nome).includes(lower(professor))) return false;
+      // Filtro por turma (match exato)
+      if (turma && a.turma !== turma) return false;
+      // Filtro por dia da semana (match exato)
+      if (diaSemana && a.diaSemana !== diaSemana) return false;
+      return true;
+    });
+
+  // Listas reais para popular os selects — derivadas do estado atual
+  // (apenas professores com aulas visíveis e apenas turmas existentes)
+  const professores = Array.from(
+    new Set(aulasVisiveis.map(a => {
+      const p = s.usuarios.find(u => u.id === a.professorId);
+      return p ? p.nome : null;
+    }).filter((v): v is string => Boolean(v)))
+  ).sort((a, b) => a.localeCompare(b, 'pt-BR'));
+
+  const turmas = Array.from(
+    new Set(aulasVisiveis.map(a => a.turma).filter(Boolean))
+  ).sort((a, b) => a.localeCompare(b, 'pt-BR'));
+
+  // Dias da semana em formato "chave interna" usada no schema (ex.: 'segunda')
+  // -> rótulo exibido no select. Ajuste o mapa se seu schema usar outro padrão.
+  const diasSemana = [
+    { valor: 'segunda', rotulo: 'Segunda-feira' },
+    { valor: 'terca',   rotulo: 'Terça-feira'   },
+    { valor: 'quarta',  rotulo: 'Quarta-feira'  },
+    { valor: 'quinta',  rotulo: 'Quinta-feira'  },
+    { valor: 'sexta',   rotulo: 'Sexta-feira'   },
+    { valor: 'sabado',  rotulo: 'Sábado'        },
+  ];
+
+  // Indica se o usuário aplicou algum filtro (para exibir "sem resultados")
+  const temFiltro = Boolean(q || disciplina || professor || turma || diaSemana);
+
+  res.render('search/search-filters', {
+    aulas,
+    busca: q,           // compatibilidade com o template atual
+    filtros: { q, disciplina, professor, turma, diaSemana },
+    professores,
+    turmas,
+    diasSemana,
+    temFiltro,
+    semResultados: temFiltro && aulas.length === 0,
+  });
 });
+
 router.get('/classes', (_req, res) => { res.redirect('/search'); });
 router.get('/classes/details', async (req, res) => {
   const s = await state(), id = String(req.query.id || '');
