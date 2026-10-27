@@ -41,53 +41,9 @@ export function vigente(aula: any, date: string): boolean {
   return date >= start && date <= end && weekday(date) === aula.diaSemana;
 }
 
-// Valida se a data da reserva não está no passado
-export function validarDataReserva(data: string): boolean {
-  const dataReserva = new Date(data + 'T00:00:00');
-  const hoje = new Date();
-  hoje.setHours(0, 0, 0, 0);
-  return dataReserva >= hoje;
-}
-
-// Valida se o horário de início é anterior ao de fim
-export function validarHorarioReserva(horaInicio: string, horaFim: string): boolean {
-  if (!horaInicio || !horaFim) return false;
-  return horaInicio < horaFim;
-}
-
-// Valida o formato esperado (HH:MM)
-export function validarFormatoHorario(horario: string): boolean {
-  return /^([01]\d|2[0-3]):([0-5]\d)$/.test(horario);
-}
-
-// Verifica se o horário está no formato HH:MM (00:00 a 23:59)
-export function validarFormatoHorario(horario: string): boolean {
-  return /^([01]\d|2[0-3]):([0-5]\d)$/.test(horario);
-}
-
-// Garante que o início é estritamente anterior ao fim (comparação lexicográfica de HH:MM)
-export function validarHorarioReserva(inicio: string, fim: string): boolean {
-  return !!inicio && !!fim && inicio < fim;
-}
-
-// Garante formato YYYY-MM-DD e que a data não está no passado
-export function validarDataReserva(data: string): boolean {
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(data)) return false;
-  const d = new Date(data + 'T00:00:00');
-  if (isNaN(d.getTime())) return false;
-  const hoje = new Date();
-  hoje.setHours(0, 0, 0, 0);
-  return d >= hoje;
-}
-// Verifica se o horário está no formato HH:MM (00:00 a 23:59)
-export function validarFormatoHorario(horario: string): boolean {
-  return /^([01]\d|2[0-3]):([0-5]\d)$/.test(horario);
-}
-
-// Garante que o início é estritamente anterior ao fim (comparação lexicográfica de HH:MM)
-export function validarHorarioReserva(inicio: string, fim: string): boolean {
-  return !!inicio && !!fim && inicio < fim;
-}
+// ------------------------------------------------------------
+// Validações de reserva
+// ------------------------------------------------------------
 
 // Garante formato YYYY-MM-DD e que a data não está no passado
 export function validarDataReserva(data: string): boolean {
@@ -99,22 +55,12 @@ export function validarDataReserva(data: string): boolean {
   return d >= hoje;
 }
 
-// Formato HH:MM
-export function validarFormatoHorario(horario: string): boolean {
-  return /^([01]\d|2[0-3]):([0-5]\d)$/.test(horario);
-}
-
-// Início antes do fim
+// Garante que o início é estritamente anterior ao fim (comparação lexicográfica de HH:MM)
 export function validarHorarioReserva(inicio: string, fim: string): boolean {
   return !!inicio && !!fim && inicio < fim;
 }
 
-// Data YYYY-MM-DD e não no passado
-export function validarDataReserva(data: string): boolean {
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(data)) return false;
-  const d = new Date(data + 'T00:00:00');
-  if (isNaN(d.getTime())) return false;
-  const hoje = new Date();
-  hoje.setHours(0, 0, 0, 0);
-  return d >= hoje;
+// Verifica se o horário está no formato HH:MM (00:00 a 23:59)
+export function validarFormatoHorario(horario: string): boolean {
+  return /^([01]\d|2[0-3]):([0-5]\d)$/.test(horario);
 }
