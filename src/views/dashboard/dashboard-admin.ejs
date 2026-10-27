@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<%- include('../partials/head', { title: 'Dashboard — Administração', pageCss: 'dashboard.css' }) %>
+<body>
+<%- include('../partials/header', { usuario }) %>
+<%- include('../partials/sidebar', { perfil: usuario.perfil }) %>
+<main class="app-main"><div class="app-main__inner">
+
+<h1 class="page-title">Painel administrativo</h1>
+<p class="page-subtitle">Visão geral do SenacManager.</p>
+
+<section class="dashboard-metrics">
+  <article class="card"><h3>Salas</h3><p><%= metricas.salas %></p></article>
+  <article class="card"><h3>Professores ativos</h3><p><%= metricas.professores %></p></article>
+  <article class="card"><h3>Alunos ativos</h3><p><%= metricas.alunos %></p></article>
+  <article class="card"><h3>Reservas ativas</h3><p><%= metricas.reservas %></p></article>
+</section>
+
+<p><a class="btn btn-primary" href="/admin">Gerenciar cadastros</a></p>
+
+<h2>Aulas ativas hoje</h2>
+<% if (!aulas.length) { %><p>Nenhuma aula ativa hoje.</p><% } %>
+<div class="card-grid">
+<% aulas.forEach(a => { %>
+  <a class="card" href="/classes/details?id=<%= a.id %>">
+    <h3><%= a.disciplina %></h3>
+    <p><%= a.professor.nome %> · <%= a.sala %> · <%= a.turma %></p>
+    <p><%= a.horario %></p>
+  </a>
+<% }) %>
+</div>
+
+<h2>Reservas confirmadas a partir de hoje</h2>
+<% if (!reservasPendentes.length) { %><p>Nenhuma reserva futura.</p><% } %>
+<div class="card-grid">
+<% reservasPendentes.forEach(r => { %>
+  <article class="card">
+    <h3><%= r.disciplina %></h3>
+    <p><%= r.turma %> · <%= r.data %> · <%= r.horarioInicio %> — <%= r.horarioFim %></p>
+  </article>
+<% }) %>
+</div>
+
+<% if (salasInativas.length) { %>
+  <h2>Salas inativas</h2>
+  <div class="card-grid">
+  <% salasInativas.forEach(r => { %>
+    <article class="card"><h3><%= r.nome %></h3><p><%= r.predio %></p></article>
+  <% }) %>
+  </div>
+<% } %>
+
+</div></main>
+<%- include('../partials/footer') %>
+</body></html>

@@ -16,23 +16,29 @@ export function userModel(data: RecordData) {
   if (perfil === 'administrador') return Administrador.fromJSON(data);
   throw new HttpError(400, 'Perfil inválido.');
 }
+
 export function safeUser(u: RecordData): RecordData {
   const { senhaHash, ...safe } = u;
   return safe;
 }
+
 export async function users(): Promise<RecordData[]> {
   return (await readData('usuarios')).map(u => ({ ...u, ...userModel(u).toJSON(), ativo: u.ativo !== false }));
 }
+
 export async function state() {
   const [usuarios, salas, reservas, aulas, inscricoes] = await Promise.all([users(), readData('salas'), readData('reservas'), readData('aulas-grade'), readData('inscricoes-noa')]);
   return { usuarios, salas, reservas, aulas, inscricoes };
 }
+
 function mustFind(rows: RecordData[], id: string, name: string) {
   const row = rows.find(r => r.id === id);
   if (!row) throw new HttpError(404, name + ' não encontrado.');
   return row;
 }
+
 export async function findUser(id: string) { return (await users()).find(u => u.id === id); }
+
 export async function authenticate(email: unknown, password: unknown) {
   const target = required(email, 'E-mail').toLowerCase();
   const secret = required(password, 'Senha');
@@ -40,6 +46,7 @@ export async function authenticate(email: unknown, password: unknown) {
   if (!u || !await bcrypt.compare(secret, u.senhaHash)) throw new HttpError(401, 'E-mail ou senha inválidos.');
   return safeUser(u);
 }
+
 function normalizeUser(data: RecordData): RecordData {
   const nome = required(data.nome, 'Nome', 3);
   const email = required(data.email, 'E-mail').toLowerCase();
@@ -47,6 +54,7 @@ function normalizeUser(data: RecordData): RecordData {
   const model = validated(() => userModel({ ...data, nome, email, perfil }));
   return { ...data, ...model.toJSON(), ativo: flag(data.ativo, true) };
 }
+
 export async function saveUser(data: RecordData, id?: string, actorId?: string) {
   return transaction(async () => {
     const s = await state();
@@ -69,6 +77,7 @@ export async function saveUser(data: RecordData, id?: string, actorId?: string) 
     return safeUser(u);
   });
 }
+
 export async function updateProfile(id: string, data: RecordData) {
   return transaction(async () => {
     const rows = await users();
@@ -82,6 +91,7 @@ export async function updateProfile(id: string, data: RecordData) {
     return safeUser(next);
   });
 }
+
 export async function changePassword(id: string, current: unknown, next: unknown) {
   return transaction(async () => {
     const rows = await users();
@@ -94,6 +104,7 @@ export async function changePassword(id: string, current: unknown, next: unknown
     await writeData('usuarios', rows);
   });
 }
+
 export async function setAvatar(id: string, url: string) {
   return transaction(async () => {
     const rows = await users();
@@ -104,6 +115,7 @@ export async function setAvatar(id: string, url: string) {
     return previous as string | null;
   });
 }
+
 export function classView(a: RecordData, s: Awaited<ReturnType<typeof state>>): RecordData {
   const professor = s.usuarios.find(u => u.id === a.professorId);
   const sala = s.salas.find(r => r.id === a.salaId);
@@ -234,6 +246,7 @@ export async function createBooking(id: string, data: RecordData) {
     return reserva;
   });
 }
+
 export async function cancelBooking(actor: string, id: string) {
   return transaction(async () => {
     const rows = await readData('reservas');
@@ -244,6 +257,7 @@ export async function cancelBooking(actor: string, id: string) {
     await writeData('reservas', rows);
   });
 }
+
 export async function saveRoom(data: RecordData, id?: string) {
   return transaction(async () => {
     const s = await state();
@@ -255,6 +269,7 @@ export async function saveRoom(data: RecordData, id?: string) {
     return next;
   });
 }
+
 export async function saveClass(data: RecordData, actor: RecordData, id?: string) {
   return transaction(async () => {
     const s = await state();
@@ -278,6 +293,7 @@ export async function saveClass(data: RecordData, actor: RecordData, id?: string
     return next;
   });
 }
+
 export async function cancelClass(id: string, actor: RecordData) {
   return transaction(async () => {
     const rows = await readData('aulas-grade');
@@ -287,6 +303,7 @@ export async function cancelClass(id: string, actor: RecordData) {
     await writeData('aulas-grade', rows);
   });
 }
+
 export async function removeRecord(collection: 'usuarios' | 'salas' | 'aulas-grade', id: string, actorId: string) {
   return transaction(async () => {
     const s = await state();
@@ -299,6 +316,7 @@ export async function removeRecord(collection: 'usuarios' | 'salas' | 'aulas-gra
     await writeData(collection, rows.filter(r => r.id !== id));
   });
 }
+
 export async function enroll(alunoId: string, aulaId: string, cancel = false) {
   return transaction(async () => {
     const s = await state();
@@ -316,6 +334,139 @@ export async function enroll(alunoId: string, aulaId: string, cancel = false) {
     await writeData('inscricoes-noa', [...s.inscricoes, { id: randomUUID(), alunoId, aulaId, criadoEm: new Date().toISOString() }]);
   });
 }
+
+
+// ============================================================
+// Consultas de leitura para as telas (dashboard, noa, search).
+// Reaproveitam state() e classView para manter um único ponto
+// de verdade sobre como uma aula é apresentada.
+// ============================================================
+
+export type FiltrosBusca = {
+  disciplina?: string;
+  professor?: string;
+  sala?: string;
+  turno?: string;
+  diaSemana?: string;
+  semestre?: string;
+  q?: string;
+};
+
+// Deriva o turno a partir do horário de início da aula.
+// Manhã: <12h · Tarde: 12h–17h59 · Noite: >=18h
+function turnoDe(horarioInicio: string): 'manha' | 'tarde' | 'noite' {
+  const hora = Number(String(horarioInicio).slice(0, 2));
+  if (hora < 12) return 'manha';
+  if (hora < 18) return 'tarde';
+  return 'noite';
+}
+
+// Aulas do dia para um professor específico.
+export async function listarProximasAulasProfessor(professorId: string): Promise<RecordData[]> {
+  const s = await state();
+  const hoje = schoolNow().slice(0, 10);
+  return s.aulas
+    .filter(a => a.ativa !== false && a.professorId === professorId && vigente(a, hoje))
+    .map(a => ({ ...classView(a, s), turno: turnoDe(a.horarioInicio) }));
+}
+
+// Salas sem reserva confirmada (nem aula vigente) no horário atual.
+export async function listarSalasDisponiveisAgora(): Promise<RecordData[]> {
+  const s = await state();
+  const agora = schoolNow(); // "YYYY-MM-DDTHH:mm"
+  const hoje = agora.slice(0, 10);
+  const hora = agora.slice(11, 16);
+  const ocupadas = new Set<string>();
+
+  for (const r of s.reservas) {
+    if (r.status !== 'confirmada') continue;
+    if (r.data !== hoje) continue;
+    if (hora >= r.horarioInicio && hora < r.horarioFim) ocupadas.add(r.salaId);
+  }
+  for (const a of s.aulas) {
+    if (a.ativa === false) continue;
+    if (!vigente(a, hoje)) continue;
+    if (hora >= a.horarioInicio && hora < a.horarioFim) ocupadas.add(a.salaId);
+  }
+  return s.salas.filter(r => r.ativa !== false && !ocupadas.has(r.id));
+}
+
+// Aulas do dia para uma turma (usado no dashboard do aluno).
+export async function listarCronogramaAluno(turma: string): Promise<RecordData[]> {
+  const s = await state();
+  const hoje = schoolNow().slice(0, 10);
+  return s.aulas
+    .filter(a => a.ativa !== false && a.turma === turma && vigente(a, hoje))
+    .map(a => ({ ...classView(a, s), turno: turnoDe(a.horarioInicio) }));
+}
+
+// Todas as atividades NOA com status de disponibilidade calculado.
+export async function listarAtividadesNoa(): Promise<RecordData[]> {
+  const s = await state();
+  const hoje = schoolNow().slice(0, 10);
+  return s.aulas
+    .filter(a => a.isNoa)
+    .map(a => {
+      const [start, end] = semesterRange(a.semestre);
+      const sala = s.salas.find(r => r.id === a.salaId);
+      const professor = s.usuarios.find(u => u.id === a.professorId);
+      const disponivel =
+        a.ativa !== false &&
+        hoje >= start && hoje <= end &&
+        !!sala && sala.ativa !== false &&
+        !!professor && professor.ativo;
+      return {
+        ...classView(a, s),
+        turno: turnoDe(a.horarioInicio),
+        disponivel,
+        vagasOcupadas: s.inscricoes.filter(i => i.aulaId === a.id).length,
+      };
+    });
+}
+
+// Inscrições NOA de um aluno (com o detalhe da atividade).
+export async function listarInscricoesNoaAluno(alunoId: string): Promise<RecordData[]> {
+  const s = await state();
+  return s.inscricoes
+    .filter(i => i.alunoId === alunoId)
+    .map((i): RecordData | null => {
+      const a = s.aulas.find(x => x.id === i.aulaId);
+      return a ? { ...classView(a, s), inscricaoId: i.id, inscritoEm: i.criadoEm } : null;
+    })
+    .filter((x): x is RecordData => x !== null);
+}
+
+// Busca de aulas com filtros opcionais. Todos são combinados com AND.
+// Se só `q` vier, faz busca textual ampla (compatível com a tela atual).
+export async function buscarAulas(filtros: FiltrosBusca = {}): Promise<RecordData[]> {
+  const s = await state();
+  const norm = (v: unknown) => String(v ?? '').trim().toLocaleLowerCase('pt-BR');
+  const disciplina = norm(filtros.disciplina);
+  const professor = norm(filtros.professor);
+  const sala = norm(filtros.sala);
+  const turno = norm(filtros.turno);
+  const diaSemana = norm(filtros.diaSemana);
+  const semestre = norm(filtros.semestre);
+  const q = norm(filtros.q);
+
+  return s.aulas
+    .map((a): RecordData => ({ ...classView(a, s), turno: turnoDe(a.horarioInicio) }))
+    .filter(a => {
+      if (disciplina && !norm(a.disciplina).includes(disciplina)) return false;
+      if (professor && !norm(a.professor?.nome).includes(professor)) return false;
+      if (sala && !norm(a.sala).includes(sala)) return false;
+      if (turno && a.turno !== turno) return false;
+      if (diaSemana && norm(a.diaSemana) !== diaSemana) return false;
+      if (semestre && norm(a.semestre) !== semestre) return false;
+      if (q) {
+        const blob = [a.disciplina, a.professor?.nome, a.sala, a.turma, a.diaSemana, a.semestre]
+          .map(norm).join(' ');
+        if (!blob.includes(q)) return false;
+      }
+      return true;
+    });
+}
+
 /**
  * Ativa/desativa um usuário administrativamente.
  * Não é possível desativar a si mesmo nem o último administrador ativo

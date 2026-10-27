@@ -1,8 +1,13 @@
 import { Router } from 'express';
 import { autenticado } from '../middlewares/authMiddleware';
 import { permitirPerfis } from '../middlewares/perfilMiddleware';
-import { state, classView, enroll, saveRoom, saveClass, saveUser, removeRecord, cancelClass, safeUser, atualizarStatusUsuario, buscarAulaPorId, cancelBooking } from '../services/SchoolService';
+import {
+  state, classView, enroll, saveRoom, saveClass, saveUser, removeRecord, cancelClass, safeUser,
+  atualizarStatusUsuario, buscarAulaPorId, cancelBooking,
+  listarAtividadesNoa, listarInscricoesNoaAluno,
+} from '../services/SchoolService';
 import { schoolNow, vigente, semesterRange, HttpError, flag } from '../services/validation';
+
 const router = Router();
 router.use(autenticado);
 router.get('/dashboard', async (req, res) => {
@@ -172,6 +177,7 @@ router.get('/search', async (req, res) => {
 });
 
 router.get('/classes', (_req, res) => { res.redirect('/search'); });
+
 router.get('/classes/details', async (req, res) => {
   const s = await state(), id = String(req.query.id || '');
   const aula = s.aulas.find(a => a.id === id);
@@ -188,6 +194,7 @@ router.get('/classes/:id/edit', permitirPerfis('professor', 'administrador'), as
   if (res.locals.usuario.perfil !== 'administrador' && aula.professorId !== res.locals.usuario.id) throw new HttpError(403, 'Esta aula pertence a outro professor.');
   res.render('admin/edit', { kind: 'aulas-grade', record: aula, salas: s.salas, professores: s.usuarios.filter(u => u.perfil === 'professor'), endpoint: '/classes/' + aula.id, back: '/classes/details?id=' + aula.id });
 });
+
 router.put('/classes/:id', permitirPerfis('professor', 'administrador'), async (req, res) => {
   await saveClass(req.body || {}, res.locals.usuario, String(req.params.id));
   res.json({ success: true, message: 'Aula atualizada.' });
@@ -207,37 +214,41 @@ router.post('/classes/:id/cancelar', autenticado, permitirPerfis('professor', 'a
   await cancelClass(aula.id, usuario);
   res.json({ success: true, message: 'Aula cancelada.' });
 });
+
+// ------------------------------------------------------------
+// NOA — Novas Oportunidades de Aprendizagem
+// ------------------------------------------------------------
 router.get('/noa', permitirPerfis('aluno'), async (req, res) => {
-  const s = await state(), today = schoolNow().slice(0,10);
-  const activities = s.aulas.filter(a => a.isNoa).map(a => {
-    const [start, end] = semesterRange(a.semestre);
-    return { ...classView(a, s), disponivel: a.ativa !== false && today >= start && today <= end && s.salas.some(r => r.id === a.salaId && r.ativa !== false) && s.usuarios.some(u => u.id === a.professorId && u.ativo), vagasOcupadas: s.inscricoes.filter(i => i.aulaId === a.id).length, inscrito: s.inscricoes.some(i => i.aulaId === a.id && i.alunoId === req.session.usuario!.id) };
-  });
-  res.render('noa/noa', { atividades: activities.filter(a => a.disponivel), minhasInscricoes: activities.filter(a => a.inscrito) });
+  const alunoId = req.session.usuario!.id;
+  const todas = await listarAtividadesNoa();
+  const inscricoes = await listarInscricoesNoaAluno(alunoId);
+  const idsInscritos = new Set(inscricoes.map(i => i.id));
+
+  const atividades = todas
+    .filter(a => a.disponivel)
+    .map(a => ({ ...a, inscrito: idsInscritos.has(a.id) }));
+
+  const minhasInscricoes = inscricoes;
+
+  res.render('noa/noa', { atividades, minhasInscricoes });
 });
+
 router.post('/noa/:id/inscrever', permitirPerfis('aluno'), async (req, res) => {
   await enroll(req.session.usuario!.id, String(req.params.id));
   res.status(201).json({ success: true, message: 'Inscrição confirmada.' });
 });
+
 router.post('/noa/:id/cancelar', permitirPerfis('aluno'), async (req, res) => {
   await enroll(req.session.usuario!.id, String(req.params.id), true);
   res.json({ success: true, message: 'Inscrição cancelada.' });
 });
+
+// ------------------------------------------------------------
+// Administração
+// ------------------------------------------------------------
 router.get('/admin', permitirPerfis('administrador'), async (_req, res) => {
   const s = await state();
   res.render('admin/admin-panel', { salas: s.salas, aulas: s.aulas.map(a => classView(a, s)), usuarios: s.usuarios.map(safeUser) });
-});
-
-// ------------------------------------------------------------
-// NOVA ROTA — toggle de status de usuário.
-// Precisa vir ANTES de qualquer /admin/:kind/:id para não colidir
-// com o PUT genérico (que tem só 2 segmentos). Aqui são 3 segmentos,
-// mas mantemos a ordem por clareza.
-// ------------------------------------------------------------
-router.put('/admin/usuarios/:id/status', permitirPerfis('administrador'), async (req, res) => {
-  const ativo = flag(req.body?.ativo, false);
-  const usuario = await atualizarStatusUsuario(String(req.params.id), ativo, req.session.usuario!.id);
-  res.json({ success: true, usuario });
 });
 
 const kinds = ['salas','usuarios','aulas-grade'] as const;
@@ -247,6 +258,7 @@ function kindOf(value: string): typeof kinds[number] {
   if (!(kinds as readonly string[]).includes(normalized)) throw new HttpError(404, 'Cadastro não encontrado.');
   return normalized as typeof kinds[number];
 }
+
 router.get('/admin/:kind/edit', permitirPerfis('administrador'), async (req, res) => {
   const s = await state(), kind = kindOf(String(req.params.kind));
   const rows = kind === 'salas' ? s.salas : kind === 'usuarios' ? s.usuarios : s.aulas;
@@ -254,16 +266,19 @@ router.get('/admin/:kind/edit', permitirPerfis('administrador'), async (req, res
   if (!record) throw new HttpError(404, 'Registro não encontrado.');
   res.render('admin/edit', { kind, record: kind === 'usuarios' ? safeUser(record) : record, salas: s.salas, professores: s.usuarios.filter(u => u.perfil === 'professor'), endpoint: '/admin/' + kind + (record.id ? '/' + record.id : ''), back: '/admin' });
 });
+
 router.post('/admin/:kind', permitirPerfis('administrador'), async (req, res) => {
   const kind = kindOf(String(req.params.kind));
   const record = kind === 'salas' ? await saveRoom(req.body || {}) : kind === 'usuarios' ? await saveUser(req.body || {}) : await saveClass(req.body || {}, res.locals.usuario);
   res.status(201).json({ success: true, record });
 });
+
 router.put('/admin/:kind/:id', permitirPerfis('administrador'), async (req, res) => {
   const kind = kindOf(String(req.params.kind)), id = String(req.params.id);
   const record = kind === 'salas' ? await saveRoom(req.body || {}, id) : kind === 'usuarios' ? await saveUser(req.body || {}, id, req.session.usuario!.id) : await saveClass(req.body || {}, res.locals.usuario, id);
   res.json({ success: true, record });
 });
+
 router.delete('/admin/:kind/:id', permitirPerfis('administrador'), async (req, res) => {
   await removeRecord(kindOf(String(req.params.kind)), String(req.params.id), req.session.usuario!.id);
   res.json({ success: true, message: 'Registro removido.' });

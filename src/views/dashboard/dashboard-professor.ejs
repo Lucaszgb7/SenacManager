@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<%- include('../partials/head', { title: 'Dashboard — Professor', pageCss: 'dashboard.css' }) %>
+<body>
+<%- include('../partials/header', { usuario }) %>
+<%- include('../partials/sidebar', { perfil: usuario.perfil }) %>
+<main class="app-main"><div class="app-main__inner">
+
+<h1 class="page-title">Olá, <%= usuario.nome.split(' ')[0] %></h1>
+<p class="page-subtitle">Suas aulas e reservas de hoje.</p>
+
+<section class="dashboard-metrics">
+  <article class="card"><h3>Aulas hoje</h3><p><%= aulas.length %></p></article>
+  <article class="card"><h3>Reservas futuras</h3><p><%= minhasReservas.length %></p></article>
+  <article class="card"><h3>Salas livres agora</h3><p><%= salasDisponiveis.length %></p></article>
+</section>
+
+<h2>Minhas aulas de hoje</h2>
+<% if (!aulas.length) { %><p>Você não tem aulas hoje.</p><% } %>
+<div class="card-grid">
+<% aulas.forEach(a => { %>
+  <a class="card" href="/classes/details?id=<%= a.id %>">
+    <h3><%= a.disciplina %></h3>
+    <p><%= a.turma %> · <%= a.sala %></p>
+    <p><%= a.horario %></p>
+  </a>
+<% }) %>
+</div>
+
+<h2>Minhas reservas</h2>
+<% if (!minhasReservas.length) { %><p>Nenhuma reserva futura.</p><% } %>
+<div class="card-grid">
+<% minhasReservas.forEach(r => { %>
+  <article class="card">
+    <h3><%= r.disciplina %></h3>
+    <p><%= r.turma %> · <%= r.sala %></p>
+    <p><%= r.data %> · <%= r.horario %></p>
+  </article>
+<% }) %>
+</div>
+
+<h2>Salas disponíveis agora</h2>
+<% if (!salasDisponiveis.length) { %><p>Todas as salas estão ocupadas neste horário.</p><% } %>
+<div class="card-grid">
+<% salasDisponiveis.forEach(r => { %>
+  <article class="card">
+    <h3><%= r.nome %></h3>
+    <p><%= r.predio %><%= r.andar ? ' · ' + r.andar + 'º andar' : '' %></p>
+    <p>Capacidade: <%= r.capacidade %></p>
+  </article>
+<% }) %>
+</div>
+
+</div></main>
+<%- include('../partials/footer') %>
+</body></html>
