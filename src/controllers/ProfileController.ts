@@ -1,473 +1,114 @@
-
-import { Request, Response, NextFunction } from 'express';
-import bcrypt from 'bcrypt';
-import multer from 'multer';
+import { randomUUID } from 'crypto';
+import { promises as fs } from 'fs';
 import path from 'path';
-import fs from 'fs';
-import { userModel } from '../services/SchoolService';
+import { Request, Response } from 'express';
+import { avatarDirectory, AVATAR_DIR_PUBLIC_PATH } from '../config/multer';
+import { changePassword, setAvatar, updateProfile } from '../services/SchoolService';
+import { HttpError } from '../services/validation';
 
-type ProfileMessage = {
-  type: 'success' | 'error';
-  text: string;
-} | null;
-
-const sanitize = (value: unknown): string =>
-  typeof value === 'string' ? value.trim() : '';
-
-const isValidEmail = (email: string): boolean =>
-  /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-
-const isValidPassword = (password: string): boolean =>
-  password.length >= 8 &&
-  /[A-Za-z]/.test(password) &&
-  /\d/.test(password);
-
-const getSession = (req: Request): any => req.session as any;
-
-const setMessage = (
-  req: Request,
-  type: 'success' | 'error',
-  text: string
-): void => {
-  getSession(req).profileMessage = { type, text } satisfies ProfileMessage;
+const avatarExtensions: Record<string, string> = {
+  'image/jpeg': '.jpg',
+  'image/png': '.png',
+  'image/webp': '.webp',
 };
 
-const avatarDirectory = path.resolve(
-  __dirname,
-  '..',
-  '..',
-  'public',
-  'uploads',
-  'avatars'
-);
+function hasValidImageSignature(buffer: Buffer, mimeType: string): boolean {
+  if (mimeType === 'image/jpeg') {
+    return buffer.length >= 3 && buffer[0] === 0xff && buffer[1] === 0xd8 && buffer[2] === 0xff;
+  }
 
-const storage = multer.diskStorage({
-  destination: (_req, _file, cb) => {
+  if (mimeType === 'image/png') {
+    return buffer.length >= 8 && buffer.subarray(0, 8).equals(Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]));
+  }
+
+  return mimeType === 'image/webp' && buffer.length >= 12 &&
+    buffer.toString('ascii', 0, 4) === 'RIFF' && buffer.toString('ascii', 8, 12) === 'WEBP';
+}
+
+function currentUserId(req: Request): string {
+  const userId = req.session.usuario?.id;
+  if (!userId) throw new HttpError(401, 'NÃ£o autenticado. FaÃ§a login para continuar.');
+  return userId;
+}
+
+function managedAvatarPath(url: string | null | undefined): string | undefined {
+  if (!url || !url.startsWith(`${AVATAR_DIR_PUBLIC_PATH}/`)) return undefined;
+
+  const filename = url.slice(`${AVATAR_DIR_PUBLIC_PATH}/`.length);
+  if (!filename || path.basename(filename) !== filename) return undefined;
+
+  const directory = path.resolve(avatarDirectory());
+  const resolved = path.resolve(directory, filename);
+  return path.dirname(resolved) === directory ? resolved : undefined;
+}
+
+class ProfileController {
+  async verPerfil(_req: Request, res: Response): Promise<void> {
+    res.render('profile/profile', { usuario: res.locals.usuario });
+  }
+
+  async atualizarInfo(req: Request, res: Response): Promise<void> {
+    const userId = currentUserId(req);
+    const updated = await updateProfile(userId, req.body || {});
+
+    req.session.usuario = {
+      id: updated.id,
+      nome: updated.nome,
+      email: updated.email,
+      perfil: updated.perfil,
+    };
+
+    res.json({ success: true, message: 'Dados atualizados com sucesso.' });
+  }
+
+  async alterarSenha(req: Request, res: Response): Promise<void> {
+    const userId = currentUserId(req);
+    const { senhaAtual, novaSenha, confirmarSenha } = req.body || {};
+
+    if (confirmarSenha !== undefined && confirmarSenha !== novaSenha) {
+      throw new HttpError(400, 'A nova senha e a confirmaÃ§Ã£o nÃ£o coincidem.');
+    }
+
+    await changePassword(userId, senhaAtual, novaSenha);
+    res.json({ success: true, message: 'Senha alterada com sucesso.' });
+  }
+
+  async uploadFoto(req: Request, res: Response): Promise<void> {
+    const userId = currentUserId(req);
+    const file = req.file;
+    const extension = file && avatarExtensions[file.mimetype];
+
+    if (!file || !extension || !hasValidImageSignature(file.buffer, file.mimetype)) {
+      throw new HttpError(415, 'Formato invÃ¡lido. Envie uma imagem JPG, PNG ou WEBP.');
+    }
+
+    const directory = path.resolve(avatarDirectory());
+    await fs.mkdir(directory, { recursive: true });
+
+    const filename = `${randomUUID()}${extension}`;
+    const newPath = path.resolve(directory, filename);
+    const fotoUrl = `${AVATAR_DIR_PUBLIC_PATH}/${filename}`;
+    await fs.writeFile(newPath, file.buffer, { flag: 'wx' });
+
+    let previousAvatar: string | null | undefined;
     try {
-      fs.mkdirSync(avatarDirectory, { recursive: true });
-      cb(null, avatarDirectory);
+      previousAvatar = await setAvatar(userId, fotoUrl);
     } catch (error) {
-      cb(error as Error, avatarDirectory);
-    }
-  },
-
-  filename: (_req, file, cb) => {
-    const ext = path.extname(file.originalname).toLowerCase();
-
-    const allowedExtensions = ['.jpg', '.jpeg', '.png', '.webp'];
-
-    if (!allowedExtensions.includes(ext)) {
-      return cb(new Error('Extensão de arquivo inválida.'), '');
+      await fs.unlink(newPath).catch(() => undefined);
+      throw error;
     }
 
-    const filename =
-      `${Date.now()}-${Math.round(Math.random() * 1e6)}${ext}`;
-
-    cb(null, filename);
-  },
-});
-
-export const uploadAvatar = multer({
-  storage,
-  limits: {
-    fileSize: 2 * 1024 * 1024,
-    files: 1,
-  },
-  fileFilter: (_req, file, cb) => {
-    const allowedTypes = [
-      'image/jpeg',
-      'image/png',
-      'image/webp',
-    ];
-
-    if (!allowedTypes.includes(file.mimetype)) {
-      return cb(
-        new Error('Formato inválido. Use JPG, PNG ou WEBP.')
-      );
+    const oldPath = managedAvatarPath(previousAvatar);
+    if (oldPath && oldPath !== newPath) {
+      await fs.unlink(oldPath).catch((error: NodeJS.ErrnoException) => {
+        if (error.code !== 'ENOENT') {
+          console.error('[ProfileController.uploadFoto] NÃ£o foi possÃ­vel remover a foto anterior:', error);
+        }
+      });
     }
 
-    cb(null, true);
-  },
-}).single('avatar');
-
-/**
- * GET /profile
- * Exibe o perfil do usuário autenticado.
- */
-export const getProfile = async (
-  req: Request,
-  res: Response
-) => {
-  const session = getSession(req);
-
-  try {
-    const userId = session.user?.id;
-
-    if (!userId) {
-      return res.redirect('/login');
-    }
-
-    const user = await (userModel as any).findById(userId);
-
-    if (!user) {
-      session.user = null;
-      return res.redirect('/login');
-    }
-
-    const message = session.profileMessage ?? null;
-    delete session.profileMessage;
-
-    return res.render('profile/profile', {
-      user,
-      message,
-      activePage: 'profile',
-    });
-  } catch (error) {
-    console.error('[ProfileController.getProfile]', error);
-
-    return res.status(500).render('profile/profile', {
-      user: null,
-      message: {
-        type: 'error',
-        text: 'Erro ao carregar perfil.',
-      },
-      activePage: 'profile',
-    });
+    res.json({ success: true, message: 'Foto atualizada com sucesso.', fotoUrl });
   }
-};
+}
 
-/**
- * POST /profile/info
- * Atualiza nome e e-mail do usuário autenticado.
- */
-export const updateInfo = async (
-  req: Request,
-  res: Response
-) => {
-  const session = getSession(req);
-  const userId = session.user?.id;
-
-  if (!userId) {
-    return res.redirect('/login');
-  }
-
-  const name = sanitize(req.body?.name);
-  const email = sanitize(req.body?.email).toLowerCase();
-
-  if (!name || !email) {
-    setMessage(
-      req,
-      'error',
-      'Nome e e-mail são obrigatórios.'
-    );
-    return res.redirect('/profile');
-  }
-
-  if (!isValidEmail(email)) {
-    setMessage(req, 'error', 'E-mail inválido.');
-    return res.redirect('/profile');
-  }
-
-  try {
-    const existingUser = await (userModel as any)
-      .findOne({
-        email,
-        _id: { $ne: userId },
-      })
-      .lean();
-
-    if (existingUser) {
-      setMessage(
-        req,
-        'error',
-        'Este e-mail já está em uso por outro usuário.'
-      );
-      return res.redirect('/profile');
-    }
-
-    const result = await (userModel as any).updateOne(
-      { _id: userId },
-      { $set: { name, email } }
-    );
-
-    if (result.matchedCount === 0) {
-      session.user = null;
-      return res.redirect('/login');
-    }
-
-    session.user.name = name;
-    session.user.email = email;
-
-    setMessage(
-      req,
-      'success',
-      'Dados atualizados com sucesso!'
-    );
-
-    return res.redirect('/profile');
-  } catch (error) {
-    console.error('[ProfileController.updateInfo]', error);
-
-    setMessage(
-      req,
-      'error',
-      'Não foi possível salvar os dados. Tente novamente.'
-    );
-
-    return res.redirect('/profile');
-  }
-};
-
-/**
- * POST /profile/password
- * Altera a senha após verificar a senha atual.
- */
-export const updatePassword = async (
-  req: Request,
-  res: Response
-) => {
-  const session = getSession(req);
-  const userId = session.user?.id;
-
-  if (!userId) {
-    return res.redirect('/login');
-  }
-
-  // Não aplique trim às senhas: espaços podem fazer parte delas.
-  const currentPassword =
-    typeof req.body?.currentPassword === 'string'
-      ? req.body.currentPassword
-      : '';
-
-  const newPassword =
-    typeof req.body?.newPassword === 'string'
-      ? req.body.newPassword
-      : '';
-
-  const confirmPassword =
-    typeof req.body?.confirmPassword === 'string'
-      ? req.body.confirmPassword
-      : '';
-
-  if (!currentPassword || !newPassword || !confirmPassword) {
-    setMessage(
-      req,
-      'error',
-      'Preencha todos os campos de senha.'
-    );
-    return res.redirect('/profile');
-  }
-
-  if (newPassword !== confirmPassword) {
-    setMessage(
-      req,
-      'error',
-      'A nova senha e a confirmação não coincidem.'
-    );
-    return res.redirect('/profile');
-  }
-
-  if (!isValidPassword(newPassword)) {
-    setMessage(
-      req,
-      'error',
-      'A nova senha deve ter no mínimo 8 caracteres, incluindo letras e números.'
-    );
-    return res.redirect('/profile');
-  }
-
-  try {
-    const user = await (userModel as any).findById(userId);
-
-    if (!user) {
-      session.user = null;
-      return res.redirect('/login');
-    }
-
-    const passwordMatches = await bcrypt.compare(
-      currentPassword,
-      user.password
-    );
-
-    if (!passwordMatches) {
-      setMessage(req, 'error', 'Senha atual incorreta.');
-      return res.redirect('/profile');
-    }
-
-    const samePassword = await bcrypt.compare(
-      newPassword,
-      user.password
-    );
-
-    if (samePassword) {
-      setMessage(
-        req,
-        'error',
-        'A nova senha deve ser diferente da atual.'
-      );
-      return res.redirect('/profile');
-    }
-
-    const passwordHash = await bcrypt.hash(newPassword, 12);
-
-    await (userModel as any).updateOne(
-      { _id: userId },
-      { $set: { password: passwordHash } }
-    );
-
-    setMessage(
-      req,
-      'success',
-      'Senha alterada com sucesso!'
-    );
-
-    return res.redirect('/profile');
-  } catch (error) {
-    console.error('[ProfileController.updatePassword]', error);
-
-    setMessage(
-      req,
-      'error',
-      'Erro ao alterar a senha. Tente novamente.'
-    );
-
-    return res.redirect('/profile');
-  }
-};
-
-/**
- * POST /profile/avatar
- * Atualiza a foto de perfil.
- */
-export const updateAvatar = async (
-  req: Request,
-  res: Response
-) => {
-  const session = getSession(req);
-  const userId = session.user?.id;
-
-  if (!userId) {
-    if (req.file) {
-      fs.promises.unlink(req.file.path).catch(() => undefined);
-    }
-
-    return res.redirect('/login');
-  }
-
-  if (!req.file) {
-    setMessage(
-      req,
-      'error',
-      'Nenhum arquivo enviado ou formato inválido.'
-    );
-    return res.redirect('/profile');
-  }
-
-  try {
-    const user = await (userModel as any).findById(userId);
-
-    if (!user) {
-      await fs.promises.unlink(req.file.path).catch(() => undefined);
-      session.user = null;
-      return res.redirect('/login');
-    }
-
-    const avatarPath = `/uploads/avatars/${req.file.filename}`;
-    const oldAvatar = user.avatar;
-    user.avatar = avatarPath;
-    await user.save();
-
-    session.user.avatar = avatarPath;
-
-    // Remove somente arquivos antigos localizados no diretório
-    // de avatares, sem permitir caminhos arbitrários.
-    if (oldAvatar) {
-      const oldFilename = path.basename(oldAvatar);
-      const oldPath = path.resolve(
-        avatarDirectory,
-        oldFilename
-      );
-
-      const isInsideAvatarDirectory =
-        path.dirname(oldPath) === avatarDirectory;
-
-      const isManagedAvatar =
-        oldAvatar.startsWith('/uploads/avatars/') &&
-        oldFilename === oldAvatar.split('/').pop();
-
-      if (
-        isInsideAvatarDirectory &&
-        isManagedAvatar &&
-        oldPath !== path.resolve(req.file.path)
-      ) {
-        await fs.promises.unlink(oldPath).catch((error: NodeJS.ErrnoException) => {
-          if (error.code !== 'ENOENT') {
-            console.error(
-              '[ProfileController.updateAvatar] Falha ao remover avatar antigo:',
-              error
-            );
-          }
-        });
-      }
-    }
-
-    setMessage(
-      req,
-      'success',
-      'Foto atualizada com sucesso!'
-    );
-
-    return res.redirect('/profile');
-  } catch (error) {
-    console.error('[ProfileController.updateAvatar]', error);
-
-    // Remove o arquivo recém-enviado caso a operação falhe.
-    await fs.promises.unlink(req.file.path).catch(() => undefined);
-
-    setMessage(
-      req,
-      'error',
-      'Erro ao enviar a foto. Tente novamente.'
-    );
-
-    return res.redirect('/profile');
-  }
-};
-
-/**
- * Middleware para tratar erros do Multer.
- * Registre depois do middleware de upload na rota.
- */
-export const handleAvatarError = (
-  err: unknown,
-  req: Request,
-  res: Response,
-  _next: NextFunction
-) => {
-  if (!err) {
-    return res.redirect('/profile');
-  }
-
-  const session = getSession(req);
-
-  let message = 'Falha no upload da imagem.';
-
-  if (err instanceof multer.MulterError) {
-    if (err.code === 'LIMIT_FILE_SIZE') {
-      message = 'A imagem deve ter no máximo 2 MB.';
-    } else if (err.code === 'LIMIT_UNEXPECTED_FILE') {
-      message = 'Campo de arquivo inválido. Use o campo avatar.';
-    } else {
-      message = 'Erro durante o envio da imagem.';
-    }
-  } else if (err instanceof Error) {
-    message = err.message;
-  }
-
-  session.profileMessage = {
-    type: 'error',
-    text: message,
-  };
-
-  return res.redirect('/profile');
-};
+export default new ProfileController();

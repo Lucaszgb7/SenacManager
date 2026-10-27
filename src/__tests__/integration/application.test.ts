@@ -67,6 +67,8 @@ test('perfil persiste telefone e senha e recusa entrada inv?lida', async () => {
   let users = JSON.parse(await fs.readFile(path.join(directory, 'usuarios.json'), 'utf8'));
   expect(users.find((u: any) => u.id === professor.id).telefone).toBe('11999999999');
   expect((await request('/profile', 'PUT', { nome: 'x', email: professor.email })).status).toBe(400);
+  expect((await request('/profile', 'PUT', { nome: professor.nome, email: admin.email })).status).toBe(409);
+  expect((await request('/profile/senha', 'PUT', { senhaAtual: 'senha-incorreta', novaSenha: 'NovaSenha123!', confirmarSenha: 'NovaSenha123!' })).status).toBe(401);
   expect((await request('/profile/senha', 'PUT', { senhaAtual: password, novaSenha: 'NovaSenha123!' })).status).toBe(200);
   users = JSON.parse(await fs.readFile(path.join(directory, 'usuarios.json'), 'utf8'));
   expect(await bcrypt.compare('NovaSenha123!', users.find((u: any) => u.id === professor.id).senhaHash)).toBe(true);
@@ -121,6 +123,35 @@ test('upload rejeita HTML disfarçado e preserva avatar depois de editar perfil'
   await request('/profile', 'PUT', { nome: professor.nome, email: professor.email, telefone: '123456789' });
   const rows = JSON.parse(await fs.readFile(path.join(directory, 'usuarios.json'), 'utf8'));
   expect(rows.find((u: any) => u.id === professor.id).fotoUrl).toBe(result.fotoUrl);
+});
+test('falha ao salvar foto remove o novo arquivo e preserva o avatar anterior', async () => {
+  await login();
+  const png = Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+jP1kAAAAASUVORK5CYII=', 'base64');
+  const enviarFoto = async (nome: string) => {
+    const form = new FormData();
+    form.append('avatar', new Blob([png], { type: 'image/png' }), nome);
+    return fetch(base + '/profile/foto', { method: 'POST', headers: { Cookie: cookie, Accept: 'application/json' }, body: form });
+  };
+
+  const primeiraResposta = await enviarFoto('anterior.png');
+  expect(primeiraResposta.status).toBe(200);
+  const fotoAnterior = await primeiraResposta.json() as any;
+  const avatarDirectory = path.join(directory, 'avatars');
+  const arquivoAnterior = path.join(avatarDirectory, path.basename(fotoAnterior.fotoUrl));
+
+  const schoolService = require('../../services/SchoolService');
+  const setAvatar = jest.spyOn(schoolService, 'setAvatar').mockRejectedValueOnce(new Error('falha de persistência'));
+  const consoleError = jest.spyOn(console, 'error').mockImplementation(() => undefined);
+  try {
+    const respostaComFalha = await enviarFoto('nova.png');
+    expect(respostaComFalha.status).toBe(500);
+    expect(await respostaComFalha.json()).toMatchObject({ success: false });
+    expect(await fs.readdir(avatarDirectory)).toEqual([path.basename(arquivoAnterior)]);
+    await expect(fs.access(arquivoAnterior)).resolves.toBeUndefined();
+  } finally {
+    setAvatar.mockRestore();
+    consoleError.mockRestore();
+  }
 });
 test('grade impede reserva sobreposta e permite horário adjacente', async () => {
   await login(admin.email);
