@@ -14,27 +14,72 @@
       </div>
     </header>
 
-    <!-- Formulário de Busca -->
+    <!-- Formulário de Busca e Filtros -->
     <section class="search-bar-card">
       <form action="/search" method="get" class="search-form-row">
-        <div class="input-group">
+
+        <!-- Busca livre (nome da disciplina, professor, sala, turma, dia) -->
+        <div class="input-group search-field--grow">
           <label for="search-input">Termo de Pesquisa</label>
           <input
             id="search-input"
             type="search"
             name="q"
-            value="<%= busca %>"
+            value="<%= filtros.q %>"
             placeholder="Digite nome da disciplina, professor, sala, turma ou dia..."
           >
         </div>
 
-        <button class="btn btn-primary" type="submit" style="padding: 11px 24px;">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <circle cx="11" cy="11" r="8"></circle>
-            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-          </svg>
-          Pesquisar
-        </button>
+        <!-- Filtro por professor (dados reais do sistema) -->
+        <div class="input-group">
+          <label for="filter-professor">Professor</label>
+          <select id="filter-professor" name="professor">
+            <option value="">Todos os professores</option>
+            <% professores.forEach(function (nome) { %>
+              <option value="<%= nome %>" <%= filtros.professor === nome ? 'selected' : '' %>>
+                <%= nome %>
+              </option>
+            <% }); %>
+          </select>
+        </div>
+
+        <!-- Filtro por turma (dados reais do sistema) -->
+        <div class="input-group">
+          <label for="filter-turma">Turma</label>
+          <select id="filter-turma" name="turma">
+            <option value="">Todas as turmas</option>
+            <% turmas.forEach(function (codigo) { %>
+              <option value="<%= codigo %>" <%= filtros.turma === codigo ? 'selected' : '' %>>
+                <%= codigo %>
+              </option>
+            <% }); %>
+          </select>
+        </div>
+
+        <!-- Filtro por dia da semana -->
+        <div class="input-group">
+          <label for="filter-dia">Dia da semana</label>
+          <select id="filter-dia" name="diaSemana">
+            <option value="">Todos os dias</option>
+            <% diasSemana.forEach(function (d) { %>
+              <option value="<%= d.valor %>" <%= filtros.diaSemana === d.valor ? 'selected' : '' %>>
+                <%= d.rotulo %>
+              </option>
+            <% }); %>
+          </select>
+        </div>
+
+        <!-- Ações: pesquisar + limpar filtros -->
+        <div class="search-form-actions">
+          <button class="btn btn-primary" type="submit">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+            Pesquisar
+          </button>
+          <a href="/search" class="btn btn-secondary btn-sm">Limpar filtros</a>
+        </div>
       </form>
     </section>
 
@@ -42,11 +87,11 @@
     <div class="search-results-header">
       <span style="font-size: 0.9rem; color: var(--color-text-secondary);">
         <strong><%= aulas.length %></strong> aula(s) encontrada(s)
-        <% if (busca) { %> para "<strong><%= busca %></strong>"<% } %>
+        <% if (temFiltro) { %> com os filtros aplicados<% } %>
       </span>
 
-      <% if (busca) { %>
-        <a href="/search" class="btn-link" style="font-size: 0.8rem;">Limpar busca</a>
+      <% if (temFiltro) { %>
+        <a href="/search" class="btn-link" style="font-size: 0.8rem;">Limpar filtros</a>
       <% } %>
     </div>
 
@@ -58,7 +103,13 @@
           <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
         </svg>
         <div class="empty-state__title">Nenhuma aula encontrada</div>
-        <p class="empty-state__text">Tente utilizar outros termos como o nome do professor, sigla da sala ou dia da semana.</p>
+        <p class="empty-state__text">
+          <% if (semResultados) { %>
+            Nenhuma aula corresponde aos filtros selecionados. Tente ajustar os critérios ou limpar os filtros.
+          <% } else { %>
+            Tente utilizar outros termos como o nome do professor, sigla da sala ou dia da semana.
+          <% } %>
+        </p>
         <a href="/search" class="btn btn-secondary btn-sm">Ver todas as aulas</a>
       </div>
     <% } else { %>
