@@ -14,7 +14,8 @@ const app = express();
 app.disable('x-powered-by');
 app.set('trust proxy', process.env.TRUST_PROXY === '1' ? 1 : false);
 app.set('view engine', 'ejs');
-app.set('views', path.join(__dirname, 'views'));
+// O código compilado também pode usar os templates de origem se dist/views não existir.
+app.set('views', [path.join(__dirname, 'views'), path.resolve(__dirname, '../src/views')]);
 app.use((_req, res, next) => { res.setHeader('X-Content-Type-Options', 'nosniff'); next(); });
 app.use('/uploads/avatars', express.static(avatarDirectory()));
 app.use(express.static(path.join(__dirname, '..', 'public')));

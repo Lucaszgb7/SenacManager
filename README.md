@@ -31,6 +31,27 @@ em JSON temporário. Execute após o build e mantenha a porta 3219 livre.
 
 O build limpa somente `dist/`, compila TypeScript e copia as views usando Node, sem depender de `cp` do Unix.
 
+## Erro ao localizar auth/login
+
+`npm run dev` executa `src/server.ts` com tsx; `npm start` executa `dist/server.js`.
+Se o erro mencionar `dist/views`, encerre o processo antigo no terminal com Ctrl+C e execute:
+
+```sh
+npm ci
+npm run build
+npm run dev
+```
+
+O build copia os templates para `dist/views`. Se essa pasta estiver ausente, o servidor
+compilado também procura em `src/views`, relativo ao projeto, sem depender do diretório
+do terminal. Preserve `src/views` ou os templates copiados ao distribuir a aplicação.
+Para testar especificamente esse caso, execute `npm run build` e
+`node scripts/views-smoke.cjs`; o teste usa uma cópia temporária sem `dist/views`.
+
+No modo `DB_DRIVER=mysql`, falhas de conexão são informadas ao cliente; não há mudança
+automática para JSON. `DATA_DIR` não altera o driver escolhido. Para usar arquivos locais,
+defina explicitamente `DB_DRIVER=json`.
+
 ## Criar um administrador local
 
 Os cinco usuários de demonstração usam a senha **123456, SOMENTE de desenvolvimento**. Professor: `carlos.silva@senac.br`; administrador: `roberto.ferreira@senac.br`. Troque as senhas antes de qualquer uso real. Para criar outra conta, faça o build e execute:
