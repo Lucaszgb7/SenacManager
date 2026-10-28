@@ -142,7 +142,8 @@ export class Professor extends Usuario {
       throw new Error('Dados inválidos para reconstruir Professor.');
     }
 
-    // Impede que dados de outro tipo de usuário sejam carregados como professor.
+    // Impede que dados de outro tipo de usuário sejam carregados como professor
+    // (perfil ausente é aceito, pois a classe já define o tipo).
     if (data.perfil !== undefined && data.perfil !== 'professor') {
       throw new Error('O perfil informado não corresponde a Professor.');
     }

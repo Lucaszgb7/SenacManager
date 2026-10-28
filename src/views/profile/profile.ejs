@@ -18,7 +18,7 @@
     <section class="profile-card-header">
       <div class="profile-avatar-container">
         <% if (usuario.fotoUrl) { %>
-          <img class="profile-avatar-img" src="<%= usuario.fotoUrl %>" alt="Foto de <%= usuario.nome %>">
+          <img id="avatar-preview" class="profile-avatar-img" src="<%= usuario.fotoUrl %>" alt="Foto de <%= usuario.nome %>">
         <% } else { %>
           <div class="avatar avatar--lg" style="width: 90px; height: 90px; font-size: 2rem;">
             <%= (usuario.nome || 'U')
@@ -123,12 +123,23 @@
 
             <div class="input-group">
               <label for="nova-senha">Nova Senha (mínimo 8 caracteres)</label>
-              <input id="nova-senha" type="password" name="novaSenha" autocomplete="new-password" minlength="8" required>
+              <div class="input-with-toggle">
+                <input id="nova-senha" type="password" name="novaSenha" autocomplete="new-password" minlength="8" required>
+                <button type="button" class="toggle-password" data-target="nova-senha" aria-label="Mostrar senha">👁</button>
+              </div>
+              <div class="password-strength" aria-live="polite">
+                <span class="bar"></span>
+                <small class="strength-text hint">Mín. 8 caracteres, com letras e números.</small>
+              </div>
             </div>
 
             <div class="input-group">
               <label for="confirmar-senha">Confirmar Nova Senha</label>
-              <input id="confirmar-senha" type="password" name="confirmarSenha" autocomplete="new-password" minlength="8" required>
+              <div class="input-with-toggle">
+                <input id="confirmar-senha" type="password" name="confirmarSenha" autocomplete="new-password" minlength="8" required>
+                <button type="button" class="toggle-password" data-target="confirmar-senha" aria-label="Mostrar senha">👁</button>
+              </div>
+              <small id="password-match" class="hint"></small>
             </div>
 
             <p data-feedback role="status" hidden></p>
@@ -143,6 +154,7 @@
   </div>
 </main>
 
+<script src="/js/profile.js" defer></script>
 <%- include('../partials/footer') %>
 </body>
 </html>

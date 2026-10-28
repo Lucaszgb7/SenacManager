@@ -65,6 +65,7 @@ export class Administrador extends Usuario {
     // Aceita os dois identificadores de perfil para manter
     // compatibilidade com dados existentes no sistema.
     if (
+      data.perfil !== undefined &&
       data.perfil !== 'administrador' &&
       data.perfil !== 'admin'
     ) {
