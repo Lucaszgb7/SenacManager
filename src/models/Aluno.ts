@@ -145,7 +145,7 @@ export class Aluno extends Usuario {
     }
 
     // Impede que dados de outro perfil sejam interpretados como aluno.
-    if (data.perfil !== 'aluno') {
+    if (data.perfil !== undefined && data.perfil !== 'aluno') {
       throw new Error('O perfil informado não corresponde a Aluno.');
     }
 

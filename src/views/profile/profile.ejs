@@ -1,132 +1,160 @@
-<%- include('../partials/header', { activePage: 'profile' }) %>
+<!DOCTYPE html>
+<html lang="pt-BR">
+<%- include('../partials/head', { title: 'Meu Perfil', pageCss: 'profile.css' }) %>
+<body>
+<%- include('../partials/header', { usuario, title: 'Meu Perfil' }) %>
+<%- include('../partials/sidebar', { perfil: usuario.perfil, usuario }) %>
 
-<main class="profile-page container">
-  <header class="profile-header">
-    <h1>Meu Perfil</h1>
-    <p class="profile-subtitle">Gerencie suas informações pessoais, senha e foto.</p>
-  </header>
+<main class="app-main">
+  <div class="app-main__inner">
+    <header class="page-header">
+      <div class="page-header__left">
+        <h1 class="page-title">Meu Perfil</h1>
+        <p class="page-subtitle">Gerencie suas credenciais de acesso, dados cadastrais e foto de identificação.</p>
+      </div>
+    </header>
 
-  <!-- Feedback global (sucesso/erro vindo do controller) -->
-  <% if (message) { %>
-    <div class="alert alert-<%= message.type %>" role="alert">
-      <%= message.text %>
-      <button class="alert-close" aria-label="Fechar">×</button>
-    </div>
-  <% } %>
-
-  <section class="profile-grid">
-    <!-- Foto do usuário -->
-    <div class="profile-card profile-avatar-card">
-      <h2>Foto de perfil</h2>
-      <img
-        id="avatar-preview"
-        class="profile-avatar"
-        src="<%= user && user.avatar ? user.avatar : '/images/default-avatar.png' %>"
-        alt="Foto de perfil de <%= user ? user.name : 'usuário' %>"
-      />
-      <form
-        action="/profile/avatar"
-        method="POST"
-        enctype="multipart/form-data"
-        id="avatar-form"
-      >
-        <label class="btn btn-secondary">
-          Escolher imagem
-          <input
-            type="file"
-            name="avatar"
-            id="avatar-input"
-            accept="image/png, image/jpeg, image/webp"
-            hidden
-          />
-        </label>
-        <button type="submit" class="btn btn-primary">Enviar foto</button>
-      </form>
-      <small class="hint">JPG, PNG ou WEBP · máx. 2 MB</small>
-    </div>
-
-    <!-- Dados cadastrais -->
-    <div class="profile-card">
-      <h2>Dados pessoais</h2>
-      <form action="/profile/info" method="POST" class="profile-form" novalidate>
-        <div class="form-group">
-          <label for="name">Nome completo *</label>
-          <input
-            type="text"
-            id="name"
-            name="name"
-            value="<%= user ? user.name : '' %>"
-            required
-            maxlength="120"
-          />
-        </div>
-        <div class="form-group">
-          <label for="email">E-mail *</label>
-          <input
-            type="email"
-            id="email"
-            name="email"
-            value="<%= user ? user.email : '' %>"
-            required
-            maxlength="120"
-          />
-        </div>
-        <button type="submit" class="btn btn-primary">Salvar dados</button>
-      </form>
-    </div>
-
-    <!-- Alteração de senha -->
-    <div class="profile-card">
-      <h2>Alterar senha</h2>
-      <form action="/profile/password" method="POST" class="profile-form" id="password-form" novalidate>
-        <div class="form-group">
-          <label for="currentPassword">Senha atual *</label>
-          <div class="input-with-toggle">
-            <input type="password" id="currentPassword" name="currentPassword" required />
-            <button type="button" class="toggle-password" data-target="currentPassword">👁</button>
+    <!-- Header do Perfil com Avatar e Identificação -->
+    <section class="profile-card-header">
+      <div class="profile-avatar-container">
+        <% if (usuario.fotoUrl) { %>
+          <img id="avatar-preview" class="profile-avatar-img" src="<%= usuario.fotoUrl %>" alt="Foto de <%= usuario.nome %>">
+        <% } else { %>
+          <div class="avatar avatar--lg" style="width: 90px; height: 90px; font-size: 2rem;">
+            <%= (usuario.nome || 'U')
+                  .split(' ')
+                  .filter(Boolean)
+                  .slice(0, 2)
+                  .map(function(n){ return n[0].toUpperCase(); })
+                  .join('') %>
           </div>
-        </div>
+        <% } %>
+      </div>
 
-        <div class="form-group">
-          <label for="newPassword">Nova senha *</label>
-          <div class="input-with-toggle">
-            <input
-              type="password"
-              id="newPassword"
-              name="newPassword"
-              required
-              minlength="8"
-              autocomplete="new-password"
-            />
-            <button type="button" class="toggle-password" data-target="newPassword">👁</button>
-          </div>
-          <div class="password-strength" aria-live="polite">
-            <span class="bar"></span>
-            <small class="strength-text">Mín. 8 caracteres, com letras e números.</small>
-          </div>
+      <div class="profile-info">
+        <h2 class="profile-info__name"><%= usuario.nome %></h2>
+        <p class="profile-info__email"><%= usuario.email %></p>
+        <div class="profile-info__badge">
+          <span class="badge <%= usuario.perfil === 'administrador' ? 'badge--info' : usuario.perfil === 'professor' ? 'badge--neutral' : 'badge--success' %>">
+            Perfil: <%= usuario.perfil %>
+          </span>
         </div>
+      </div>
+    </section>
 
-        <div class="form-group">
-          <label for="confirmPassword">Confirmar nova senha *</label>
-          <div class="input-with-toggle">
-            <input
-              type="password"
-              id="confirmPassword"
-              name="confirmPassword"
-              required
-              minlength="8"
-              autocomplete="new-password"
-            />
-            <button type="button" class="toggle-password" data-target="confirmPassword">👁</button>
+    <!-- Layout em Grade com as Seções de Edição -->
+    <div class="profile-sections-grid">
+      <!-- Coluna Esquerda: Informações Pessoais -->
+      <section class="card">
+        <h2 class="card__title">Informações Pessoais</h2>
+        
+        <form action="/profile" method="post" data-api-form data-method="PUT" data-redirect="/profile">
+          <div class="form-grid">
+            <div class="input-group">
+              <label for="prof-nome">Nome Completo</label>
+              <input id="prof-nome" name="nome" value="<%= usuario.nome %>" minlength="3" required>
+            </div>
+
+            <div class="input-group">
+              <label for="prof-email">E-mail Institucional</label>
+              <input id="prof-email" name="email" type="email" value="<%= usuario.email %>" required>
+            </div>
+
+            <div class="input-group" style="grid-column: 1 / -1;">
+              <label for="prof-telefone">Telefone de Contato</label>
+              <input id="prof-telefone" name="telefone" type="tel" value="<%= usuario.telefone || '' %>" placeholder="(11) 98765-4321">
+            </div>
+
+            <% if (usuario.perfil === 'professor') { %>
+              <div class="input-group" style="grid-column: 1 / -1;">
+                <label for="prof-disciplinas">Disciplinas Ministradas (separadas por vírgula)</label>
+                <input id="prof-disciplinas" name="disciplinas" data-array value="<%= (usuario.disciplinas || []).join(', ') %>">
+              </div>
+            <% } %>
+
+            <% if (usuario.perfil === 'aluno') { %>
+              <div class="input-group">
+                <label for="prof-curso">Curso Matriculado</label>
+                <input id="prof-curso" name="curso" value="<%= usuario.curso %>" minlength="2" required>
+              </div>
+
+              <div class="input-group">
+                <label for="prof-turma">Turma</label>
+                <input id="prof-turma" name="turma" value="<%= usuario.turma %>" required>
+              </div>
+            <% } %>
           </div>
-          <small id="password-match" class="hint"></small>
-        </div>
 
-        <button type="submit" class="btn btn-primary">Alterar senha</button>
-      </form>
+          <p data-feedback role="status" hidden></p>
+
+          <button type="submit" class="btn btn-primary" style="margin-top: 8px;">
+            Salvar dados
+          </button>
+        </form>
+      </section>
+
+      <!-- Coluna Direita: Segurança e Foto -->
+      <div style="display: flex; flex-direction: column; gap: 24px;">
+        <!-- Card de Foto -->
+        <section class="card">
+          <h2 class="card__title">Foto de Perfil</h2>
+          <form action="/profile/foto" method="post" enctype="multipart/form-data" data-api-form data-redirect="/profile">
+            <div class="input-group">
+              <label for="avatar-input">Selecione uma imagem (JPG, PNG ou WebP de até 2 MB)</label>
+              <input id="avatar-input" type="file" name="avatar" accept="image/jpeg,image/png,image/webp" required>
+            </div>
+
+            <p data-feedback role="status" hidden></p>
+
+            <button class="btn btn-secondary btn-sm" type="submit" style="margin-top: 8px;">
+              Atualizar Foto de Perfil
+            </button>
+          </form>
+        </section>
+
+        <!-- Card de Alteração de Senha -->
+        <section class="card">
+          <h2 class="card__title">Alterar Senha</h2>
+          <form action="/profile/senha" method="post" data-api-form data-method="PUT" data-reset>
+            <div class="input-group">
+              <label for="senha-atual">Senha Atual</label>
+              <input id="senha-atual" type="password" name="senhaAtual" autocomplete="current-password" required>
+            </div>
+
+            <div class="input-group">
+              <label for="nova-senha">Nova Senha (mínimo 8 caracteres)</label>
+              <div class="input-with-toggle">
+                <input id="nova-senha" type="password" name="novaSenha" autocomplete="new-password" minlength="8" required>
+                <button type="button" class="toggle-password" data-target="nova-senha" aria-label="Mostrar senha">👁</button>
+              </div>
+              <div class="password-strength" aria-live="polite">
+                <span class="bar"></span>
+                <small class="strength-text hint">Mín. 8 caracteres, com letras e números.</small>
+              </div>
+            </div>
+
+            <div class="input-group">
+              <label for="confirmar-senha">Confirmar Nova Senha</label>
+              <div class="input-with-toggle">
+                <input id="confirmar-senha" type="password" name="confirmarSenha" autocomplete="new-password" minlength="8" required>
+                <button type="button" class="toggle-password" data-target="confirmar-senha" aria-label="Mostrar senha">👁</button>
+              </div>
+              <small id="password-match" class="hint"></small>
+            </div>
+
+            <p data-feedback role="status" hidden></p>
+
+            <button class="btn btn-secondary btn-sm" type="submit" style="margin-top: 8px;">
+              Alterar Senha de Acesso
+            </button>
+          </form>
+        </section>
+      </div>
     </div>
-  </section>
+  </div>
 </main>
 
 <script src="/js/profile.js" defer></script>
 <%- include('../partials/footer') %>
+</body>
+</html>

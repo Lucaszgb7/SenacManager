@@ -27,7 +27,7 @@ function hasValidImageSignature(buffer: Buffer, mimeType: string): boolean {
 
 function currentUserId(req: Request): string {
   const userId = req.session.usuario?.id;
-  if (!userId) throw new HttpError(401, 'NÃ£o autenticado. FaÃ§a login para continuar.');
+  if (!userId) throw new HttpError(401, 'Não autenticado. Faça login para continuar.');
   return userId;
 }
 
@@ -66,7 +66,7 @@ class ProfileController {
     const { senhaAtual, novaSenha, confirmarSenha } = req.body || {};
 
     if (confirmarSenha !== undefined && confirmarSenha !== novaSenha) {
-      throw new HttpError(400, 'A nova senha e a confirmaÃ§Ã£o nÃ£o coincidem.');
+      throw new HttpError(400, 'A nova senha e a confirmação não coincidem.');
     }
 
     await changePassword(userId, senhaAtual, novaSenha);
@@ -79,7 +79,7 @@ class ProfileController {
     const extension = file && avatarExtensions[file.mimetype];
 
     if (!file || !extension || !hasValidImageSignature(file.buffer, file.mimetype)) {
-      throw new HttpError(415, 'Formato invÃ¡lido. Envie uma imagem JPG, PNG ou WEBP.');
+      throw new HttpError(415, 'Formato inválido. Envie uma imagem JPG, PNG ou WEBP.');
     }
 
     const directory = path.resolve(avatarDirectory());
@@ -102,7 +102,7 @@ class ProfileController {
     if (oldPath && oldPath !== newPath) {
       await fs.unlink(oldPath).catch((error: NodeJS.ErrnoException) => {
         if (error.code !== 'ENOENT') {
-          console.error('[ProfileController.uploadFoto] NÃ£o foi possÃ­vel remover a foto anterior:', error);
+          console.error('[ProfileController.uploadFoto] Não foi possível remover a foto anterior:', error);
         }
       });
     }

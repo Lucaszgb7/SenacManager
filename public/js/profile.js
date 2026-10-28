@@ -43,8 +43,8 @@
   });
 
   /* ---------- Força da nova senha ---------- */
-  const newPassword = document.getElementById('newPassword');
-  const confirmPassword = document.getElementById('confirmPassword');
+  const newPassword = document.getElementById('nova-senha');
+  const confirmPassword = document.getElementById('confirmar-senha');
   const strengthBar = document.querySelector('.password-strength .bar');
   const strengthText = document.querySelector('.strength-text');
   const matchHint = document.getElementById('password-match');
