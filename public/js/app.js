@@ -46,6 +46,20 @@
     if (!response.ok || result.success === false) throw new Error(result.message || 'Não foi possível concluir a operação.');
     return result;
   }
+  const roomSelect = document.querySelector('#book-sala');
+  if (roomSelect) {
+    const choices = document.querySelectorAll('[name=salaChoice]');
+    const syncRoom = () => choices.forEach(choice => {
+      choice.checked = choice.value === roomSelect.value;
+      choice.closest('.sala-card').classList.toggle('sala-selecionada', choice.checked);
+    });
+    choices.forEach(choice => choice.addEventListener('change', () => {
+      roomSelect.value = choice.value;
+      syncRoom();
+    }));
+    roomSelect.addEventListener('change', syncRoom);
+    syncRoom();
+  }
   const formsInFlight = new WeakSet();
   document.querySelectorAll('[data-api-form]').forEach(form => {
     form.addEventListener('submit', async event => {

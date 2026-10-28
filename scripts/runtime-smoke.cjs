@@ -40,7 +40,7 @@ async function login(email) {
   return response.headers.get('set-cookie').split(';')[0];
 }
 async function main() {
-  await launch(['node_modules/ts-node-dev/lib/bin.js', '--respawn', 'src/server.ts'], 'npm run dev (json)');
+  await launch(['node_modules/tsx/dist/cli.mjs', 'watch', 'src/server.ts'], 'npm run dev (json)');
   let cookie = await login('carlos.silva@senac.br');
   for (const route of ['/dashboard','/rooms/available','/bookings/my','/profile','/admin']) {
     const response = await fetch(base + route, { headers: { Cookie: cookie }, redirect: 'manual' });

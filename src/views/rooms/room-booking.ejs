@@ -107,9 +107,8 @@
                           <%= selecionada ? 'sala-selecionada' : '' %>"
                    data-sala-id="<%= s.id %>">
               <input type="radio"
-                     name="salaId"
+                     name="salaChoice"
                      value="<%= s.id %>"
-                     form="booking-form"
                      <%= indisponivel ? 'disabled' : '' %>
                      <%= selecionada ? 'checked' : '' %>>
               <div class="sala-card__head">
@@ -129,7 +128,7 @@
         </div>
       <% } %>
 
-      <form id="booking-form" action="/rooms/booking" method="post">
+      <form id="booking-form" action="/rooms/booking" method="post" data-api-form data-redirect="/bookings/my">
         <div class="form-grid">
           <div class="input-group" style="grid-column: 1 / -1;">
             <label for="book-sala">Ou escolha pela lista</label>

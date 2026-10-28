@@ -24,7 +24,7 @@ npm.cmd run test:browser
 node scripts/runtime-smoke.cjs
 ```
 
-O teste de navegador usa o Microsoft Edge instalado, em modo headless. Testes HTTP, repositories e navegador usam diretórios temporários e não alteram os dados da aplicação.
+O teste de navegador usa o Microsoft Edge instalado, em modo headless, ou o Chromium do Playwright. Para usar o Chromium do sistema no Linux, execute `PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH=/usr/bin/chromium npm run test:browser`. Testes HTTP, repositories e navegador usam diretórios temporários e não alteram os dados da aplicação.
 
 `runtime-smoke.cjs` verifica a inicialização de desenvolvimento e build, login e permissões HTTP
 em JSON temporário. Execute após o build e mantenha a porta 3219 livre.

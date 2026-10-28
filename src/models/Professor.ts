@@ -143,7 +143,7 @@ export class Professor extends Usuario {
     }
 
     // Impede que dados de outro tipo de usuário sejam carregados como professor.
-    if (data.perfil !== 'professor') {
+    if (data.perfil !== undefined && data.perfil !== 'professor') {
       throw new Error('O perfil informado não corresponde a Professor.');
     }
 

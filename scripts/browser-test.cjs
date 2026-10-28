@@ -24,7 +24,7 @@ const { chromium } = require('@playwright/test');
     try {
       browser = await chromium.launch({ channel: 'msedge', headless: true });
     } catch {
-      browser = await chromium.launch({ headless: true });
+      browser = await chromium.launch({ headless: true, ...(process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH ? { executablePath: process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH } : {}) });
     }
     const page = await browser.newPage();
     const errors = [];
@@ -35,7 +35,12 @@ const { chromium } = require('@playwright/test');
     await Promise.all([page.waitForURL('**/dashboard'), page.locator('#submit-btn').click()]);
     assert.equal(await page.locator('#hamburgerBtn').count(), 1);
     assert.match(await page.locator('main').innerText(), /Professor Navegador/);
-    await page.goto(base + '/rooms/booking');
+    await page.goto(base + '/rooms/booking?salaId=s1');
+    assert.equal(await page.locator('#book-sala').inputValue(), 's1');
+    assert.equal(await page.locator('[name=salaChoice][value=s1]').isChecked(), true);
+    await page.locator('#book-sala').selectOption('');
+    await page.locator('[name=salaChoice][value=s1]').check();
+    assert.equal(await page.locator('#book-sala').inputValue(), 's1');
     const form = page.locator('[data-api-form]');
     await form.locator('[name=salaId]').selectOption('s1');
     await form.locator('[name=data]').fill('2099-06-15');

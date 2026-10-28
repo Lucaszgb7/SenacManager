@@ -48,11 +48,9 @@ export function vigente(aula: any, date: string): boolean {
 // Garante formato YYYY-MM-DD e que a data não está no passado
 export function validarDataReserva(data: string): boolean {
   if (!/^\d{4}-\d{2}-\d{2}$/.test(data)) return false;
-  const d = new Date(data + 'T00:00:00');
-  if (isNaN(d.getTime())) return false;
-  const hoje = new Date();
-  hoje.setHours(0, 0, 0, 0);
-  return d >= hoje;
+  const d = new Date(data + 'T12:00:00Z');
+  if (isNaN(d.getTime()) || d.toISOString().slice(0, 10) !== data) return false;
+  return data >= schoolNow().slice(0, 10);
 }
 
 // Garante que o início é estritamente anterior ao fim (comparação lexicográfica de HH:MM)
