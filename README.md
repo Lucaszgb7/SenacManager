@@ -52,6 +52,23 @@ No modo `DB_DRIVER=mysql`, falhas de conexão são informadas ao cliente; não h
 automática para JSON. `DATA_DIR` não altera o driver escolhido. Para usar arquivos locais,
 defina explicitamente `DB_DRIVER=json`.
 
+## Erro Cannot POST /auth/login
+
+A rota de login é `POST /auth/login` e aceita o formulário HTML e JSON. Se aparecer
+`Cannot POST /auth/login`, o servidor atendendo essa porta não registrou a rota.
+Encerre o processo antigo com Ctrl+C antes de atualizar e reiniciar:
+
+```sh
+git pull origin main
+npm ci
+npm run dev
+```
+
+Confira se a porta/endereço aberto no navegador corresponde ao servidor recém-iniciado.
+`npm run dev` e `npm start` recompilam automaticamente antes de iniciar, mantendo
+as rotas e views de `dist` atualizadas. Após essa preparação, `npm run dev` executa
+diretamente `src/server.ts`, com recarga automática.
+
 ## Criar um administrador local
 
 Os cinco usuários de demonstração usam a senha **123456, SOMENTE de desenvolvimento**. Professor: `carlos.silva@senac.br`; administrador: `roberto.ferreira@senac.br`. Troque as senhas antes de qualquer uso real. Para criar outra conta, faça o build e execute:

@@ -2,8 +2,10 @@
   "name": "senac-manager",
   "version": "1.0.0",
   "scripts": {
+    "predev": "npm run build",
     "dev": "tsx watch src/server.ts",
     "build": "node scripts/build.cjs",
+    "prestart": "npm run build",
     "start": "node dist/server.js",
     "test": "jest",
     "lint": "tsc --noEmit",

@@ -45,6 +45,24 @@ test('cadastro n?o permite criar administrador sem autentica??o', async () => {
   cookie = '';
   expect((await request('/auth/registrar', 'POST', { nome: 'Intruso Teste', email: 'intruso@example.com', senha: password, perfil: 'administrador' })).status).toBe(401);
 });
+test('formulário HTML faz POST na rota publicada e mantém a sessão', async () => {
+  const page = await request('/login');
+  expect(page.status).toBe(200);
+  expect(await page.text()).toContain('action="/auth/login"');
+  const response = await fetch(base + '/auth/login', {
+    method: 'POST', redirect: 'manual',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: new URLSearchParams({ email: professor.email, password }),
+  });
+  expect(response.status).toBe(302);
+  expect(response.headers.get('location')).toBe('/dashboard');
+  const sessionCookie = response.headers.get('set-cookie')!.split(';')[0]!;
+  const dashboard = await fetch(base + '/dashboard', {
+    redirect: 'manual', headers: { Cookie: sessionCookie },
+  });
+  expect(dashboard.status).toBe(200);
+  expect(await dashboard.text()).toContain(professor.nome);
+});
 test('login real permite renderizar todas as p?ginas de professor', async () => {
   await login();
   for (const url of ['/dashboard', '/rooms/available', '/rooms/booking', '/bookings/my', '/profile', '/search']) {
