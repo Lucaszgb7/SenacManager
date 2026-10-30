@@ -3,7 +3,7 @@ import 'dotenv/config'; // Carrega as variáveis de ambiente do arquivo .env par
 
 import bcrypt from 'bcryptjs'; // Importa a biblioteca utilizada para gerar hashes seguros de senhas.
 import { initializeSchema } from '../database/schema'; // Importa a função responsável por criar e inicializar a estrutura das tabelas do banco de dados.
-import { getPool, closePool } from '../database/connection'; // Importa as funções para obter o pool de conexões MySQL e encerrá-lo ao final da execução.
+import { getPool, closePool, databaseOptions } from '../database/connection'; // Importa as funções para obter o pool de conexões MySQL e encerrá-lo ao final da execução.
 import { readData as readJson } from '../database/jsonStore'; // Importa a função de leitura dos dados JSON e atribui a ela o nome readJson neste arquivo.
 import { transaction, upsertData } from '../database/mysqlStore'; // Importa as funções para executar transações e inserir ou atualizar registros no MySQL.
 import { Collection } from '../database/types'; // Importa o tipo que define as coleções de dados aceitas pelo sistema.
@@ -22,13 +22,87 @@ const collections: Collection[] = [
 ];
 
 // ---------------------------------------------------------------------
+// Diagnóstico seguro do banco de dados MySQL
+// ---------------------------------------------------------------------
+
+/**
+ * Realiza um diagnóstico seguro e não-destrutivo do banco de dados:
+ * - Não remove dados, tabelas ou volumes.
+ * - Não expõe senhas ou credenciais sensíveis.
+ * - Reporta o status da conexão, tabelas existentes e registros.
+ */
+async function checkDatabase(): Promise<void> {
+  console.log('=== SenacManager — Diagnóstico Seguro do Banco de Dados ===');
+  let opts;
+  try {
+    opts = databaseOptions();
+    console.log(`[Configuração] Host: ${opts.host}:${opts.port} | Banco: ${opts.database} | Usuário: ${opts.user}`);
+  } catch (err: any) {
+    console.log(`[Configuração] Variáveis incompletas: ${err.message}`);
+    console.log('[Status] Fallback ativo: Armazenamento em arquivos JSON locais (src/data/*.json).');
+    return;
+  }
+
+  let conn;
+  try {
+    const pool = getPool();
+    conn = await pool.getConnection();
+    console.log('[Conexão] Conexão com o servidor MySQL estabelecida com sucesso.');
+  } catch (err: any) {
+    console.log(`[Conexão] Não foi possível conectar ao MySQL: ${err.code || err.message}`);
+    console.log('[Status] Fallback ativo: Sistema operando com persistência JSON local (src/data/*.json).');
+    return;
+  }
+
+  try {
+    const [tables]: any = await conn.query(
+      'SELECT TABLE_NAME FROM information_schema.TABLES WHERE TABLE_SCHEMA = ?',
+      [opts.database]
+    );
+    const existingTableNames = new Set(
+      Array.isArray(tables) ? tables.map((t: any) => t.TABLE_NAME || t.table_name) : []
+    );
+
+    const requiredTables = [
+      'usuarios',
+      'salas',
+      'reservas',
+      'aulas_grade',
+      'inscricoes_noa'
+    ];
+
+    console.log('[Tabelas]');
+    let allPresent = true;
+    for (const table of requiredTables) {
+      if (existingTableNames.has(table)) {
+        const [countRes]: any = await conn.query(`SELECT COUNT(*) as total FROM \`${table}\``);
+        const total = countRes[0]?.total ?? 0;
+        console.log(`  ✓ ${table}: presente (${total} registros)`);
+      } else {
+        allPresent = false;
+        console.log(`  ✗ ${table}: ausente`);
+      }
+    }
+
+    if (allPresent) {
+      console.log('[Status] Todas as tabelas necessárias foram encontradas no MySQL.');
+    } else {
+      console.log('[Status] Algumas tabelas estão ausentes. Execute `npm run db:init` para criar a estrutura.');
+    }
+  } finally {
+    if (conn) conn.release();
+  }
+}
+
+// ---------------------------------------------------------------------
 // Função principal de gerenciamento do banco de dados
 // ---------------------------------------------------------------------
 
 /**
  * Executa a operação solicitada pelo terminal.
  *
- * A função aceita três ações:
+ * A função aceita quatro ações:
+ * - check: diagnóstico seguro sem alterações.
  * - init: inicializa a estrutura do banco de dados.
  * - seed: importa dados dos arquivos JSON para o MySQL.
  * - reset: remove as tabelas existentes e recria a estrutura.
@@ -38,9 +112,15 @@ async function main() {
   const action = process.argv[2];
 
   // Verifica se a ação informada corresponde a uma das operações permitidas.
-  if (!['init', 'seed', 'reset'].includes(action || '')) {
+  if (!['init', 'seed', 'reset', 'check'].includes(action || '')) {
     // Interrompe a execução caso a ação seja inválida e informa as opções aceitas.
-    throw new Error('Use init, seed ou reset.');
+    throw new Error('Use check, init, seed ou reset.');
+  }
+
+  // Operação de verificação segura (diagnóstico)
+  if (action === 'check') {
+    await checkDatabase();
+    return;
   }
 
   // ---------------------------------------------------------------------

@@ -10,18 +10,37 @@
   const avatarPreview = document.getElementById('avatar-preview');
 
   if (avatarInput && avatarPreview) {
+    const avatarForm = avatarInput.closest('form');
+    const avatarFeedback = avatarForm ? avatarForm.querySelector('[data-feedback]') : null;
+
+    const setFeedback = (msg) => {
+      if (avatarFeedback) {
+        avatarFeedback.textContent = msg;
+        avatarFeedback.className = 'feedback feedback--error';
+        avatarFeedback.hidden = false;
+      }
+    };
+
+    const clearFeedback = () => {
+      if (avatarFeedback) {
+        avatarFeedback.textContent = '';
+        avatarFeedback.hidden = true;
+      }
+    };
+
     avatarInput.addEventListener('change', function () {
+      clearFeedback();
       const file = this.files && this.files[0];
       if (!file) return;
 
       // Validação rápida no cliente (backend valida novamente)
       if (!file.type.startsWith('image/')) {
-        alert('Selecione um arquivo de imagem.');
+        setFeedback('Selecione um arquivo de imagem válido (JPG, PNG ou WebP).');
         this.value = '';
         return;
       }
       if (file.size > 2 * 1024 * 1024) {
-        alert('A imagem deve ter no máximo 2 MB.');
+        setFeedback('A imagem deve ter no máximo 2 MB.');
         this.value = '';
         return;
       }

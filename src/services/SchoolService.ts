@@ -307,11 +307,10 @@ export async function authenticate(
   const secret = required(password, 'Senha');
 
   /*
-   * Procura um usuário com o e-mail informado
-   * que também esteja ativo.
+   * Procura o usuário com o e-mail informado.
    */
   const u = (await users()).find(
-    u => u.email === target && u.ativo
+    u => u.email === target
   );
 
   /*
@@ -325,6 +324,17 @@ export async function authenticate(
     throw new HttpError(
       401,
       'E-mail ou senha inválidos.'
+    );
+  }
+
+  /*
+   * Verifica se a conta está ativa. Contas desativadas não
+   * podem se autenticar no sistema.
+   */
+  if (u.ativo === false) {
+    throw new HttpError(
+      401,
+      'Esta conta está inativa. Contate a administração.'
     );
   }
 

@@ -39,7 +39,7 @@ app.use(async (req, res, next) => {
   next();
 });
 app.get('/', (_req, res) => { res.redirect('/login'); });
-app.get(['/auth/forgot-password', '/contato'], (_req, res) => {
+app.get(['/auth/forgot-password', '/contato', '/ajuda'], (_req, res) => {
   res.render('auth/help', { title: 'Ajuda de acesso' });
 });
 app.use(authRoutes);

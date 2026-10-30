@@ -90,6 +90,7 @@ authRoutes.get(
 // Define uma rota POST para enviar os dados de autenticação.
 // O controlador verifica as credenciais e executa o processo de login.
 authRoutes.post('/auth/login', AuthController.login);
+authRoutes.post('/login', AuthController.login);
 
 // ---------------------------------------------------------------------
 // Rota para registrar usuários

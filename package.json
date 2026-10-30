@@ -13,7 +13,8 @@
     "test:browser": "npm run build && node scripts/browser-test.cjs",
     "db:init": "node scripts/database.cjs init",
     "db:seed": "node scripts/database.cjs seed",
-    "db:reset": "node scripts/database.cjs reset"
+    "db:reset": "node scripts/database.cjs reset",
+    "db:check": "node scripts/database.cjs check"
   },
   "dependencies": {
     "bcryptjs": "^3.0.3",
