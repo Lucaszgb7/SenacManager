@@ -5,8 +5,18 @@ import { Reserva } from '../../models/Reserva';
 import { ReservaRepository } from '../../repositories/ReservaRepository';
 const reserva = (id: string, inicio = '08:00', fim = '10:00', status: 'confirmada' | 'cancelada' = 'confirmada') => new Reserva('sala-1', 'prof-1', 'TI', 'A', '2025-06-10', inicio, fim, status, id);
 let directory: string;
-beforeEach(async () => { directory = await fs.mkdtemp(path.join(os.tmpdir(), 'senac-reservas-')); process.env.DATA_DIR = directory; });
-afterEach(async () => { delete process.env.DATA_DIR; await fs.rm(directory, { recursive: true, force: true }); });
+const savedDriver = process.env.DB_DRIVER;
+beforeEach(async () => {
+  directory = await fs.mkdtemp(path.join(os.tmpdir(), 'senac-reservas-'));
+  process.env.DATA_DIR = directory;
+  process.env.DB_DRIVER = 'json';
+});
+afterEach(async () => {
+  delete process.env.DATA_DIR;
+  if (savedDriver === undefined) delete process.env.DB_DRIVER;
+  else process.env.DB_DRIVER = savedDriver;
+  await fs.rm(directory, { recursive: true, force: true });
+});
 async function seed(rows: Reserva[]) { await fs.writeFile(path.join(directory, 'reservas.json'), JSON.stringify(rows.map(r => r.toJSON()))); }
 describe('ReservaRepository', () => {
   it('lista e filtra reservas persistidas', async () => {

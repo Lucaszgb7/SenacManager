@@ -27,13 +27,17 @@ app.use(async (req, res, next) => {
   res.locals.perfil = 'aluno';
   res.locals.paginaAtual = ({ '/dashboard': 'dashboard', '/rooms/available': 'rooms-available', '/rooms/booking': 'rooms-booking', '/bookings/my': 'bookings-my', '/profile': 'profile', '/search': 'search', '/noa': 'noa', '/admin': 'admin' } as Record<string, string>)[req.path] || '';
   if (req.session.usuario) {
-    const user = await findUser(req.session.usuario.id);
-    if (!user || !user.ativo) {
-      delete req.session.usuario;
-    } else {
-      req.session.usuario = { id: user.id, nome: user.nome, email: user.email, perfil: user.perfil };
-      res.locals.usuario = safeUser(user);
-      res.locals.perfil = user.perfil;
+    try {
+      const user = await findUser(req.session.usuario.id);
+      if (!user || !user.ativo) {
+        delete req.session.usuario;
+      } else {
+        req.session.usuario = { id: user.id, nome: user.nome, email: user.email, perfil: user.perfil };
+        res.locals.usuario = safeUser(user);
+        res.locals.perfil = user.perfil;
+      }
+    } catch (err) {
+      return next(err);
     }
   }
   next();

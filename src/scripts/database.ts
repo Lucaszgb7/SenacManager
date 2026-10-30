@@ -39,7 +39,11 @@ async function checkDatabase(): Promise<void> {
     console.log(`[Configuração] Host: ${opts.host}:${opts.port} | Banco: ${opts.database} | Usuário: ${opts.user}`);
   } catch (err: any) {
     console.log(`[Configuração] Variáveis incompletas: ${err.message}`);
-    console.log('[Status] Fallback ativo: Armazenamento em arquivos JSON locais (src/data/*.json).');
+    if (process.env.DB_DRIVER === 'mysql') {
+      console.log('[Status] DB_DRIVER=mysql configurado: a aplicação exigirá MySQL válido e não usará JSON como alternativa.');
+    } else {
+      console.log('[Status] Armazenamento configurado em arquivos JSON locais (src/data/*.json).');
+    }
     return;
   }
 
@@ -50,7 +54,11 @@ async function checkDatabase(): Promise<void> {
     console.log('[Conexão] Conexão com o servidor MySQL estabelecida com sucesso.');
   } catch (err: any) {
     console.log(`[Conexão] Não foi possível conectar ao MySQL: ${err.code || err.message}`);
-    console.log('[Status] Fallback ativo: Sistema operando com persistência JSON local (src/data/*.json).');
+    if (process.env.DB_DRIVER === 'mysql') {
+      console.log('[Status] DB_DRIVER=mysql ativo: sistema apresentará erro controlado (503) em vez de gravar silenciosamente em JSON.');
+    } else {
+      console.log('[Status] DB_DRIVER=json ativo: sistema operando com persistência em arquivos JSON locais.');
+    }
     return;
   }
 

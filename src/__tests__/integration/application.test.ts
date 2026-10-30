@@ -21,9 +21,11 @@ async function login(email = professor.email) {
   expect(res.status).toBe(302);
   cookie = res.headers.get('set-cookie')!.split(';')[0]!;
 }
+const savedDriver = process.env.DB_DRIVER;
 beforeAll(async () => {
   directory = await fs.mkdtemp(path.join(os.tmpdir(), 'senac-test-'));
   process.env.DATA_DIR = directory;
+  process.env.DB_DRIVER = 'json';
   process.env.AVATAR_DIR = path.join(directory, 'avatars');
   const senhaHash = await bcrypt.hash(password, 4);
   await fs.writeFile(path.join(directory, 'usuarios.json'), JSON.stringify([professor, admin, aluno].map(u => ({ ...u, senhaHash }))));
@@ -40,6 +42,8 @@ afterAll(async () => {
   if (directory) await fs.rm(directory, { recursive: true, force: true });
   delete process.env.DATA_DIR;
   delete process.env.AVATAR_DIR;
+  if (savedDriver === undefined) delete process.env.DB_DRIVER;
+  else process.env.DB_DRIVER = savedDriver;
 });
 test('cadastro n?o permite criar administrador sem autentica??o', async () => {
   cookie = '';
@@ -221,3 +225,41 @@ test('edição administrativa preserva referências e bloqueia autoexclusão', a
   expect((await request('/admin/salas/edit?id=sala-1')).status).toBe(200);
   expect((await request('/admin/aulas-grade/edit')).status).toBe(200);
 });
+
+test('login com senha incorreta responde 401 e não 500', async () => {
+  cookie = '';
+  const res = await request('/auth/login', 'POST', { email: professor.email, password: 'senha-errada' });
+  expect(res.status).toBe(401);
+  const data = await res.json() as any;
+  expect(data.message).toContain('E-mail ou senha inválidos');
+});
+
+test('login de conta desativada informa que a conta está inativa', async () => {
+  await login(admin.email);
+  await request('/admin/usuarios/' + aluno.id, 'PUT', { ...aluno, ativo: false });
+  cookie = '';
+  const res = await request('/auth/login', 'POST', { email: aluno.email, password });
+  expect(res.status).toBe(401);
+  const data = await res.json() as any;
+  expect(data.message).toContain('Esta conta está inativa');
+  await login(admin.email);
+  await request('/admin/usuarios/' + aluno.id, 'PUT', aluno);
+});
+
+test('login com erro de conexão com o banco responde 503 e não confunde com senha incorreta', async () => {
+  cookie = '';
+  const schoolService = require('../../services/SchoolService');
+  const authenticateSpy = jest.spyOn(schoolService, 'authenticate').mockRejectedValueOnce(
+    Object.assign(new Error('connect ECONNREFUSED 127.0.0.1:3306'), { code: 'ECONNREFUSED', status: 503 })
+  );
+  try {
+    const res = await request('/auth/login', 'POST', { email: professor.email, password });
+    expect(res.status).toBe(503);
+    const data = await res.json() as any;
+    expect(data.message).toContain('Banco de dados indisponível');
+    expect(data.message).not.toContain('senha');
+  } finally {
+    authenticateSpy.mockRestore();
+  }
+});
+

@@ -5,6 +5,9 @@ import { UsuarioRepository } from '../repositories/UsuarioRepository';
 import { Professor } from '../models/Professor';
 import { Aluno } from '../models/Aluno';
 import { Administrador } from '../models/Administrador';
+import { authenticate } from '../services/SchoolService';
+import { HttpError } from '../services/validation';
+import { DatabaseError } from '../services/store';
 
 /**
  * Detecta se a requisição provém de uma chamada de API (JSON/fetch)
@@ -40,9 +43,9 @@ function responderErro(req: Request, res: Response, status: number, mensagem: st
 export class AuthController {
   /**
    * Realiza a autenticação do usuário.
-   * Valida credenciais com bcrypt, checa se a conta está ativa,
-   * renova o identificador da sessão (prevenção contra Session Fixation)
-   * e persiste a sessão antes de efetuar o redirecionamento ou responder em JSON.
+   * Centraliza a validação das credenciais com o SchoolService.authenticate,
+   * prevenindo duplicação de regras e garantindo que falhas de conexão
+   * com o banco não sejam confundidas com credenciais inválidas.
    */
   async login(req: Request, res: Response): Promise<void> {
     try {
@@ -57,30 +60,15 @@ export class AuthController {
         return;
       }
 
-      const emailLimpo = String(email).trim().toLowerCase();
-      const senhaLimpa = String(password);
-
-      const usuarioRepository = new UsuarioRepository();
-      const usuario = await usuarioRepository.buscarPorEmail(emailLimpo);
-
-      if (!usuario) {
-        responderErro(req, res, 401, 'E-mail ou senha inválidos');
-        return;
-      }
-
-      const senhaValida = await bcrypt.compare(
-        senhaLimpa,
-        usuario.senhaHash
-      );
-
-      if (!senhaValida) {
-        responderErro(req, res, 401, 'E-mail ou senha inválidos');
-        return;
-      }
-
-      if (usuario.ativo === false) {
-        responderErro(req, res, 401, 'Esta conta está inativa. Contate a administração.');
-        return;
+      let usuario;
+      try {
+        usuario = await authenticate(email, password);
+      } catch (authErr: any) {
+        if (authErr instanceof HttpError) {
+          responderErro(req, res, authErr.status, authErr.message);
+          return;
+        }
+        throw authErr;
       }
 
       const dadosUsuario = {
@@ -115,8 +103,22 @@ export class AuthController {
           res.redirect('/dashboard');
         });
       });
-    } catch (err) {
+    } catch (err: any) {
       console.error('[AuthController.login] Erro inesperado:', err);
+      const isDbError =
+        err instanceof DatabaseError ||
+        err?.status === 503 ||
+        err?.code === 'ECONNREFUSED' ||
+        err?.code === 'ETIMEDOUT' ||
+        err?.code === 'ENOTFOUND' ||
+        err?.message?.includes('Banco de dados indisponível') ||
+        err?.message?.includes('Configuração MySQL incompleta');
+
+      if (isDbError) {
+        responderErro(req, res, 503, 'Banco de dados indisponível. Tente novamente mais tarde.');
+        return;
+      }
+
       responderErro(req, res, 500, 'Erro interno. Tente novamente mais tarde.');
     }
   }
