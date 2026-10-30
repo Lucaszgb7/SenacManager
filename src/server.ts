@@ -4,7 +4,7 @@ import { getPool } from './database/connection';
 
 async function startServer(): Promise<void> {
   const envPort = Number(process.env.PORT);
-  const port = (!envPort || envPort === 8080) ? 3000 : envPort;
+  const port = envPort && envPort !== 8080 ? envPort : 3000;
   if (!Number.isInteger(port) || port < 1 || port > 65535) {
     throw new Error('PORT inválida.');
   }

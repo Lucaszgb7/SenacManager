@@ -223,6 +223,21 @@
   color: var(--color-text);
 }
 
+.demo-accounts .link-btn {
+  background: none;
+  border: none;
+  padding: 0;
+  color: var(--color-primary);
+  cursor: pointer;
+  text-decoration: underline;
+  font-size: inherit;
+  font-family: inherit;
+}
+
+.demo-accounts .link-btn:hover {
+  color: var(--color-primary-dark, #0056A8);
+}
+
 @media (max-width: 480px) {
   .login-card {
     padding: 30px 20px 24px;

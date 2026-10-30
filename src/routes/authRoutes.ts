@@ -112,6 +112,8 @@ authRoutes.post(
 // Define uma rota POST para encerrar a sessão de autenticação.
 // O controlador é responsável por executar o processo de logout.
 authRoutes.post('/auth/logout', AuthController.logout);
+authRoutes.get('/auth/logout', AuthController.logout);
+authRoutes.all('/logout', AuthController.logout);
 
 // ---------------------------------------------------------------------
 // Exportação das rotas

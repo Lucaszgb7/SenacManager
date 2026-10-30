@@ -2,5 +2,7 @@
   "name": "SenacManager",
   "description": "Sistema de gestão acadêmica e reserva de salas do Senac",
   "permissions": [],
-  "capabilities": []
+  "capabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
 }

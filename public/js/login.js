@@ -115,4 +115,12 @@
     submitBtn.textContent = 'Entrando...';
     // O submit segue naturalmente (POST /auth/login)
   });
+
+  window.fillLogin = (email, password) => {
+    emailInput.value = email;
+    passwordInput.value = password;
+    clearError(emailInput);
+    clearError(passwordInput);
+    emailInput.focus();
+  };
 })();

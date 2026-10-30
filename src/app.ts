@@ -12,7 +12,15 @@ import { errorMiddleware } from './middlewares/errorMiddleware';
 import { findUser, safeUser } from './services/SchoolService';
 const app = express();
 app.disable('x-powered-by');
-app.set('trust proxy', process.env.TRUST_PROXY === '0' ? false : 1);
+const trustProxyEnv = process.env.TRUST_PROXY;
+const trustProxy = trustProxyEnv === '0'
+  ? false
+  : trustProxyEnv === 'true'
+    ? true
+    : trustProxyEnv && !isNaN(Number(trustProxyEnv))
+      ? Number(trustProxyEnv)
+      : 1;
+app.set('trust proxy', trustProxy);
 app.set('view engine', 'ejs');
 // O código compilado também pode usar os templates de origem se dist/views não existir.
 app.set('views', [path.join(__dirname, 'views'), path.resolve(__dirname, '../src/views')]);
