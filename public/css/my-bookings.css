@@ -1,19 +1,20 @@
 /* ============================================================
    SenacManager — my-bookings.css
    Listagem e gerenciamento de reservas do professor
+   Design inspirado na identidade visual SenacManager
    ============================================================ */
 
 .bookings-grid {
-  display: grid;
-  grid-template-columns: 1fr;
+  display: flex;
+  flex-direction: column;
   gap: 16px;
 }
 
 .booking-item-card {
-  background: #FFFFFF;
-  border-radius: var(--radius-lg);
-  border: 1px solid var(--color-border);
-  box-shadow: var(--shadow-sm);
+  background: var(--color-surface, #FFFFFF);
+  border-radius: var(--radius-lg, 16px);
+  border: 1px solid var(--color-border, #E2E8F0);
+  box-shadow: var(--shadow-sm, 0 1px 3px rgba(0,0,0,0.06));
   padding: 22px 24px;
   display: flex;
   align-items: center;
@@ -25,12 +26,14 @@
 
 .booking-item-card:hover {
   border-color: #CBD5E1;
-  box-shadow: var(--shadow-md);
+  box-shadow: var(--shadow-md, 0 4px 14px rgba(0,0,0,0.08));
+  transform: translateY(-1px);
 }
 
 .booking-item-card--cancelada {
-  opacity: 0.7;
+  opacity: 0.65;
   background-color: #F8FAFC;
+  border-color: #E2E8F0;
 }
 
 .booking-item-card__left {
@@ -46,44 +49,49 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  width: 64px;
-  height: 64px;
-  background: var(--color-primary-light);
-  border-radius: var(--radius-md);
-  color: var(--color-primary-dark);
+  width: 68px;
+  height: 68px;
+  background: var(--color-primary-soft, #EAF2FF);
+  border-radius: var(--radius-md, 12px);
+  color: var(--color-primary, #0649B8);
   font-weight: 700;
   line-height: 1.1;
   flex-shrink: 0;
-  border: 1px solid #BFDBFE;
+  border: 1.5px solid rgba(6, 73, 184, 0.2);
 }
 
 .booking-date-badge__day {
-  font-size: 1.25rem;
+  font-family: var(--font-heading, "Space Grotesk", sans-serif);
+  font-size: 1.4rem;
+  font-weight: 800;
 }
 
 .booking-date-badge__month {
-  font-size: 0.7rem;
+  font-size: 0.72rem;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.08em;
+  font-weight: 700;
+  opacity: 0.85;
 }
 
 .booking-item-card__content {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 6px;
   min-width: 0;
 }
 
 .booking-item-card__title {
   margin: 0;
-  font-size: 1.05rem;
+  font-family: var(--font-heading, "Space Grotesk", sans-serif);
+  font-size: 1.15rem;
   font-weight: 700;
-  color: var(--color-navy);
+  color: var(--color-text, #211D1D);
 }
 
 .booking-item-card__meta {
-  font-size: 0.85rem;
-  color: var(--color-text-secondary);
+  font-size: 0.88rem;
+  color: var(--color-muted, #62656B);
   display: flex;
   align-items: center;
   gap: 8px;
@@ -97,15 +105,16 @@
   flex-shrink: 0;
 }
 
-@media (max-width: 680px) {
+@media (max-width: 720px) {
   .booking-item-card {
     flex-direction: column;
     align-items: flex-start;
   }
+
   .booking-item-card__right {
     width: 100%;
     justify-content: space-between;
-    padding-top: 12px;
-    border-top: 1px solid var(--color-border);
+    padding-top: 14px;
+    border-top: 1px dashed var(--color-border, #E2E8F0);
   }
 }

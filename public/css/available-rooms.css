@@ -1,15 +1,15 @@
 /* ============================================================
    SenacManager — available-rooms.css
-   Catálogo moderno de salas com filtros em tempo real
+   Catálogo Educacional de Salas e Laboratórios
    ============================================================ */
 
 .rooms-toolbar-card {
   background: #FFFFFF;
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius-md);
   border: 1px solid var(--color-border);
-  box-shadow: var(--shadow-sm);
-  padding: 16px 20px;
-  margin-bottom: 24px;
+  box-shadow: var(--shadow-card);
+  padding: 20px 24px;
+  margin-bottom: 26px;
 }
 
 .rooms-filter-form {
@@ -42,26 +42,26 @@
 
 .room-card {
   background: #FFFFFF;
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius-md);
   border: 1px solid var(--color-border);
-  box-shadow: var(--shadow-sm);
+  box-shadow: var(--shadow-card);
   padding: 24px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  transition: all 0.2s ease;
+  transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
   position: relative;
 }
 
 .room-card:hover {
   transform: translateY(-2px);
   box-shadow: var(--shadow-md);
-  border-color: #CBD5E1;
+  border-color: var(--color-border-strong);
 }
 
 .room-card--inativa {
-  opacity: 0.75;
-  background-color: #F8FAFC;
+  opacity: 0.72;
+  background: #FAFAFC;
 }
 
 .room-card__header {
@@ -69,67 +69,73 @@
   align-items: flex-start;
   justify-content: space-between;
   gap: 12px;
-  margin-bottom: 12px;
+  margin-bottom: 14px;
 }
 
-.room-card-name {
+.room-card__name {
+  font-family: var(--font-heading);
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--color-dark);
   margin: 0;
-  font-size: 1.15rem;
-  font-weight: 700;
-  color: var(--color-navy);
+  line-height: 1.2;
 }
 
-.room-card__meta {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  font-size: 0.85rem;
-  color: var(--color-text-secondary);
-  margin-bottom: 16px;
-  flex-wrap: wrap;
-}
-
-.room-card__capacity {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  background: #F1F5F9;
-  padding: 4px 8px;
-  border-radius: var(--radius-xs);
-  font-weight: 600;
-  color: var(--color-text);
-  font-size: 0.78rem;
-}
-
-/* Ocupação Atual */
-.room-card__occupancy {
-  background: #FFFBEB;
-  border: 1px solid #FDE68A;
-  border-radius: var(--radius-sm);
-  padding: 10px 14px;
-  margin-bottom: 18px;
+.room-card__location {
   font-size: 0.82rem;
-  color: #92400E;
-}
-
-.room-card__occupancy-title {
-  font-weight: 700;
-  margin-bottom: 2px;
+  color: var(--color-muted);
   display: flex;
   align-items: center;
   gap: 6px;
+  margin-top: 4px;
 }
 
-.room-card__occupancy-time {
-  font-weight: 600;
-  color: #B45309;
+.room-card__details {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin: 16px 0 20px;
+  padding: 14px 0;
+  border-top: 1px solid var(--color-border-subtle);
+  border-bottom: 1px solid var(--color-border-subtle);
 }
 
-.room-card__actions {
-  margin-top: auto;
-  padding-top: 14px;
-  border-top: 1px solid var(--color-border);
+.room-card__stat {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  font-size: 0.86rem;
+  color: var(--color-muted);
+}
+
+.room-card__stat-value {
+  font-weight: 700;
+  color: var(--color-dark);
+}
+
+/* Lista de Recursos / Tags */
+.room-card__resources {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.resource-pill {
+  font-size: 0.74rem;
+  font-weight: 600;
+  color: var(--color-primary);
+  background: var(--color-primary-soft);
+  padding: 3px 9px;
+  border-radius: var(--radius-pill);
+}
+
+.room-card__footer {
+  margin-top: auto;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.room-card__footer .btn {
+  width: 100%;
 }

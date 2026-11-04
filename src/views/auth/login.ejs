@@ -1,169 +1,352 @@
-
 <!DOCTYPE html>
 <html lang="pt-BR">
 <%- include('../partials/head', { title: 'Entrar', pageCss: 'login.css' }) %>
 
 <body class="login-page">
-  <main class="login-container">
-    <section class="card login-card">
+  <div class="login-wrapper">
 
-      <!-- Cabeçalho do SenacManager -->
-      <header class="login-brand">
-        <h1 class="login-brand__name">SenacManager</h1>
-        <p class="login-brand__tagline">
-          Organize aulas, salas e horários em um só lugar
+    <!-- LADO ESQUERDO: Apresentação e Identidade Visual (Inspirado no PDF) -->
+    <aside class="login-hero">
+      <div class="login-hero__content">
+        <!-- Badge institucional -->
+        <div class="login-hero__brand">
+          <div class="login-hero__logo-box">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
+              <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+            </svg>
+          </div>
+          <span class="login-hero__brand-name">SENAC<span>MANAGER</span></span>
+        </div>
+
+        <h1 class="login-hero__title">
+          A educação mais organizada começa aqui.
+        </h1>
+
+        <p class="login-hero__text">
+          Uma plataforma intuitiva para simplificar a rotina acadêmica: organize salas, consulte a grade vigente e acesse atividades escolares em um só lugar.
         </p>
-      </header>
 
-      <!-- Mensagem de erro enviada pelo servidor -->
-      <% if (typeof error !== 'undefined' && error) { %>
-        <div class="login-alert" role="alert">
-          <%= error %>
+        <!-- Ilustração SVG em estilo traço à mão livre do PDF -->
+        <div class="login-hero__illustration" aria-hidden="true">
+          <svg viewBox="0 0 460 320" fill="none" xmlns="http://www.w3.org/2000/svg" class="doodle-illustration">
+            <!-- Círculo azul de fundo (como nos slides 4, 7 e 8) -->
+            <circle cx="280" cy="180" r="100" fill="#EAF2FF" />
+            <circle cx="340" cy="220" r="45" fill="#0649B8" />
+
+            <!-- Grade de quadros / cards flutuantes (como no slide 1) -->
+            <rect x="22" y="32" width="76" height="52" rx="8" fill="#FFFFFF" stroke="#211D1D" stroke-width="2.5" stroke-dasharray="4 4" />
+            <circle cx="44" cy="58" r="4" fill="#0649B8" />
+            <line x1="56" y1="58" x2="84" y2="58" stroke="#211D1D" stroke-width="2.5" stroke-linecap="round" />
+
+            <rect x="110" y="20" width="80" height="54" rx="8" fill="#FFFFFF" stroke="#211D1D" stroke-width="2.5" />
+            <circle cx="130" cy="46" r="3" fill="#211D1D" />
+            <circle cx="142" cy="46" r="3" fill="#211D1D" />
+            <circle cx="154" cy="46" r="3" fill="#0649B8" />
+
+            <!-- Lâmpada de ideia com traços pretos e amarelo vibrante (como nos slides 3 e 5) -->
+            <g transform="translate(195, 30)">
+              <!-- Brilho amarelo -->
+              <circle cx="32" cy="32" r="26" fill="#FFD84D" opacity="0.95" />
+              <!-- Traços da lâmpada -->
+              <path d="M22 42C17 38 14 31 14 24C14 14 22 6 32 6C42 6 50 14 50 24C50 31 47 38 42 42V48H22V42Z" fill="#FFFFFF" stroke="#211D1D" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />
+              <path d="M24 48H40V52C40 54 38 56 36 56H28C26 56 24 54 24 52V48Z" fill="#211D1D" />
+              <!-- Filamento -->
+              <path d="M28 26L32 20L36 26" stroke="#211D1D" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
+              <!-- Raios de luz desenhados à mão -->
+              <line x1="32" y1="-4" x2="32" y2="1" stroke="#211D1D" stroke-width="3" stroke-linecap="round" />
+              <line x1="52" y1="4" x2="48" y2="9" stroke="#211D1D" stroke-width="3" stroke-linecap="round" />
+              <line x1="62" y1="24" x2="56" y2="24" stroke="#211D1D" stroke-width="3" stroke-linecap="round" />
+              <line x1="12" y1="4" x2="16" y2="9" stroke="#211D1D" stroke-width="3" stroke-linecap="round" />
+              <line x1="2" y1="24" x2="8" y2="24" stroke="#211D1D" stroke-width="3" stroke-linecap="round" />
+            </g>
+
+            <!-- Personagem 1: Estudante desenhado à mão apontando para a lâmpada (slides 3 e 5) -->
+            <g transform="translate(40, 110)">
+              <!-- Cabeça -->
+              <circle cx="70" cy="50" r="34" fill="#FFFFFF" stroke="#211D1D" stroke-width="3.5" />
+              <!-- Olhos e sorriso simples -->
+              <circle cx="62" cy="44" r="3.5" fill="#211D1D" />
+              <circle cx="76" cy="44" r="3.5" fill="#211D1D" />
+              <path d="M60 56C64 61 74 61 78 56" stroke="#211D1D" stroke-width="3" stroke-linecap="round" />
+              <!-- Cabelo / mecha simples -->
+              <path d="M50 30C58 20 78 18 88 28" stroke="#211D1D" stroke-width="3" stroke-linecap="round" />
+
+              <!-- Braço apontando para cima -->
+              <path d="M96 86C108 80 120 60 126 36L130 18" stroke="#211D1D" stroke-width="4.5" stroke-linecap="round" />
+              <!-- Dedo indicador levantado -->
+              <path d="M130 18C132 10 138 12 138 18L136 30" stroke="#211D1D" stroke-width="3.5" stroke-linecap="round" />
+
+              <!-- Corpo / ombros -->
+              <path d="M42 98C46 80 62 76 74 76C86 76 102 82 106 98L114 170H32L42 98Z" fill="#FFFFFF" stroke="#211D1D" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" />
+              <!-- Detalhe da gola -->
+              <path d="M66 76L74 90L82 76" stroke="#211D1D" stroke-width="3" stroke-linecap="round" />
+            </g>
+
+            <!-- Personagem 2: Estudante lendo livro aberto (slide 4) -->
+            <g transform="translate(220, 140)">
+              <!-- Cabeça -->
+              <circle cx="85" cy="40" r="30" fill="#FFFFFF" stroke="#211D1D" stroke-width="3.5" />
+              <!-- Olhos atentos para o livro e sorriso -->
+              <circle cx="78" cy="38" r="3" fill="#211D1D" />
+              <circle cx="92" cy="38" r="3" fill="#211D1D" />
+              <path d="M80 50C84 53 90 53 94 50" stroke="#211D1D" stroke-width="2.8" stroke-linecap="round" />
+              <!-- Cabelo -->
+              <path d="M64 26C74 12 96 14 104 28" stroke="#211D1D" stroke-width="3" stroke-linecap="round" />
+
+              <!-- Braços segurando o livro -->
+              <path d="M50 96L24 106" stroke="#211D1D" stroke-width="4" stroke-linecap="round" />
+              <path d="M110 96L126 106" stroke="#211D1D" stroke-width="4" stroke-linecap="round" />
+
+              <!-- Livro aberto em perspectiva (traço à mão livre) -->
+              <g transform="translate(14, 95)">
+                <!-- Páginas do livro -->
+                <path d="M10 16C36 8 58 12 68 24C78 12 100 8 126 16L120 56C96 48 76 52 68 62C60 52 40 48 16 56L10 16Z" fill="#FFFFFF" stroke="#211D1D" stroke-width="3" stroke-linejoin="round" />
+                <line x1="68" y1="24" x2="68" y2="62" stroke="#211D1D" stroke-width="2.5" />
+                <!-- Linhas de texto nas páginas -->
+                <line x1="24" y1="28" x2="54" y2="24" stroke="#0649B8" stroke-width="2" stroke-linecap="round" />
+                <line x1="22" y1="36" x2="56" y2="32" stroke="#211D1D" stroke-width="2" stroke-linecap="round" />
+                <line x1="82" y1="24" x2="112" y2="28" stroke="#0649B8" stroke-width="2" stroke-linecap="round" />
+                <line x1="80" y1="32" x2="114" y2="36" stroke="#211D1D" stroke-width="2" stroke-linecap="round" />
+              </g>
+
+              <!-- Corpo do estudante lendo -->
+              <path d="M60 76C68 68 96 68 104 76L116 140H48L60 76Z" fill="#FFFFFF" stroke="#211D1D" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" />
+            </g>
+
+            <!-- Pilha de cadernos / livros embaixo com toque amarelo (slide 8) -->
+            <g transform="translate(320, 240)">
+              <rect x="0" y="16" width="90" height="16" rx="4" fill="#FFFFFF" stroke="#211D1D" stroke-width="2.5" />
+              <rect x="10" y="0" width="86" height="16" rx="4" fill="#FFD84D" stroke="#211D1D" stroke-width="2.5" />
+              <rect x="4" y="-16" width="84" height="16" rx="4" fill="#0649B8" stroke="#211D1D" stroke-width="2.5" />
+            </g>
+          </svg>
         </div>
-      <% } %>
 
-      <!-- Formulário de autenticação -->
-      <form
-        id="login-form"
-        class="login-form"
-        method="POST"
-        action="/auth/login"
-        novalidate
-      >
-        <!-- Campo de e-mail -->
-        <div class="input-group">
-          <label for="email">E-mail</label>
-          <input
-            type="email"
-            id="email"
-            name="email"
-            placeholder="seu.email@senac.com"
-            autocomplete="email"
-            required
-          />
-          <span class="error-message" data-error-for="email"></span>
+        <!-- Pilares rápidos / Badges -->
+        <div class="login-hero__tags">
+          <span class="hero-tag">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            Reserva de Salas
+          </span>
+          <span class="hero-tag">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            Grade de Aulas
+          </span>
+          <span class="hero-tag hero-tag--accent">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            Atividades NOA
+          </span>
         </div>
+      </div>
+    </aside>
 
-        <!-- Campo de senha e botão de visibilidade -->
-        <div class="input-group">
-          <label for="password">Senha</label>
+    <!-- LADO DIREITO: Formulário de Autenticação -->
+    <main class="login-main">
+      <section class="login-card">
 
-          <div class="password-wrapper">
-            <input
-              type="password"
-              id="password"
-              name="password"
-              placeholder="Digite sua senha"
-              autocomplete="current-password"
-              required
-            />
+        <!-- Cabeçalho do Card -->
+        <header class="login-card__header">
+          <span class="login-card__badge">Acesso ao Sistema</span>
+          <h2 class="login-card__title">Entre na sua conta</h2>
+          <p class="login-card__subtitle">
+            Informe suas credenciais institucionais para continuar.
+          </p>
+        </header>
 
-            <button
-              type="button"
-              class="password-toggle"
-              id="toggle-password"
-              aria-label="Mostrar senha"
-              aria-pressed="false"
-            >
-              <!-- Ícone de senha visível -->
-              <svg
-                id="icon-eye"
-                xmlns="http://www.w3.org/2000/svg"
-                width="20"
-                height="20"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              >
-                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-                <circle cx="12" cy="12" r="3"></circle>
+        <!-- Mensagem de erro enviada pelo servidor -->
+        <% if (typeof error !== 'undefined' && error) { %>
+          <div class="login-alert" role="alert">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <circle cx="12" cy="12" r="10"/>
+              <line x1="12" y1="8" x2="12" y2="12"/>
+              <line x1="12" y1="16" x2="12.01" y2="16"/>
+            </svg>
+            <span><%= error %></span>
+          </div>
+        <% } %>
+
+        <!-- Formulário de autenticação -->
+        <form
+          id="login-form"
+          class="login-form"
+          method="POST"
+          action="/auth/login"
+          novalidate
+        >
+          <!-- Campo de e-mail -->
+          <div class="input-group">
+            <label for="email">E-mail institucional</label>
+            <div class="input-icon-wrapper">
+              <svg class="input-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+                <polyline points="22,6 12,13 2,6"/>
               </svg>
-
-              <!-- Ícone de senha oculta -->
-              <svg
-                id="icon-eye-off"
-                xmlns="http://www.w3.org/2000/svg"
-                width="20"
-                height="20"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                style="display: none"
-              >
-                <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
-                <line x1="1" y1="1" x2="23" y2="23"></line>
-              </svg>
-            </button>
+              <input
+                type="email"
+                id="email"
+                name="email"
+                placeholder="nome.sobrenome@senac.br"
+                autocomplete="email"
+                required
+              />
+            </div>
+            <span class="error-message" data-error-for="email"></span>
           </div>
 
-          <span class="error-message" data-error-for="password"></span>
+          <!-- Campo de senha e botão de visibilidade -->
+          <div class="input-group">
+            <label for="password">Senha de acesso</label>
+
+            <div class="password-wrapper">
+              <div class="input-icon-wrapper" style="width: 100%;">
+                <svg class="input-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+                  <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                </svg>
+                <input
+                  type="password"
+                  id="password"
+                  name="password"
+                  placeholder="Digite sua senha"
+                  autocomplete="current-password"
+                  required
+                />
+              </div>
+
+              <button
+                type="button"
+                class="password-toggle"
+                id="toggle-password"
+                aria-label="Mostrar senha"
+                aria-pressed="false"
+              >
+                <!-- Ícone de senha visível -->
+                <svg
+                  id="icon-eye"
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="19"
+                  height="19"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                  <circle cx="12" cy="12" r="3"></circle>
+                </svg>
+
+                <!-- Ícone de senha oculta -->
+                <svg
+                  id="icon-eye-off"
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="19"
+                  height="19"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  style="display: none"
+                >
+                  <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
+                  <line x1="1" y1="1" x2="23" y2="23"></line>
+                </svg>
+              </button>
+            </div>
+
+            <span class="error-message" data-error-for="password"></span>
+          </div>
+
+          <!-- Opções adicionais do login -->
+          <div class="login-form__row">
+            <label class="checkbox-group" for="remember">
+              <input
+                type="checkbox"
+                id="remember"
+                name="remember"
+                value="1"
+              />
+              <span>Manter conectado</span>
+            </label>
+
+            <a href="/auth/forgot-password" class="link">
+              Esqueci minha senha
+            </a>
+          </div>
+
+          <!-- Botão de autenticação -->
+          <button
+            type="submit"
+            id="submit-btn"
+            class="btn btn-primary login-form__submit"
+          >
+            Entrar no SenacManager
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+              <polyline points="12 5 19 12 12 19"></polyline>
+            </svg>
+          </button>
+        </form>
+
+        <!-- Painel de Contas de Demonstração (1 clique para testar) -->
+        <div class="demo-accounts">
+          <div class="demo-accounts__header">
+            <span class="demo-accounts__spark" aria-hidden="true">💡</span>
+            <span class="demo-accounts__title">Acesso Rápido de Teste (Senha: 123456):</span>
+          </div>
+          <div class="demo-accounts__chips">
+            <button
+              type="button"
+              class="demo-chip demo-chip--admin"
+              onclick="fillLogin('roberto.ferreira@senac.br','123456')"
+              title="Preencher login de Administrador"
+            >
+              <span class="demo-chip__role">Admin</span>
+              <span class="demo-chip__name">Roberto</span>
+            </button>
+            <button
+              type="button"
+              class="demo-chip demo-chip--prof"
+              onclick="fillLogin('carlos.silva@senac.br','123456')"
+              title="Preencher login de Professor"
+            >
+              <span class="demo-chip__role">Professor</span>
+              <span class="demo-chip__name">Carlos</span>
+            </button>
+            <button
+              type="button"
+              class="demo-chip demo-chip--aluno"
+              onclick="fillLogin('joao.almeida@aluno.senac.br','123456')"
+              title="Preencher login de Aluno"
+            >
+              <span class="demo-chip__role">Aluno</span>
+              <span class="demo-chip__name">João</span>
+            </button>
+          </div>
         </div>
 
-        <!-- Opções adicionais do login -->
-        <div class="login-form__row">
-          <label class="checkbox-group" for="remember">
-            <input
-              type="checkbox"
-              id="remember"
-              name="remember"
-              value="1"
-            />
-            Lembrar-me
-          </label>
+        <!-- Links de rodapé -->
+        <footer class="login-footer">
+          <p>
+            Novo por aqui?
+            <a href="/contato" class="link">Fale com a coordenação</a>
+          </p>
+          <p style="margin-top: 6px;">
+            Dúvidas de uso?
+            <a href="/ajuda" class="link">Central de Ajuda</a>
+          </p>
+        </footer>
 
-          <a href="/auth/forgot-password" class="link">
-            Esqueci minha senha
-          </a>
-        </div>
+      </section>
+    </main>
 
-        <!-- Botão de autenticação -->
-        <button
-          type="submit"
-          id="submit-btn"
-          class="btn btn-primary login-form__submit"
-        >
-          Entrar
-        </button>
-      </form>
+  </div>
 
-      <!-- Contas de demonstração -->
-      <div class="demo-accounts">
-        <div class="demo-accounts__title">
-          <span>Contas de demonstração (senha: 123456):</span>
-        </div>
-        <ul>
-          <li><strong>Administrador:</strong> <button type="button" class="link-btn" onclick="fillLogin('roberto.ferreira@senac.br','123456')">roberto.ferreira@senac.br</button></li>
-          <li><strong>Professor:</strong> <button type="button" class="link-btn" onclick="fillLogin('carlos.silva@senac.br','123456')">carlos.silva@senac.br</button></li>
-          <li><strong>Aluno:</strong> <button type="button" class="link-btn" onclick="fillLogin('joao.almeida@aluno.senac.br','123456')">joao.almeida@aluno.senac.br</button></li>
-        </ul>
-      </div>
-
-      <!-- Links de ajuda e contato já existentes -->
-      <footer class="login-footer">
-        <p>
-          Ainda não tem conta?
-          <a href="/contato" class="link">Fale com a administração</a>
-        </p>
-
-        <!-- Acesso à Central de Ajuda -->
-        <p>
-          Precisa de ajuda?
-          <a href="/ajuda" class="link">
-            Acesse a Central de Ajuda
-          </a>
-        </p>
-      </footer>
-
-    </section>
-  </main>
-
-  <!-- Script original do formulário de login -->
+  <!-- Script com lógica do formulário de login -->
   <script src="/js/login.js" defer></script>
 </body>
 </html>

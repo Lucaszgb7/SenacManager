@@ -43,6 +43,66 @@
       </div>
     </header>
 
+    <!-- Banner de Boas-Vindas Educacional (Inspirado no PDF) -->
+    <section class="welcome-banner" aria-label="Boas-vindas">
+      <div class="welcome-banner__content">
+        <span class="welcome-banner__badge">
+          <% if (usuario.perfil === 'professor') { %>
+            Perfil Docente · Senac
+          <% } else if (usuario.perfil === 'administrador') { %>
+            Gestão Institucional
+          <% } else { %>
+            Ambiente do Aluno
+          <% } %>
+        </span>
+        <h2 class="welcome-banner__title">
+          <% if (usuario.perfil === 'professor') { %>
+            Pronto para as atividades de hoje, Prof. <%= usuario.nome.split(' ')[0] %>?
+          <% } else if (usuario.perfil === 'administrador') { %>
+            Painel Geral do Campus, <%= usuario.nome.split(' ')[0] %>!
+          <% } else { %>
+            Bons estudos, <%= usuario.nome.split(' ')[0] %>!
+          <% } %>
+        </h2>
+        <p class="welcome-banner__text">
+          <% if (usuario.perfil === 'professor') { %>
+            Consulte sua grade curricular, verifique a disponibilidade de laboratórios e reserve salas para suas aulas práticas.
+          <% } else if (usuario.perfil === 'administrador') { %>
+            Gerencie o cadastro de salas, usuários e horários acadêmicos com visão centralizada e segura.
+          <% } else { %>
+            Acompanhe suas aulas de hoje, confira o prédio e a sala da sua turma e participe das oficinas NOA no contraturno.
+          <% } %>
+        </p>
+      </div>
+
+      <!-- Ilustração Doodle SVG minimalista do PDF -->
+      <div class="welcome-banner__illustration" aria-hidden="true">
+        <svg viewBox="0 0 160 120" fill="none" xmlns="http://www.w3.org/2000/svg" style="width: 100%; height: 100%;">
+          <!-- Círculo azul e destaque amarelo -->
+          <circle cx="110" cy="65" r="38" fill="#EAF2FF" />
+          <circle cx="125" cy="80" r="18" fill="#0649B8" />
+          <circle cx="48" cy="32" r="16" fill="#FFD84D" />
+
+          <!-- Lâmpada de ideia -->
+          <path d="M42 36C38 33 36 29 36 24C36 17 41 12 48 12C55 12 60 17 60 24C60 29 58 33 54 36V40H42V36Z" fill="#FFFFFF" stroke="#211D1D" stroke-width="2.5" />
+          <line x1="48" y1="4" x2="48" y2="8" stroke="#211D1D" stroke-width="2.5" stroke-linecap="round" />
+          <line x1="62" y1="18" x2="58" y2="20" stroke="#211D1D" stroke-width="2.5" stroke-linecap="round" />
+          <line x1="34" y1="18" x2="38" y2="20" stroke="#211D1D" stroke-width="2.5" stroke-linecap="round" />
+
+          <!-- Personagem desenhado à mão (doodle) -->
+          <circle cx="68" cy="64" r="22" fill="#FFFFFF" stroke="#211D1D" stroke-width="2.8" />
+          <circle cx="63" cy="61" r="2.5" fill="#211D1D" />
+          <circle cx="73" cy="61" r="2.5" fill="#211D1D" />
+          <path d="M62 70C65 73 71 73 74 70" stroke="#211D1D" stroke-width="2.2" stroke-linecap="round" />
+          <path d="M54 48C60 40 76 40 82 48" stroke="#211D1D" stroke-width="2.5" stroke-linecap="round" />
+
+          <!-- Livro aberto em frente -->
+          <path d="M42 98C56 92 68 94 74 100C80 94 92 92 106 98L102 116C90 110 80 112 74 118C68 112 58 110 46 116L42 98Z" fill="#FFFFFF" stroke="#211D1D" stroke-width="2.5" stroke-linejoin="round" />
+          <line x1="74" y1="100" x2="74" y2="118" stroke="#211D1D" stroke-width="2" />
+        </svg>
+      </div>
+    </section>
+
     <!-- Cards de Indicadores / Métricas Globais -->
     <section class="metric-grid" aria-label="Indicadores principais">
       <!-- Card 1: Salas -->
