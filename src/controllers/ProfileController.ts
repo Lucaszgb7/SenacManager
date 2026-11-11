@@ -6,23 +6,48 @@ import { avatarDirectory, AVATAR_DIR_PUBLIC_PATH } from '../config/multer';
 import { changePassword, setAvatar, updateProfile } from '../services/SchoolService';
 import { HttpError } from '../services/validation';
 
-const avatarExtensions: Record<string, string> = {
+export const avatarExtensions: Record<string, string> = {
   'image/jpeg': '.jpg',
   'image/png': '.png',
   'image/webp': '.webp',
 };
 
-function hasValidImageSignature(buffer: Buffer, mimeType: string): boolean {
+/**
+ * Validação rigorosa de assinatura binária (magic numbers) e integridade de imagens.
+ * Rejeita executáveis, scripts embutidos (PHP/JS/HTML) e arquivos corrompidos.
+ */
+export function hasValidImageSignature(buffer: Buffer, mimeType: string): boolean {
+  if (!buffer || buffer.length < 12) return false;
+
+  // 1. Rejeição de executáveis conhecidos
+  // Assinatura Windows PE (MZ)
+  if (buffer[0] === 0x4d && buffer[1] === 0x5a) return false;
+  // Assinatura Linux ELF
+  if (buffer[0] === 0x7f && buffer[1] === 0x45 && buffer[2] === 0x4c && buffer[3] === 0x46) return false;
+  // Assinatura Shell Script (#!...)
+  if (buffer[0] === 0x23 && buffer[1] === 0x21) return false;
+
+  // 2. Rejeição de scripts embutidos / HTML injection
+  const headStr = buffer.toString('utf8', 0, Math.min(buffer.length, 512)).toLowerCase();
+  const dangerousPatterns = ['<script', '<?php', '<%', '<!doctype', '<html', 'eval(', '/bin/sh', 'powershell'];
+  if (dangerousPatterns.some(p => headStr.includes(p))) {
+    return false;
+  }
+
+  // 3. Validação estrita por formato
   if (mimeType === 'image/jpeg') {
-    return buffer.length >= 3 && buffer[0] === 0xff && buffer[1] === 0xd8 && buffer[2] === 0xff;
+    return buffer[0] === 0xff && buffer[1] === 0xd8 && buffer[2] === 0xff;
   }
 
   if (mimeType === 'image/png') {
     return buffer.length >= 8 && buffer.subarray(0, 8).equals(Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]));
   }
 
-  return mimeType === 'image/webp' && buffer.length >= 12 &&
-    buffer.toString('ascii', 0, 4) === 'RIFF' && buffer.toString('ascii', 8, 12) === 'WEBP';
+  if (mimeType === 'image/webp') {
+    return buffer.toString('ascii', 0, 4) === 'RIFF' && buffer.toString('ascii', 8, 12) === 'WEBP';
+  }
+
+  return false;
 }
 
 function currentUserId(req: Request): string {

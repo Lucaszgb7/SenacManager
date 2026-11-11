@@ -39,9 +39,32 @@
       if (scope && scopeBusy) setAttributeState(scope, 'aria-busy', scopeBusy);
     };
   }
+
+  function getCsrfToken() {
+    const meta = document.querySelector('meta[name="csrf-token"]');
+    if (meta && meta.content) return meta.content;
+    const match = document.cookie.match(/(?:^|;\s*)XSRF-TOKEN=([^;]+)/);
+    if (match) return decodeURIComponent(match[1]);
+    const input = document.querySelector('input[name="_csrf"]');
+    if (input && input.value) return input.value;
+    return '';
+  }
   async function send(url, method, body) {
     const multipart = body instanceof FormData;
-    const response = await fetch(url, { method, headers: { Accept: 'application/json', ...(multipart ? {} : { 'Content-Type': 'application/json' }) }, ...(body === undefined ? {} : { body: multipart ? body : JSON.stringify(body) }) });
+    const csrf = getCsrfToken();
+    const csrfHeader = csrf ? { 'X-CSRF-Token': csrf } : {};
+    if (multipart && csrf && typeof body.has === 'function' && !body.has('_csrf')) {
+      body.append('_csrf', csrf);
+    }
+    const response = await fetch(url, {
+      method,
+      headers: {
+        Accept: 'application/json',
+        ...(multipart ? {} : { 'Content-Type': 'application/json' }),
+        ...csrfHeader,
+      },
+      ...(body === undefined ? {} : { body: multipart ? body : JSON.stringify(body) }),
+    });
     const result = await response.json().catch(() => ({ message: 'Resposta inesperada do servidor.' }));
     if (!response.ok || result.success === false) throw new Error(result.message || 'Não foi possível concluir a operação.');
     return result;

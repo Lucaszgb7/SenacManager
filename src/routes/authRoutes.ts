@@ -3,6 +3,7 @@ import { Router, Request, Response, NextFunction } from 'express';
 
 // Importa o controlador responsável por executar as operações de autenticação.
 import AuthController from '../controllers/AuthController';
+import { loginRateLimiter } from '../middlewares/rateLimitMiddleware';
 
 // ---------------------------------------------------------------------
 // Configuração das rotas de autenticação
@@ -89,8 +90,8 @@ authRoutes.get(
 
 // Define uma rota POST para enviar os dados de autenticação.
 // O controlador verifica as credenciais e executa o processo de login.
-authRoutes.post('/auth/login', AuthController.login);
-authRoutes.post('/login', AuthController.login);
+authRoutes.post('/auth/login', loginRateLimiter, AuthController.login);
+authRoutes.post('/login', loginRateLimiter, AuthController.login);
 
 // ---------------------------------------------------------------------
 // Rota para registrar usuários

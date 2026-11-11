@@ -8,5 +8,6 @@ declare module "express-session" {
       email?: string;
       perfil: string;
     };
+    csrfToken?: string;
   }
 }

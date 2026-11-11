@@ -9,7 +9,7 @@ async function startServer(): Promise<void> {
     throw new Error('PORT inválida.');
   }
 
-  // Quando DB_DRIVER=mysql, valida a conexão real com o banco antes de iniciar o servidor
+  // Quando DB_DRIVER=mysql, valida a conexão real com o banco antes de considerar a aplicação pronta
   if (process.env.DB_DRIVER === 'mysql') {
     try {
       const pool = getPool();
@@ -26,8 +26,7 @@ async function startServer(): Promise<void> {
       const safeMessage = String(err?.message || 'Falha ao estabelecer conexão.')
         .replace(/:[^:@/]+@/, ':***@');
       console.error(`[Inicialização] Erro ao conectar ao MySQL (${errorCode}): ${safeMessage}`);
-      console.error('[Inicialização] A aplicação requer MySQL acessível quando DB_DRIVER=mysql.');
-      process.exit(1);
+      console.error('[Inicialização] O servidor permanecerá ativo respondendo com erro 503 controlado nas requisições enquanto o MySQL estiver indisponível.');
     }
   }
 

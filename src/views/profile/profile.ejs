@@ -49,6 +49,7 @@
         <h2 class="card__title">Informações Pessoais</h2>
 
         <form action="/profile" method="post" data-api-form data-method="PUT" data-redirect="/profile">
+          <input type="hidden" name="_csrf" value="<%= typeof csrfToken !== 'undefined' ? csrfToken : '' %>">
           <div class="form-grid">
             <div class="input-group">
               <label for="prof-nome">Nome Completo</label>
@@ -99,6 +100,7 @@
         <section class="card">
           <h2 class="card__title">Foto de Perfil</h2>
           <form action="/profile/foto" method="post" enctype="multipart/form-data" data-api-form data-redirect="/profile">
+            <input type="hidden" name="_csrf" value="<%= typeof csrfToken !== 'undefined' ? csrfToken : '' %>">
             <div class="input-group">
               <label for="avatar-input">Selecione uma imagem (JPG, PNG ou WebP de até 2 MB)</label>
               <input id="avatar-input" type="file" name="avatar" accept="image/jpeg,image/png,image/webp" required>
@@ -116,6 +118,7 @@
         <section class="card">
           <h2 class="card__title">Alterar Senha</h2>
           <form action="/profile/senha" method="post" data-api-form data-method="PUT" data-reset>
+            <input type="hidden" name="_csrf" value="<%= typeof csrfToken !== 'undefined' ? csrfToken : '' %>">
             <div class="input-group">
               <label for="senha-atual">Senha Atual</label>
               <input id="senha-atual" type="password" name="senhaAtual" autocomplete="current-password" required>

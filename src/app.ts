@@ -2,6 +2,7 @@
 import express from 'express';
 import path from 'path';
 import sessionMiddleware from './config/session';
+import { csrfMiddleware } from './middlewares/csrfMiddleware';
 import { avatarDirectory } from './config/multer';
 import authRoutes from './routes/authRoutes';
 import roomRoutes from './routes/roomRoutes';
@@ -30,9 +31,12 @@ app.use(express.static(path.join(__dirname, '..', 'public')));
 app.use(express.urlencoded({ extended: false, limit: '100kb' }));
 app.use(express.json({ limit: '100kb' }));
 app.use(sessionMiddleware);
+app.use(csrfMiddleware);
 app.use(async (req, res, next) => {
   res.locals.usuario = null;
   res.locals.perfil = 'aluno';
+  const isProd = process.env.NODE_ENV === 'production';
+  res.locals.showDemoAccounts = !isProd && (process.env.SHOW_DEMO_ACCOUNTS === 'true' || process.env.SHOW_DEMO_ACCOUNTS === undefined);
   res.locals.paginaAtual = ({ '/dashboard': 'dashboard', '/rooms/available': 'rooms-available', '/rooms/booking': 'rooms-booking', '/bookings/my': 'bookings-my', '/profile': 'profile', '/search': 'search', '/noa': 'noa', '/admin': 'admin' } as Record<string, string>)[req.path] || '';
   if (req.session.usuario) {
     try {

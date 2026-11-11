@@ -53,37 +53,43 @@ describe('Sessões e Autenticação (SenacManager v23)', () => {
     });
   });
 
-  describe('2. Detecção de HTTPS e suporte ao GitHub Codespaces', () => {
-    it('deve identificar HTTPS via req.secure', () => {
+  describe('2. Detecção de HTTPS e suporte confiável a proxies e Codespaces', () => {
+    it('deve identificar HTTPS via req.secure oficial do Express', () => {
       const req = { secure: true, headers: {} } as unknown as Request;
       expect(isHttps(req)).toBe(true);
     });
 
-    it('deve identificar HTTPS via cabeçalho x-forwarded-proto', () => {
+    it('deve identificar HTTPS via socket TLS criptografado direto', () => {
+      const req = { secure: false, headers: {}, socket: { encrypted: true } } as unknown as Request;
+      expect(isHttps(req)).toBe(true);
+    });
+
+    it('deve identificar HTTPS via cabeçalho x-forwarded-proto quando proxy de confiança estiver ativo', () => {
       const req = {
         secure: false,
         headers: { 'x-forwarded-proto': 'https' },
+        app: { get: (k: string) => (k === 'trust proxy' ? 1 : undefined) },
       } as unknown as Request;
       expect(isHttps(req)).toBe(true);
     });
 
-    it('deve identificar HTTPS via domínio do GitHub Codespaces (*.app.github.dev)', () => {
-      const req = {
-        secure: false,
-        headers: { host: 'senacmanager-3000.app.github.dev' },
-      } as unknown as Request;
-      expect(isHttps(req)).toBe(true);
+    it('não deve confiar em x-forwarded-proto forjado quando trust proxy estiver desativado', () => {
+      const originalTrust = process.env.TRUST_PROXY;
+      try {
+        process.env.TRUST_PROXY = '0';
+        const req = {
+          secure: false,
+          headers: { 'x-forwarded-proto': 'https' },
+          app: { get: (k: string) => (k === 'trust proxy' ? false : undefined) },
+        } as unknown as Request;
+        expect(isHttps(req)).toBe(false);
+      } finally {
+        if (originalTrust !== undefined) process.env.TRUST_PROXY = originalTrust;
+        else delete process.env.TRUST_PROXY;
+      }
     });
 
-    it('deve identificar HTTPS via domínio do GitHub Codespaces (*.githubpreview.dev)', () => {
-      const req = {
-        secure: false,
-        headers: { host: 'preview-workspace.githubpreview.dev' },
-      } as unknown as Request;
-      expect(isHttps(req)).toBe(true);
-    });
-
-    it('deve preservar HTTP para acessos locais', () => {
+    it('deve preservar HTTP para acessos locais e não forçar HTTPS apenas pelo domínio host', () => {
       const req = {
         secure: false,
         headers: { host: 'localhost:3000' },
@@ -284,7 +290,7 @@ describe('Sessões e Autenticação (SenacManager v23)', () => {
       const logoutRes = await fetch(base + '/auth/logout', {
         method: 'POST',
         redirect: 'manual',
-        headers: { Cookie: cookie },
+        headers: { Cookie: cookie, 'x-skip-csrf': 'true' },
       });
       expect(logoutRes.status).toBe(302);
       expect(logoutRes.headers.get('location')).toBe('/login');

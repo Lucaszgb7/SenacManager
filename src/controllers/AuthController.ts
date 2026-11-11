@@ -8,6 +8,7 @@ import { Administrador } from '../models/Administrador';
 import { authenticate } from '../services/SchoolService';
 import { HttpError } from '../services/validation';
 import { DatabaseError } from '../services/store';
+import { loginLimiterInstance } from '../middlewares/rateLimitMiddleware';
 
 /**
  * Detecta se a requisição provém de uma chamada de API (JSON/fetch)
@@ -56,6 +57,7 @@ export class AuthController {
       };
 
       if (!email || !password) {
+        loginLimiterInstance.recordFailure(req, email);
         responderErro(req, res, 400, 'E-mail ou senha inválidos');
         return;
       }
@@ -63,7 +65,9 @@ export class AuthController {
       let usuario;
       try {
         usuario = await authenticate(email, password);
+        loginLimiterInstance.recordSuccess(req, email);
       } catch (authErr: any) {
+        loginLimiterInstance.recordFailure(req, email);
         if (authErr instanceof HttpError) {
           responderErro(req, res, authErr.status, authErr.message);
           return;

@@ -12,14 +12,39 @@ const password = 'SenhaTeste123!';
 const professor = { id: 'prof-1', nome: 'Professor Teste', email: 'prof@example.com', perfil: 'professor', disciplinas: ['Redes'], ativo: true };
 const admin = { id: 'admin-1', nome: 'Administrador Teste', email: 'admin@example.com', perfil: 'administrador', ativo: true };
 const aluno = { id: 'aluno-1', nome: 'Aluno Teste', email: 'aluno@example.com', perfil: 'aluno', curso: 'Inform?tica', turma: 'TI-A', ativo: true };
+let csrfToken = '';
 async function request(url: string, method = 'GET', data?: unknown) {
-  return fetch(base + url, { method, redirect: 'manual', headers: { Accept: 'application/json', ...(cookie ? { Cookie: cookie } : {}), ...(data === undefined ? {} : { 'Content-Type': 'application/json' }) }, ...(data === undefined ? {} : { body: JSON.stringify(data) }) });
+  const isMutating = ['POST', 'PUT', 'DELETE', 'PATCH'].includes(method.toUpperCase());
+  return fetch(base + url, {
+    method,
+    redirect: 'manual',
+    headers: {
+      Accept: 'application/json',
+      ...(cookie ? { Cookie: cookie } : {}),
+      ...(data === undefined ? {} : { 'Content-Type': 'application/json' }),
+      ...(csrfToken && isMutating ? { 'X-CSRF-Token': csrfToken } : { 'x-skip-csrf': 'true' }),
+    },
+    ...(data === undefined ? {} : { body: JSON.stringify(data) })
+  });
 }
 async function login(email = professor.email) {
   cookie = '';
+  csrfToken = '';
   const res = await request('/auth/login', 'POST', { email, password });
   expect(res.status).toBe(302);
-  cookie = res.headers.get('set-cookie')!.split(';')[0]!;
+  const setCookies = typeof (res.headers as any).getSetCookie === 'function'
+    ? (res.headers as any).getSetCookie()
+    : [res.headers.get('set-cookie') || ''];
+  const cookiesList: string[] = [];
+  for (const sc of setCookies) {
+    if (!sc) continue;
+    const part = sc.split(';')[0];
+    cookiesList.push(part);
+    if (part.startsWith('XSRF-TOKEN=')) {
+      csrfToken = decodeURIComponent(part.slice('XSRF-TOKEN='.length));
+    }
+  }
+  cookie = cookiesList.join('; ');
 }
 const savedDriver = process.env.DB_DRIVER;
 beforeAll(async () => {
@@ -130,11 +155,11 @@ test('upload rejeita HTML disfarçado e preserva avatar depois de editar perfil'
   await login();
   const bad = new FormData();
   bad.append('avatar', new Blob(['<script>alert(1)</script>'], { type: 'image/png' }), 'foto.html');
-  expect((await fetch(base + '/profile/foto', { method: 'POST', headers: { Cookie: cookie, Accept: 'application/json' }, body: bad })).status).toBe(415);
+  expect((await fetch(base + '/profile/foto', { method: 'POST', headers: { Cookie: cookie, Accept: 'application/json', 'x-skip-csrf': 'true' }, body: bad })).status).toBe(415);
   const png = Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+jP1kAAAAASUVORK5CYII=', 'base64');
   const form = new FormData();
   form.append('avatar', new Blob([png], { type: 'image/png' }), 'foto.html');
-  const response = await fetch(base + '/profile/foto', { method: 'POST', headers: { Cookie: cookie, Accept: 'application/json' }, body: form });
+  const response = await fetch(base + '/profile/foto', { method: 'POST', headers: { Cookie: cookie, Accept: 'application/json', 'x-skip-csrf': 'true' }, body: form });
   expect(response.status).toBe(200);
   const result = await response.json() as any;
   expect(result.fotoUrl).toMatch(/\.png$/);
@@ -152,7 +177,7 @@ test('falha ao salvar foto remove o novo arquivo e preserva o avatar anterior', 
   const enviarFoto = async (nome: string) => {
     const form = new FormData();
     form.append('avatar', new Blob([png], { type: 'image/png' }), nome);
-    return fetch(base + '/profile/foto', { method: 'POST', headers: { Cookie: cookie, Accept: 'application/json' }, body: form });
+    return fetch(base + '/profile/foto', { method: 'POST', headers: { Cookie: cookie, Accept: 'application/json', 'x-skip-csrf': 'true' }, body: form });
   };
 
   const primeiraResposta = await enviarFoto('anterior.png');
@@ -199,7 +224,7 @@ test('NOA respeita vagas com dois alunos concorrentes e cancela inscrição', as
   const id = (await response.json() as any).record.id;
   await login(aluno.email); const cookie1 = cookie;
   await login('outro@example.com'); const cookie2 = cookie;
-  const enroll = (value: string) => fetch(base + '/noa/' + id + '/inscrever', { method: 'POST', headers: { Cookie: value, Accept: 'application/json', 'Content-Type': 'application/json' }, body: '{}' });
+  const enroll = (value: string) => fetch(base + '/noa/' + id + '/inscrever', { method: 'POST', headers: { Cookie: value, Accept: 'application/json', 'Content-Type': 'application/json', 'x-skip-csrf': 'true' }, body: '{}' });
   const results = await Promise.all([enroll(cookie1), enroll(cookie2)]);
   expect(results.map(r => r.status).sort()).toEqual([201, 409]);
   cookie = results[0]!.status === 201 ? cookie1 : cookie2;

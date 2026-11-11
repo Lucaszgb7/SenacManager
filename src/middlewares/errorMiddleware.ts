@@ -23,7 +23,7 @@ export function errorMiddleware(
 
   const codigo = status >= 400 && status <= 599 ? status : 500;
   const mensagem =
-    codigo < 500
+    codigo < 500 || codigo === 503
       ? err.message
       : "Erro interno do servidor. Tente novamente mais tarde.";
 
@@ -41,8 +41,13 @@ export function errorMiddleware(
     return;
   }
 
-  res.status(codigo).send(
-    `<!DOCTYPE html>
+  res.status(codigo).render(
+    "errors/error",
+    { status: codigo, message: mensagem },
+    (renderErr, html) => {
+      if (renderErr) {
+        res.status(codigo).send(
+          `<!DOCTYPE html>
 <html lang="pt-br">
 <head>
 <meta charset="UTF-8">
@@ -51,17 +56,22 @@ export function errorMiddleware(
 <body style="font-family:sans-serif;text-align:center;padding:60px">
 <h1>${codigo} — ${codigo === 500 ? "Erro interno" : "Não foi possível concluir a solicitação"}</h1>
 <p>${mensagem.replace(/[&<>"']/g, (char) => {
-      const entidades: Record<string, string> = {
-        "&": "&amp;",
-        "<": "&lt;",
-        ">": "&gt;",
-        '"': "&quot;",
-        "'": "&#39;",
-      };
-      return entidades[char] ?? char;
-    })}</p>
+            const entidades: Record<string, string> = {
+              "&": "&amp;",
+              "<": "&lt;",
+              ">": "&gt;",
+              '"': "&quot;",
+              "'": "&#39;",
+            };
+            return entidades[char] ?? char;
+          })}</p>
 <a href="/dashboard">Voltar para o dashboard</a>
 </body>
 </html>`
+        );
+        return;
+      }
+      res.send(html);
+    }
   );
 }
