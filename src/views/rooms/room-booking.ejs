@@ -98,12 +98,12 @@
         <div class="salas-grid" role="radiogroup" aria-label="Selecionar sala">
           <% salas.forEach(function(s) { %>
             <%
-              // indisponivel: calculado pelo controller para o intervalo consultado
-              const indisponivel = !!s.indisponivel || s.disponivel === false;
+              const realizada = typeof consultaRealizada !== 'undefined' && Boolean(consultaRealizada);
+              const indisponivel = realizada && (s.disponivel === false || !!s.indisponivel);
               const selecionada  = filtros && filtros.salaId === s.id;
             %>
             <label class="sala-card
-                          <%= indisponivel ? 'sala-ocupada' : 'sala-disponivel' %>
+                          <%= realizada ? (indisponivel ? 'sala-ocupada' : 'sala-disponivel') : '' %>
                           <%= selecionada ? 'sala-selecionada' : '' %>"
                    data-sala-id="<%= s.id %>">
               <input type="radio"
@@ -117,10 +117,12 @@
               </div>
               <div class="sala-card__meta">
                 <span><%= s.capacidade %> lugares</span>
-                <% if (indisponivel) { %>
-                  <span class="badge-ocupada">Ocupada no intervalo</span>
-                <% } else { %>
-                  <span class="badge-disponivel">Disponível</span>
+                <% if (realizada) { %>
+                  <% if (s.disponivel === false || !!s.indisponivel) { %>
+                    <span class="badge-ocupada">Sala indisponível neste horário.</span>
+                  <% } else { %>
+                    <span class="badge-disponivel">Sim, sala disponível neste horário.</span>
+                  <% } %>
                 <% } %>
               </div>
             </label>
@@ -137,7 +139,8 @@
               <option value="">Selecione uma sala</option>
               <% (salas || []).forEach(function(s) { %>
                 <%
-                  const indisponivel = !!s.indisponivel || s.disponivel === false;
+                  const realizada = typeof consultaRealizada !== 'undefined' && Boolean(consultaRealizada);
+                  const indisponivel = realizada && (s.disponivel === false || !!s.indisponivel);
                   const selecionada  = filtros && filtros.salaId === s.id;
                 %>
                 <option

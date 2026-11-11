@@ -1,6 +1,13 @@
 import { Request, Response } from 'express';
 import { state, createBooking, listarSalasComDisponibilidade } from '../services/SchoolService';
-import { schoolNow, vigente, HttpError } from '../services/validation';
+import {
+  schoolNow,
+  vigente,
+  HttpError,
+  validarDataReserva,
+  validarHorarioReserva,
+  validarFormatoHorario,
+} from '../services/validation';
 export class RoomController {
   listarDisponiveis = async (req: Request, res: Response): Promise<void> => {
     const s = await state();
@@ -29,11 +36,21 @@ export class RoomController {
       salaId: String(req.query.salaId || ''),
     };
 
+    const consultaRealizada = Boolean(
+      filtros.data &&
+      filtros.horarioInicio &&
+      filtros.horarioFim &&
+      validarDataReserva(filtros.data) &&
+      validarFormatoHorario(filtros.horarioInicio) &&
+      validarFormatoHorario(filtros.horarioFim) &&
+      validarHorarioReserva(filtros.horarioInicio, filtros.horarioFim)
+    );
+
     // Salas com disponibilidade calculada para o intervalo consultado
     const salas = await listarSalasComDisponibilidade(
-      filtros.data || undefined,
-      filtros.horarioInicio || undefined,
-      filtros.horarioFim || undefined
+      consultaRealizada ? filtros.data : undefined,
+      consultaRealizada ? filtros.horarioInicio : undefined,
+      consultaRealizada ? filtros.horarioFim : undefined
     );
 
     res.render('rooms/room-booking', {
@@ -42,6 +59,7 @@ export class RoomController {
       hoje: schoolNow().slice(0, 10),
       sucesso: String(req.query.sucesso || ''),
       erro: String(req.query.erro || ''),
+      consultaRealizada,
     });
   };
   /**
