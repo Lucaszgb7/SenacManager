@@ -32,8 +32,9 @@ class LoginRateLimiter {
   }
 
   private getKey(req: Request, email?: string): string {
-    // req.ip utiliza o endereço remoto real baseado em trust proxy
-    const ip = req.ip || req.socket.remoteAddress || 'unknown';
+    // req.ip utiliza o endereço remoto validado pelo Express conforme a política de trust proxy
+    const rawIp = req.ip || req.socket.remoteAddress || 'unknown';
+    const ip = rawIp.replace(/^::ffff:/, '');
     const normalizedEmail = (email || '').trim().toLowerCase();
     return normalizedEmail ? `${ip}:${normalizedEmail}` : `ip:${ip}`;
   }

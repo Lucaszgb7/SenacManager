@@ -13,14 +13,21 @@ import { errorMiddleware } from './middlewares/errorMiddleware';
 import { findUser, safeUser } from './services/SchoolService';
 const app = express();
 app.disable('x-powered-by');
+// Configuração explícita de Trust Proxy:
+// - Desativado quando TRUST_PROXY=0 ou TRUST_PROXY=false
+// - Habilitado quando TRUST_PROXY=true ou número/string de subnets confiáveis (ex: 'loopback', '127.0.0.1')
+// - Em Codespaces ou produção: 1 hop de proxy reverso
 const trustProxyEnv = process.env.TRUST_PROXY;
-const trustProxy = trustProxyEnv === '0'
-  ? false
-  : trustProxyEnv === 'true'
-    ? true
-    : trustProxyEnv && !isNaN(Number(trustProxyEnv))
-      ? Number(trustProxyEnv)
-      : 1;
+const trustProxy: boolean | number | string =
+  trustProxyEnv === '0' || trustProxyEnv === 'false'
+    ? false
+    : trustProxyEnv === 'true'
+      ? true
+      : trustProxyEnv && !isNaN(Number(trustProxyEnv))
+        ? Number(trustProxyEnv)
+        : trustProxyEnv && trustProxyEnv.trim() !== ''
+          ? trustProxyEnv.trim()
+          : (process.env.CODESPACES === 'true' || process.env.GITHUB_CODESPACES_PORT_FORWARDING_DOMAIN || process.env.NODE_ENV === 'production' ? 1 : 1);
 app.set('trust proxy', trustProxy);
 app.set('view engine', 'ejs');
 // O código compilado também pode usar os templates de origem se dist/views não existir.

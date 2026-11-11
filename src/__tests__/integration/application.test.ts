@@ -13,8 +13,15 @@ const professor = { id: 'prof-1', nome: 'Professor Teste', email: 'prof@example.
 const admin = { id: 'admin-1', nome: 'Administrador Teste', email: 'admin@example.com', perfil: 'administrador', ativo: true };
 const aluno = { id: 'aluno-1', nome: 'Aluno Teste', email: 'aluno@example.com', perfil: 'aluno', curso: 'Inform?tica', turma: 'TI-A', ativo: true };
 let csrfToken = '';
+function extractCsrfFromCookie(cookieHeader?: string): string {
+  if (!cookieHeader) return '';
+  const match = cookieHeader.match(/XSRF-TOKEN=([^;]+)/);
+  return match && match[1] ? decodeURIComponent(match[1]) : '';
+}
+
 async function request(url: string, method = 'GET', data?: unknown) {
   const isMutating = ['POST', 'PUT', 'DELETE', 'PATCH'].includes(method.toUpperCase());
+  const tokenToUse = cookie ? (csrfToken || extractCsrfFromCookie(cookie)) : '';
   return fetch(base + url, {
     method,
     redirect: 'manual',
@@ -22,7 +29,7 @@ async function request(url: string, method = 'GET', data?: unknown) {
       Accept: 'application/json',
       ...(cookie ? { Cookie: cookie } : {}),
       ...(data === undefined ? {} : { 'Content-Type': 'application/json' }),
-      ...(csrfToken && isMutating ? { 'X-CSRF-Token': csrfToken } : { 'x-skip-csrf': 'true' }),
+      ...(tokenToUse && isMutating ? { 'X-CSRF-Token': tokenToUse } : {}),
     },
     ...(data === undefined ? {} : { body: JSON.stringify(data) })
   });
@@ -30,21 +37,57 @@ async function request(url: string, method = 'GET', data?: unknown) {
 async function login(email = professor.email) {
   cookie = '';
   csrfToken = '';
-  const res = await request('/auth/login', 'POST', { email, password });
-  expect(res.status).toBe(302);
-  const setCookies = typeof (res.headers as any).getSetCookie === 'function'
-    ? (res.headers as any).getSetCookie()
-    : [res.headers.get('set-cookie') || ''];
-  const cookiesList: string[] = [];
-  for (const sc of setCookies) {
+
+  // 1. Obtém sessão inicial e token CSRF via GET /login
+  const getRes = await fetch(base + '/login');
+  const getCookies = typeof (getRes.headers as any).getSetCookie === 'function'
+    ? (getRes.headers as any).getSetCookie()
+    : [getRes.headers.get('set-cookie') || ''];
+  const cookiesMap = new Map<string, string>();
+  for (const sc of getCookies) {
     if (!sc) continue;
     const part = sc.split(';')[0];
-    cookiesList.push(part);
+    const [name] = part.split('=');
+    if (name) cookiesMap.set(name, part);
     if (part.startsWith('XSRF-TOKEN=')) {
       csrfToken = decodeURIComponent(part.slice('XSRF-TOKEN='.length));
     }
   }
-  cookie = cookiesList.join('; ');
+  cookie = Array.from(cookiesMap.values()).join('; ');
+
+  // 2. Faz login com o cookie e token obtidos
+  const res = await request('/auth/login', 'POST', { email, password });
+  expect(res.status).toBe(302);
+
+  const postCookies = typeof (res.headers as any).getSetCookie === 'function'
+    ? (res.headers as any).getSetCookie()
+    : [res.headers.get('set-cookie') || ''];
+  for (const sc of postCookies) {
+    if (!sc) continue;
+    const part = sc.split(';')[0];
+    const [name] = part.split('=');
+    if (name) cookiesMap.set(name, part);
+    if (part.startsWith('XSRF-TOKEN=')) {
+      csrfToken = decodeURIComponent(part.slice('XSRF-TOKEN='.length));
+    }
+  }
+  cookie = Array.from(cookiesMap.values()).join('; ');
+
+  // 3. Acessa /dashboard (GET) para sincronizar cookie de sessão autenticada e XSRF-TOKEN
+  const dashRes = await request('/dashboard');
+  const dashCookies = typeof (dashRes.headers as any).getSetCookie === 'function'
+    ? (dashRes.headers as any).getSetCookie()
+    : [dashRes.headers.get('set-cookie') || ''];
+  for (const sc of dashCookies) {
+    if (!sc) continue;
+    const part = sc.split(';')[0];
+    const [name] = part.split('=');
+    if (name) cookiesMap.set(name, part);
+    if (part.startsWith('XSRF-TOKEN=')) {
+      csrfToken = decodeURIComponent(part.slice('XSRF-TOKEN='.length));
+    }
+  }
+  cookie = Array.from(cookiesMap.values()).join('; ');
 }
 const savedDriver = process.env.DB_DRIVER;
 beforeAll(async () => {
@@ -155,11 +198,11 @@ test('upload rejeita HTML disfarçado e preserva avatar depois de editar perfil'
   await login();
   const bad = new FormData();
   bad.append('avatar', new Blob(['<script>alert(1)</script>'], { type: 'image/png' }), 'foto.html');
-  expect((await fetch(base + '/profile/foto', { method: 'POST', headers: { Cookie: cookie, Accept: 'application/json', 'x-skip-csrf': 'true' }, body: bad })).status).toBe(415);
+  expect((await fetch(base + '/profile/foto', { method: 'POST', headers: { Cookie: cookie, Accept: 'application/json', 'X-CSRF-Token': csrfToken }, body: bad })).status).toBe(415);
   const png = Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+jP1kAAAAASUVORK5CYII=', 'base64');
   const form = new FormData();
   form.append('avatar', new Blob([png], { type: 'image/png' }), 'foto.html');
-  const response = await fetch(base + '/profile/foto', { method: 'POST', headers: { Cookie: cookie, Accept: 'application/json', 'x-skip-csrf': 'true' }, body: form });
+  const response = await fetch(base + '/profile/foto', { method: 'POST', headers: { Cookie: cookie, Accept: 'application/json', 'X-CSRF-Token': csrfToken }, body: form });
   expect(response.status).toBe(200);
   const result = await response.json() as any;
   expect(result.fotoUrl).toMatch(/\.png$/);
@@ -177,7 +220,7 @@ test('falha ao salvar foto remove o novo arquivo e preserva o avatar anterior', 
   const enviarFoto = async (nome: string) => {
     const form = new FormData();
     form.append('avatar', new Blob([png], { type: 'image/png' }), nome);
-    return fetch(base + '/profile/foto', { method: 'POST', headers: { Cookie: cookie, Accept: 'application/json', 'x-skip-csrf': 'true' }, body: form });
+    return fetch(base + '/profile/foto', { method: 'POST', headers: { Cookie: cookie, Accept: 'application/json', 'X-CSRF-Token': csrfToken }, body: form });
   };
 
   const primeiraResposta = await enviarFoto('anterior.png');
@@ -222,12 +265,13 @@ test('NOA respeita vagas com dois alunos concorrentes e cancela inscrição', as
   const response = await request('/admin/aulas-grade', 'POST', { disciplina: 'Oficina NOA', professorId: professor.id, salaId: 'sala-1', turma: 'TI-A', semestre, diaSemana: 'sabado', horarioInicio: '16:00', horarioFim: '17:00', isNoa: true, vagasTotal: 1, ativa: true });
   expect(response.status).toBe(201);
   const id = (await response.json() as any).record.id;
-  await login(aluno.email); const cookie1 = cookie;
-  await login('outro@example.com'); const cookie2 = cookie;
-  const enroll = (value: string) => fetch(base + '/noa/' + id + '/inscrever', { method: 'POST', headers: { Cookie: value, Accept: 'application/json', 'Content-Type': 'application/json', 'x-skip-csrf': 'true' }, body: '{}' });
-  const results = await Promise.all([enroll(cookie1), enroll(cookie2)]);
+  await login(aluno.email); const cookie1 = cookie; const token1 = csrfToken;
+  await login('outro@example.com'); const cookie2 = cookie; const token2 = csrfToken;
+  const enroll = (valCookie: string, valToken: string) => fetch(base + '/noa/' + id + '/inscrever', { method: 'POST', headers: { Cookie: valCookie, Accept: 'application/json', 'Content-Type': 'application/json', 'X-CSRF-Token': valToken }, body: '{}' });
+  const results = await Promise.all([enroll(cookie1, token1), enroll(cookie2, token2)]);
   expect(results.map(r => r.status).sort()).toEqual([201, 409]);
   cookie = results[0]!.status === 201 ? cookie1 : cookie2;
+  csrfToken = results[0]!.status === 201 ? token1 : token2;
   expect((await request('/noa/' + id + '/inscrever', 'POST', {})).status).toBe(409);
   expect((await request('/noa/' + id + '/cancelar', 'POST', {})).status).toBe(200);
   expect(JSON.parse(await fs.readFile(path.join(directory, 'inscricoes-noa.json'), 'utf8'))).toHaveLength(0);

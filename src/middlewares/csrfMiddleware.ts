@@ -23,11 +23,6 @@ export function csrfMiddleware(req: Request, res: Response, next: NextFunction):
   const token = req.session.csrfToken;
   res.locals.csrfToken = token;
 
-  // Permitir bypass explícito em testes unitários automatizados via cabeçalho de teste
-  if (req.headers['x-skip-csrf'] === 'true') {
-    return next();
-  }
-
   // Métodos seguros (idempotentes/leitura) recebem o cookie XSRF-TOKEN e são liberados
   const safeMethods = ['GET', 'HEAD', 'OPTIONS'];
   if (safeMethods.includes(req.method)) {
@@ -51,7 +46,8 @@ export function csrfMiddleware(req: Request, res: Response, next: NextFunction):
 
   // Na rota de login inicial não autenticada, aceita com validação se enviado
   const isAuthLoginRoute = req.path === '/auth/login' || req.path === '/login';
-  const hasUserSession = Boolean(req.session.usuario);
+  const hasUserSession = Boolean(req.session?.usuario);
+  const hasCookieHeader = Boolean(req.headers.cookie);
 
   if (isAuthLoginRoute && !hasUserSession) {
     if (receivedToken && receivedToken !== token) {
@@ -60,7 +56,17 @@ export function csrfMiddleware(req: Request, res: Response, next: NextFunction):
     return next();
   }
 
-  // Para todas as operações autenticadas ou com mutação de estado: token é obrigatório
+  // Se o cliente não enviou nenhum cookie de sessão e não está autenticado,
+  // não há credenciais ambientais em jogo para CSRF; os middlewares de autenticação
+  // responderão 401 apropriadamente nas rotas protegidas.
+  if (!hasCookieHeader && !hasUserSession) {
+    if (receivedToken && receivedToken !== token) {
+      return rejectCsrf(req, res);
+    }
+    return next();
+  }
+
+  // Para todas as operações autenticadas ou onde há sessão/cookies: token é obrigatório
   if (!receivedToken || receivedToken !== token) {
     return rejectCsrf(req, res);
   }

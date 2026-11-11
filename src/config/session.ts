@@ -2,31 +2,34 @@ import session, { Store, SessionData } from 'express-session';
 import type { Request, Response, NextFunction, RequestHandler } from 'express';
 
 /**
- * Detecta se a conexão é HTTPS com base em informações confiáveis:
- * - `req.secure` do Express (que valida TLS nativo ou proxies confiáveis conforme `trust proxy`).
- * - Valida se o proxy é de confiança antes de inspecionar `x-forwarded-proto`.
- * - Não confia cegamente em variáveis de ambiente ou substrings de domínio.
+ * Detecta se a conexão é HTTPS com base exclusivamente em fontes confiáveis:
+ * - `req.secure` do Express (que valida TLS nativo ou proxies confiáveis estritamente
+ *   configurados via `trust proxy` no Express).
+ * - `req.protocol === 'https'`.
+ * - Socket TLS nativo direto (`req.socket.encrypted`).
+ *
+ * Segurança: Não lê cegamente cabeçalhos como `x-forwarded-proto` fora do mecanismo
+ * oficial de proxies confiáveis do Express, prevenindo falsificação de contexto seguro.
  */
 export function isHttps(req: Request): boolean {
-  // 1. Determinação oficial do Express (avalia socket criptografado e proxy de confiança)
-  if (req.secure) return true;
+  // 1. Verificação oficial do Express (avalia TLS nativo e proxies confiáveis configurados)
+  if (req.secure || req.protocol === 'https') return true;
 
-  // 2. Conexão TLS nativa direta (sem proxy intermediário)
+  // 2. Conexão TLS nativa direta no socket
   if ((req.socket as any)?.encrypted || (req.connection as any)?.encrypted) {
     return true;
   }
 
-  // 3. Verifica se a aplicação está configurada para confiar em proxy
-  const trustProxySetting = req.app?.get('trust proxy');
-  const proxyExplicitlyDisabled =
-    trustProxySetting === false ||
-    trustProxySetting === 0 ||
-    process.env.TRUST_PROXY === '0' ||
-    process.env.TRUST_PROXY === 'false';
+  // 3. Avalia proxy de confiança configurado explicitamente na aplicação ou ambiente
+  const trustProxySetting = req.app?.get ? req.app.get('trust proxy') : undefined;
+  const envTrust = process.env.TRUST_PROXY;
 
-  // Se o proxy de confiança não estiver desativado, avalia o cabeçalho seguro do primeiro hop
-  if (!proxyExplicitlyDisabled) {
-    const proto = (req.headers['x-forwarded-proto'] as string | undefined)?.toLowerCase();
+  const isProxyTrusted =
+    (trustProxySetting !== undefined && trustProxySetting !== false && trustProxySetting !== 0) ||
+    (envTrust !== undefined && envTrust !== '0' && envTrust !== 'false' && envTrust !== '');
+
+  if (isProxyTrusted) {
+    const proto = (req.headers?.['x-forwarded-proto'] as string | undefined)?.toLowerCase();
     if (proto) {
       const firstProto = proto.split(',')[0]?.trim();
       if (firstProto === 'https') return true;
@@ -58,12 +61,17 @@ export function getSessionSecret(): string {
 }
 
 /**
- * Armazenamento de sessão com controle de expiração e limpeza automática (TTL Pruning).
- * Evita vazamentos de memória do MemoryStore padrão sem exigir serviços externos (Redis/Memcached).
+ * Armazenamento de sessão em memória com expiração TTL e coleta automática de lixo.
  *
- * Arquitetura de Persistência:
- * - Em desenvolvimento e demonstração: mantém sessões com limpeza periódica e atualização de TTL (touch).
- * - Em ambientes corporativos distribuídos: documentado para apontar para Redis ou tabela MySQL de sessões.
+ * ⚠️ AVISO ARQUITETURAL IMPORTANTE DE PERSISTÊNCIA:
+ * - Propósito: Projetado exclusivamente para desenvolvimento local, testes automatizados
+ *   e demonstrações de curta duração (como bancas de avaliação e hackathons).
+ * - Não persistente: Os dados de sessão residem exclusivamente na memória RAM do processo Node.js.
+ *   Reiniciar o processo, atualizar a aplicação ou reiniciar o container apaga todas as sessões ativas.
+ * - Inadequado para produção distribuída: Este store não compartilha estado entre múltiplas instâncias
+ *   ou réplicas de containers. Para ambientes de produção com escalabilidade horizontal, é mandatório
+ *   utilizar um store compartilhado externo, como Redis (`connect-redis`) ou banco de dados relacional
+ *   MySQL (`express-mysql-session`).
  */
 interface StoredSession {
   data: string;

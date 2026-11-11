@@ -14,18 +14,28 @@ export function errorMiddleware(
 
   if (res.headersSent) return;
 
-  const status =
+  const isMulterSize = (err as any)?.code === 'LIMIT_FILE_SIZE';
+  const isTipoInvalido = err?.message === 'TIPO_INVALIDO';
+
+  let status =
     err instanceof HttpError
       ? err.status
-      : typeof (err as Error & { status?: number }).status === "number"
+      : typeof (err as Error & { status?: number }).status === 'number'
         ? (err as Error & { status: number }).status
         : 500;
 
+  if (isMulterSize) status = 413;
+  if (isTipoInvalido) status = 415;
+
   const codigo = status >= 400 && status <= 599 ? status : 500;
   const mensagem =
-    codigo < 500 || codigo === 503
-      ? err.message
-      : "Erro interno do servidor. Tente novamente mais tarde.";
+    isMulterSize
+      ? 'O arquivo enviado excede o limite máximo permitido de 2 MB.'
+      : isTipoInvalido
+        ? 'Formato inválido. Envie uma imagem JPG, PNG ou WEBP.'
+        : codigo < 500 || codigo === 503
+          ? err.message
+          : 'Erro interno do servidor. Tente novamente mais tarde.';
 
   const accept = req.headers.accept ?? "";
   const contentType = req.headers["content-type"] ?? "";

@@ -280,17 +280,27 @@ describe('Sessões e Autenticação (SenacManager v23)', () => {
       });
       const cookie = loginRes.headers.get('set-cookie')!.split(';')[0]!;
 
-      // 2. Confirma que a sessão é válida no dashboard
+      // 2. Confirma que a sessão é válida no dashboard e extrai o token CSRF
       const dashBefore = await fetch(base + '/dashboard', {
         headers: { Cookie: cookie },
       });
       expect(dashBefore.status).toBe(200);
 
-      // 3. Faz logout via POST /auth/logout
+      const setCookies = typeof (dashBefore.headers as any).getSetCookie === 'function'
+        ? (dashBefore.headers as any).getSetCookie()
+        : [dashBefore.headers.get('set-cookie') || ''];
+      let xsrfToken = '';
+      for (const sc of setCookies) {
+        if (sc.startsWith('XSRF-TOKEN=')) {
+          xsrfToken = decodeURIComponent(sc.split(';')[0].slice('XSRF-TOKEN='.length));
+        }
+      }
+
+      // 3. Faz logout via POST /auth/logout utilizando token CSRF válido
       const logoutRes = await fetch(base + '/auth/logout', {
         method: 'POST',
         redirect: 'manual',
-        headers: { Cookie: cookie, 'x-skip-csrf': 'true' },
+        headers: { Cookie: cookie, 'X-CSRF-Token': xsrfToken },
       });
       expect(logoutRes.status).toBe(302);
       expect(logoutRes.headers.get('location')).toBe('/login');

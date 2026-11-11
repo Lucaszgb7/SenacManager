@@ -118,4 +118,27 @@ describe('Segurança — Proteção CSRF (Cross-Site Request Forgery)', () => {
 
     expect(logoutRes.status).toBe(302);
   });
+
+  it('deve rejeitar e ignorar completamente tentativa de bypass via cabeçalho x-skip-csrf', async () => {
+    // 1. Obtém sessão
+    const getRes = await fetch(`${base}/login`);
+    const cookie = getRes.headers.get('set-cookie')!.split(';')[0]!;
+
+    // 2. Tenta fazer mutação com x-skip-csrf sem enviar token CSRF válido
+    const postRes = await fetch(`${base}/profile`, {
+      method: 'PUT',
+      headers: {
+        Cookie: cookie,
+        'Content-Type': 'application/json',
+        Accept: 'application/json',
+        'x-skip-csrf': 'true',
+      },
+      body: JSON.stringify({ nome: 'Tentativa Bypass' }),
+    });
+
+    expect(postRes.status).toBe(403);
+    const body = await postRes.json() as any;
+    expect(body.success).toBe(false);
+    expect(body.message).toContain('Token CSRF');
+  });
 });

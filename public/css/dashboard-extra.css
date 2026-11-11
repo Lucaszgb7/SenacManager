@@ -74,6 +74,15 @@
   justify-content: center;
 }
 
+.welcome-banner__mascot-img {
+  width: 95px;
+  height: 95px;
+  aspect-ratio: 1 / 1;
+  object-fit: contain;
+  filter: drop-shadow(0 4px 10px rgba(6, 73, 184, 0.08));
+  display: block;
+}
+
 /* ---------- 2. Grid de Métricas / KPIs ---------- */
 .metric-grid {
   display: grid;

@@ -5,18 +5,24 @@
 <body class="login-page">
   <div class="login-wrapper">
 
-    <!-- LADO ESQUERDO: Apresentação e Identidade Visual (Inspirado no PDF) -->
+    <!-- LADO ESQUERDO: Apresentação e Identidade Visual com Ilustração Original -->
     <aside class="login-hero">
       <div class="login-hero__content">
         <!-- Badge institucional -->
         <div class="login-hero__brand">
           <div class="login-hero__logo-box">
-            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
-              <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
-            </svg>
+            <img
+              src="/images/senac-mascote-transparent.png"
+              alt=""
+              class="login-hero__brand-mascot"
+              width="32"
+              height="32"
+            />
           </div>
-          <span class="login-hero__brand-name">SENAC<span>MANAGER</span></span>
+          <div class="login-hero__brand-info">
+            <span class="login-hero__brand-name">SENAC<span>MANAGER</span></span>
+            <span class="login-hero__brand-tag">Gestão Acadêmica Integrada</span>
+          </div>
         </div>
 
         <h1 class="login-hero__title">
@@ -27,100 +33,22 @@
           Uma plataforma intuitiva para simplificar a rotina acadêmica: organize salas, consulte a grade vigente e acesse atividades escolares em um só lugar.
         </p>
 
-        <!-- Ilustração SVG em estilo traço à mão livre do PDF -->
-        <div class="login-hero__illustration" aria-hidden="true">
-          <svg viewBox="0 0 460 320" fill="none" xmlns="http://www.w3.org/2000/svg" class="doodle-illustration">
-            <!-- Círculo azul de fundo (como nos slides 4, 7 e 8) -->
-            <circle cx="280" cy="180" r="100" fill="#EAF2FF" />
-            <circle cx="340" cy="220" r="45" fill="#0649B8" />
-
-            <!-- Grade de quadros / cards flutuantes (como no slide 1) -->
-            <rect x="22" y="32" width="76" height="52" rx="8" fill="#FFFFFF" stroke="#211D1D" stroke-width="2.5" stroke-dasharray="4 4" />
-            <circle cx="44" cy="58" r="4" fill="#0649B8" />
-            <line x1="56" y1="58" x2="84" y2="58" stroke="#211D1D" stroke-width="2.5" stroke-linecap="round" />
-
-            <rect x="110" y="20" width="80" height="54" rx="8" fill="#FFFFFF" stroke="#211D1D" stroke-width="2.5" />
-            <circle cx="130" cy="46" r="3" fill="#211D1D" />
-            <circle cx="142" cy="46" r="3" fill="#211D1D" />
-            <circle cx="154" cy="46" r="3" fill="#0649B8" />
-
-            <!-- Lâmpada de ideia com traços pretos e amarelo vibrante (como nos slides 3 e 5) -->
-            <g transform="translate(195, 30)">
-              <!-- Brilho amarelo -->
-              <circle cx="32" cy="32" r="26" fill="#FFD84D" opacity="0.95" />
-              <!-- Traços da lâmpada -->
-              <path d="M22 42C17 38 14 31 14 24C14 14 22 6 32 6C42 6 50 14 50 24C50 31 47 38 42 42V48H22V42Z" fill="#FFFFFF" stroke="#211D1D" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />
-              <path d="M24 48H40V52C40 54 38 56 36 56H28C26 56 24 54 24 52V48Z" fill="#211D1D" />
-              <!-- Filamento -->
-              <path d="M28 26L32 20L36 26" stroke="#211D1D" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
-              <!-- Raios de luz desenhados à mão -->
-              <line x1="32" y1="-4" x2="32" y2="1" stroke="#211D1D" stroke-width="3" stroke-linecap="round" />
-              <line x1="52" y1="4" x2="48" y2="9" stroke="#211D1D" stroke-width="3" stroke-linecap="round" />
-              <line x1="62" y1="24" x2="56" y2="24" stroke="#211D1D" stroke-width="3" stroke-linecap="round" />
-              <line x1="12" y1="4" x2="16" y2="9" stroke="#211D1D" stroke-width="3" stroke-linecap="round" />
-              <line x1="2" y1="24" x2="8" y2="24" stroke="#211D1D" stroke-width="3" stroke-linecap="round" />
-            </g>
-
-            <!-- Personagem 1: Estudante desenhado à mão apontando para a lâmpada (slides 3 e 5) -->
-            <g transform="translate(40, 110)">
-              <!-- Cabeça -->
-              <circle cx="70" cy="50" r="34" fill="#FFFFFF" stroke="#211D1D" stroke-width="3.5" />
-              <!-- Olhos e sorriso simples -->
-              <circle cx="62" cy="44" r="3.5" fill="#211D1D" />
-              <circle cx="76" cy="44" r="3.5" fill="#211D1D" />
-              <path d="M60 56C64 61 74 61 78 56" stroke="#211D1D" stroke-width="3" stroke-linecap="round" />
-              <!-- Cabelo / mecha simples -->
-              <path d="M50 30C58 20 78 18 88 28" stroke="#211D1D" stroke-width="3" stroke-linecap="round" />
-
-              <!-- Braço apontando para cima -->
-              <path d="M96 86C108 80 120 60 126 36L130 18" stroke="#211D1D" stroke-width="4.5" stroke-linecap="round" />
-              <!-- Dedo indicador levantado -->
-              <path d="M130 18C132 10 138 12 138 18L136 30" stroke="#211D1D" stroke-width="3.5" stroke-linecap="round" />
-
-              <!-- Corpo / ombros -->
-              <path d="M42 98C46 80 62 76 74 76C86 76 102 82 106 98L114 170H32L42 98Z" fill="#FFFFFF" stroke="#211D1D" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" />
-              <!-- Detalhe da gola -->
-              <path d="M66 76L74 90L82 76" stroke="#211D1D" stroke-width="3" stroke-linecap="round" />
-            </g>
-
-            <!-- Personagem 2: Estudante lendo livro aberto (slide 4) -->
-            <g transform="translate(220, 140)">
-              <!-- Cabeça -->
-              <circle cx="85" cy="40" r="30" fill="#FFFFFF" stroke="#211D1D" stroke-width="3.5" />
-              <!-- Olhos atentos para o livro e sorriso -->
-              <circle cx="78" cy="38" r="3" fill="#211D1D" />
-              <circle cx="92" cy="38" r="3" fill="#211D1D" />
-              <path d="M80 50C84 53 90 53 94 50" stroke="#211D1D" stroke-width="2.8" stroke-linecap="round" />
-              <!-- Cabelo -->
-              <path d="M64 26C74 12 96 14 104 28" stroke="#211D1D" stroke-width="3" stroke-linecap="round" />
-
-              <!-- Braços segurando o livro -->
-              <path d="M50 96L24 106" stroke="#211D1D" stroke-width="4" stroke-linecap="round" />
-              <path d="M110 96L126 106" stroke="#211D1D" stroke-width="4" stroke-linecap="round" />
-
-              <!-- Livro aberto em perspectiva (traço à mão livre) -->
-              <g transform="translate(14, 95)">
-                <!-- Páginas do livro -->
-                <path d="M10 16C36 8 58 12 68 24C78 12 100 8 126 16L120 56C96 48 76 52 68 62C60 52 40 48 16 56L10 16Z" fill="#FFFFFF" stroke="#211D1D" stroke-width="3" stroke-linejoin="round" />
-                <line x1="68" y1="24" x2="68" y2="62" stroke="#211D1D" stroke-width="2.5" />
-                <!-- Linhas de texto nas páginas -->
-                <line x1="24" y1="28" x2="54" y2="24" stroke="#0649B8" stroke-width="2" stroke-linecap="round" />
-                <line x1="22" y1="36" x2="56" y2="32" stroke="#211D1D" stroke-width="2" stroke-linecap="round" />
-                <line x1="82" y1="24" x2="112" y2="28" stroke="#0649B8" stroke-width="2" stroke-linecap="round" />
-                <line x1="80" y1="32" x2="114" y2="36" stroke="#211D1D" stroke-width="2" stroke-linecap="round" />
-              </g>
-
-              <!-- Corpo do estudante lendo -->
-              <path d="M60 76C68 68 96 68 104 76L116 140H48L60 76Z" fill="#FFFFFF" stroke="#211D1D" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" />
-            </g>
-
-            <!-- Pilha de cadernos / livros embaixo com toque amarelo (slide 8) -->
-            <g transform="translate(320, 240)">
-              <rect x="0" y="16" width="90" height="16" rx="4" fill="#FFFFFF" stroke="#211D1D" stroke-width="2.5" />
-              <rect x="10" y="0" width="86" height="16" rx="4" fill="#FFD84D" stroke="#211D1D" stroke-width="2.5" />
-              <rect x="4" y="-16" width="84" height="16" rx="4" fill="#0649B8" stroke="#211D1D" stroke-width="2.5" />
-            </g>
-          </svg>
+        <!-- Destaque da Ilustração Original do Estudante Lendo -->
+        <div class="login-hero__mascot-stage">
+          <div class="login-hero__mascot-card">
+            <div class="login-hero__mascot-glow" aria-hidden="true"></div>
+            <img
+              src="/images/senac-mascote-transparent.png"
+              alt="Ilustração de estudante lendo livro — mascote SenacManager"
+              class="login-hero__mascot-img"
+              width="240"
+              height="240"
+            />
+            <div class="login-hero__mascot-caption">
+              <strong class="mascot-title">SenacManager</strong>
+              <p class="mascot-tagline">Conhecimento em movimento e gestão acadêmica organizada</p>
+            </div>
+          </div>
         </div>
 
         <!-- Pilares rápidos / Badges -->
@@ -144,6 +72,23 @@
     <!-- LADO DIREITO: Formulário de Autenticação -->
     <main class="login-main">
       <section class="login-card">
+
+        <!-- Cabeçalho Mobile Compacto com Ilustração (exibido apenas em telas menores) -->
+        <div class="login-mobile-mascot" aria-hidden="true">
+          <div class="login-mobile-mascot__avatar">
+            <img
+              src="/images/senac-mascote-transparent.png"
+              alt=""
+              class="login-mobile-mascot__img"
+              width="50"
+              height="50"
+            />
+          </div>
+          <div class="login-mobile-mascot__info">
+            <div class="login-mobile-mascot__name">SENAC<span>MANAGER</span></div>
+            <div class="login-mobile-mascot__phrase">Gestão acadêmica simplificada</div>
+          </div>
+        </div>
 
         <!-- Cabeçalho do Card -->
         <header class="login-card__header">
